@@ -6,3 +6,10 @@ export type Edge = {
   targetNode: string
   disable?: boolean
 }
+
+
+
+export type EdgeWrapperProps = {
+  onClick?: (evt: MouseEvent, edge: Edge) => void
+  
+}

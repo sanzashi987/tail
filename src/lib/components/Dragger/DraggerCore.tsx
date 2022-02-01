@@ -4,7 +4,7 @@ import type { DraggerCoreBasic } from './utils/types';
 import { addUserSelectStyles, removeUserSelectStyles } from './utils/domFns';
 
 const options = { capture: true, passive: false };
-class DraggerCore<T extends DraggerCoreBasic = DraggerCoreBasic> extends Component<T> {
+class DraggerCore<T extends DraggerCoreBasic = DraggerCoreBasic, S = any> extends Component<T, S> {
   dragging = false;
 
   _onMouseDown = (e: React.MouseEvent) => {
@@ -19,15 +19,16 @@ class DraggerCore<T extends DraggerCoreBasic = DraggerCoreBasic> extends Compone
   };
 
   onDrag = (e: MouseEvent) => {
+    if (!this.dragging) return;
     this._onMouseMove(e);
   };
 
   onDragEnd = (e: MouseEvent) => {
+    if (!this.dragging) return;
     this._onMouseUp(e);
   };
 
   _onMouseMove = (e: MouseEvent) => {
-    if (!this.dragging) return;
     return this.getEventCoordinate(e);
   };
 
@@ -42,7 +43,6 @@ class DraggerCore<T extends DraggerCoreBasic = DraggerCoreBasic> extends Compone
   }
 
   _onMouseUp = (e: MouseEvent) => {
-    if (!this.dragging) return;
     this.dragging = false;
     removeUserSelectStyles(document);
     document.removeEventListener('mousemove', this.onDrag, options);

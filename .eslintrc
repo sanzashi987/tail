@@ -1,0 +1,84 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "react-hooks",
+    "import"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "prettier/@typescript-eslint"
+  ],
+  "settings": {
+    "react": {
+      "version": "17.0"
+    }
+  },
+  "env": {
+    "browser": true,
+    "jest": true,
+    "es6": true,
+    "node": true
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "jsx": true,
+      "modules": true
+    }
+  },
+  "rules": {
+    "@typescript-eslint/no-var-requires": 0,
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-object-literal-type-assertion": 0,
+    "@typescript-eslint/no-non-null-assertion": 0,
+    "@typescript-eslint/no-use-before-define": 0,
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "react/jsx-indent-props": 0,
+    "react/jsx-uses-react": 1,
+    "react/prop-types": 0,
+    "semi": [
+      2,
+      "always"
+    ],
+    "import/no-self-import": [
+      2
+    ],
+    "import/no-cycle": [
+      2
+    ],
+    "import/no-duplicates": [
+      2
+    ],
+    "import/newline-after-import": [
+      2
+    ],
+    "import/order": [
+      "error",
+      {
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "external",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": [
+          "builtin"
+        ],
+        "groups": [
+          "external",
+          "builtin",
+          "internal",
+          "sibling",
+          "parent"
+        ]
+      }
+    ]
+  }
+}

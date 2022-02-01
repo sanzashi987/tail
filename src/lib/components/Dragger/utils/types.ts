@@ -1,3 +1,10 @@
+export type DraggerIterState = {
+  x: number,
+  y: number,
+  lastX: number,
+  lastY: number
+}
+
 export type coordinates = {
   x: number;
   y: number;

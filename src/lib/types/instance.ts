@@ -10,3 +10,4 @@ type SelectedNode = SelectedItem<'node'>
 type SelectedEdge = SelectedItem<'edge'>
 
 export type SelectedItemCollection = IObject<SelectedNode> | IObject<SelectedEdge>
+
