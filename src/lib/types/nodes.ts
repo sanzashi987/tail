@@ -43,6 +43,7 @@ export type NodeRendererProps = {
 export type NodeProps<T = {}> = {
   config: Node
   selected: boolean
+  selectedHandles: string[]
 } & T
 
 

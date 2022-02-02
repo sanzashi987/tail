@@ -11,5 +11,10 @@ export type Edge = {
 
 export type EdgeWrapperProps = {
   onClick?: (evt: MouseEvent, edge: Edge) => void
-  
+}
+
+
+
+export type EdgeRendererProps = {
+  edges: Edge[]
 }

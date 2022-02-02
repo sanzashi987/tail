@@ -1,14 +1,16 @@
-import { Component } from "react";
+import { Component, createRef } from "react";
 import NodeRenderer from "../NodeRenderer";
 import EdgeRenderer from "../EdgeRenderer";
 import InfiniteViewer from "../InfiniteViewer";
-import type { NodeEdgeMap } from "../../types/instance";
+
 
 class TailRenderer extends Component {
-  nodeToEdge: NodeEdgeMap = new Map()
+
+  edgeRendererRef = createRef<EdgeRenderer>()
+
 
   getEdgesFromNodeId = (node: string) => {
-    return this.nodeToEdge.get(node)
+    return this.edgeRendererRef.current?.nodeToEdge.get(node)
   }
 
   findUnreachableItems = () => {
@@ -18,7 +20,7 @@ class TailRenderer extends Component {
   render() {
     return <InfiniteViewer>
       <NodeRenderer />
-      <EdgeRenderer />
+      <EdgeRenderer ref={this.edgeRendererRef} />
     </InfiniteViewer>
   }
 }

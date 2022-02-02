@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
-
-
-type EdgeRendererProps = {
-
-}
+import { NodeEdgeMap } from '../../types/instance';
+import type  { EdgeRendererProps } from '../../types/edges'
 
 
 
 class EdgeRenderer extends Component<EdgeRendererProps> {
+  nodeToEdge: NodeEdgeMap = new Map()
 
+  componentDidMount() {
 
-
+  }
 
 
   render() {
