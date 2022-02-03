@@ -10,6 +10,11 @@ export type coordinates = {
   y: number;
 };
 
+export type rect = {
+  width: number
+  height: number
+}
+
 export type DraggerCoreBasic = {
   disable?: boolean;
   nodeRef?: React.RefObject<HTMLDivElement>;

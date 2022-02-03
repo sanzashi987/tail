@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { getCoordinatesFromParent } from './utils/calc';
-import type { DraggerCoreBasic } from './utils/types';
+import type { DraggerCoreBasic } from '../../types/dragger';
 import { addUserSelectStyles, removeUserSelectStyles } from './utils/domFns';
 
 const options = { capture: true, passive: false };

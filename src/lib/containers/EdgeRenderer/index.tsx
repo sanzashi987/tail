@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { NodeEdgeMap } from '../../types/instance';
-import type  { EdgeRendererProps } from '../../types/edges'
+import type { EdgeRendererProps, NodeEdgeMap, Edge } from '../../types'
 
 
 
@@ -8,6 +7,10 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
   nodeToEdge: NodeEdgeMap = new Map()
 
   componentDidMount() {
+
+  }
+
+  parseEdges(edge: Edge[]) {
 
   }
 

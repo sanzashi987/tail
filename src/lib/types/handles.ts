@@ -1,3 +1,6 @@
+import { rect } from "."
+import { coordinates } from "./dragger"
+
 type HandleType = 'target' | 'source'
 
 export type HandleProps = {
@@ -15,5 +18,10 @@ export enum HandlePosition {
   Top = 'top',
   Right = 'right',
   Bottom = 'bottom',
+}
+
+
+export interface HandleElement extends coordinates, rect {
+  id: string,
 }
 

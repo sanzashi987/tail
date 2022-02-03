@@ -1,21 +1,59 @@
-import React, { Component } from 'react';
-import { NodeWrapper } from '../../components/Node';
-import type { NodeRendererProps } from '../../types';
+import React, { Component, ComponentType } from 'react';
+import { NodeWrapper, BasicNode, BasicFoldedNode } from '../../components/Node';
+import type { FoldedNodeProps, Node, NodeRendererProps, TemplateNodeClass } from '../../types';
 
-class NodeRenderer extends Component<NodeRendererProps> {
+const defaultProps = {
+  templateIdentifier: (node: Node) => node.type,
+  templates: {}
+} as const
+
+const defaultTemplate: TemplateNodeClass = {
+  default: BasicNode,
+  folded: BasicFoldedNode as unknown as ComponentType<FoldedNodeProps>
+}
+
+const defaultTemplates = { 'logical': defaultTemplate }
+
+type NodeRendererPropsWithDefaults = NodeRendererProps & typeof defaultProps
+
+
+
+function createMemoTemplates() {
+  let lastTemplates: IObject<TemplateNodeClass>, lastRes: IObject<TemplateNodeClass>
+  return function (templates: IObject<TemplateNodeClass>) {
+    if (templates !== lastTemplates) {
+      lastTemplates = templates
+      lastRes = { ...defaultTemplates, ...templates }
+    }
+    return lastRes
+  }
+}
+
+const mergeTemplatesWithDefault = createMemoTemplates()
+class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
+  
+  static defaultProps = defaultProps
+
 
   render() {
-    const { nodes, nodeClass, ...otherProps } = this.props
+    const { nodes, templates, templateIdentifier, ...otherProps } = this.props
+
+    const fullTemplates = mergeTemplatesWithDefault(templates)
     return <div
       className="tail-node-container"
     >
-      {nodes.map(node => {
-        return <NodeWrapper
-          config={node}
-          nodeClass={nodeClass}
+      {nodes.reduce<React.ReactNode[]>((prev, node) => {
+        const type = templateIdentifier(node)
+        if (!type || !fullTemplates[type]) return prev
+        const { default: template, folded: templateFolded } = fullTemplates[type]
+        prev.push(<NodeWrapper
+          node={node}
+          template={template}
+          templateFolded={templateFolded}
           {...otherProps}
-        />
-      })}
+        />)
+        return prev
+      }, [])}
     </div>
   }
 }

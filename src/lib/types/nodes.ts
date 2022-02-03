@@ -1,5 +1,6 @@
 import type { ComponentType } from "react"
-import type { coordinates } from "../components/Dragger/utils/types"
+import { HandleElement } from "."
+import type { coordinates } from "./dragger"
 
 export type Node<T = {}> = {
   id: string
@@ -7,6 +8,7 @@ export type Node<T = {}> = {
   top: number
   fold?: boolean
   disable?: boolean
+  type: string
 } & T
 
 
@@ -21,34 +23,54 @@ export type DraggerCallbacks = {
   onDragEnd?: (e: MouseEvent, c: coordinates) => boolean | void
 }
 
+export type TemplateNodeClass = {
+  default: ComponentType<NodeProps>
+  folded: ComponentType<FoldedNodeProps>
+}
+
+
+export type NodeRendererProps = {
+  nodes: Node[],
+  templates?: IObject<TemplateNodeClass>
+  templateIdentifier?: (node: Node) => string
+} & Omit<NodeWrapperProps, 'node' | 'template' | 'templateFolded'>
+
+
 export type NodeWrapperProps<T = NodeMouseCallback> = {
   backgroundColor?: string
-  config: Node
+  node: Node
   selected: boolean
-  nodeClass: ComponentType<NodeProps>
+  template: TemplateNodeClass['default'],
+  templateFolded: TemplateNodeClass['folded']
   onClick?: T
+  registerNodeEl(): void
+  updateNodeEl(): void
+  delistNodeEl(): void
   // onMouseEnter?: T
   // onMouseLeave?: T
   // onContextMenu?: T
 } & {
-    [key in keyof DraggerCallbacks]: (e: MouseEventCollection, n: Node, c: coordinates) => boolean | void
+    [key in keyof DraggerCallbacks]?: (e: MouseEventCollection, n: Node, c: coordinates) => boolean | void
   }
 
-export type NodeRendererProps = {
-  nodes: Node[]
-} & Omit<NodeWrapperProps, 'config'>
-
-
-
 export type NodeProps<T = {}> = {
-  config: Node
+  node: Node
   selected: boolean
   selectedHandles: string[]
 } & T
 
 
-export type FoldedNodeProps<T> = {
-  config: Node<T>,
+export type FoldedNodeProps<T = {}> = {
+  node: Node<T>,
   sourceFold: boolean
   targetFold: boolean
 }
+
+
+export type NodeInternalInfo = { //
+  handles: {
+    source: HandleElement[]
+    target: HandleElement[]
+  }
+}
+export type MountedNodes = Map<string, NodeInternalInfo>

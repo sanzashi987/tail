@@ -1,12 +1,13 @@
 import React, { Component, createRef, CSSProperties } from 'react';
 import type { NodeWrapperProps } from '../../types';
-import type { coordinates } from '../Dragger/utils/types';
+import type { coordinates } from '../../types/dragger';
 import Dragger from './Dragger'
 
 function createStyleMemo() {
   let lastX = NaN, lastY = NaN, lastRes: CSSProperties = {}
   return function (x: number, y: number) {
     if (x !== lastX || lastY !== y) {
+      [lastX, lastY] = [x, y]
       lastRes = {
         transform: `translate(${x}px,${y}px)`
       }
@@ -30,22 +31,22 @@ class NodeWrapper extends Component<NodeWrapperProps, NodeWrapperState> {
 
   constructor(props: NodeWrapperProps) {
     super(props)
-    const { left, top } = props.config
+    const { left, top } = props.node
     this.state = { x: left, y: top }
     this.getStyle = createStyleMemo()
   }
 
 
   onDragStart = (e: React.MouseEvent, c: coordinates) => {
-    return this.props.onDragStart?.(e, this.props.config, c)
+    return this.props.onDragStart?.(e, this.props.node, c)
   }
   onDrag = (e: MouseEvent, c: coordinates) => {
     this.setState(c)
-    return this.props.onDrag?.(e, this.props.config, c)
+    return this.props.onDrag?.(e, this.props.node, c)
   }
   onDragEnd = (e: MouseEvent, c: coordinates) => {
     this.setState(c)
-    return this.props.onDragEnd?.(e, this.props.config, c)
+    return this.props.onDragEnd?.(e, this.props.node, c)
   }
 
 
@@ -59,16 +60,21 @@ class NodeWrapper extends Component<NodeWrapperProps, NodeWrapperState> {
   }
 
   componentWillUnmount() {
-    
+
+  }
+
+  getHandlesPosition() {
+
   }
 
 
 
 
   render() {
-    const { nodeClass: Node, config, selected } = this.props
+    const { template, node, selected } = this.props
     const { onDragEnd, onDrag, onDragStart } = this
     const { x, y } = this.state
+    const { fold = false } = node
     return <Dragger
       onDragStart={onDragStart}
       onDrag={onDrag}
@@ -80,10 +86,12 @@ class NodeWrapper extends Component<NodeWrapperProps, NodeWrapperState> {
         ref={this.ref}
         style={this.getStyle(x, y)}
       >
-        <Node
-          config={config}
+        {!fold ? <template.default
+          node={node}
           selected={selected}
-        />
+        /> :
+          <template.folded />
+        }
       </div>
     </Dragger>
 
