@@ -20,18 +20,18 @@ export const StateConsumer = ConnectingState.Consumer;
 
 
 
-type ConnectedPayload = {
+export type ConnectedPayload = {
   target: string
   targetNode: string
 }
 
 
-type InterfaceMethodType = (nodeId: string, handleId: string) => void
+export type InterfaceMethodType = (nodeId: string, handleId: string) => void
 
 
 
 
-export type InterfaceValue = {
+export interface InterfaceValue {
   startConnecting: InterfaceMethodType
   onConnected: InterfaceMethodType
   startReconnecting: InterfaceMethodType

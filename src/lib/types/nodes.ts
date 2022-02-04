@@ -1,6 +1,5 @@
 import type { ComponentType } from "react"
-import { HandleElement } from "."
-import type { coordinates } from "./dragger"
+import type { HandleElement, coordinates, NodeInternalMutation } from "."
 
 export type Node<T = {}> = {
   id: string
@@ -43,21 +42,18 @@ export type NodeWrapperProps<T = NodeMouseCallback> = {
   template: TemplateNodeClass['default'],
   templateFolded: TemplateNodeClass['folded']
   onClick?: T
-  registerNodeEl(): void
-  updateNodeEl(): void
-  delistNodeEl(): void
   // onMouseEnter?: T
   // onMouseLeave?: T
   // onContextMenu?: T
 } & {
     [key in keyof DraggerCallbacks]?: (e: MouseEventCollection, n: Node, c: coordinates) => boolean | void
-  }
+  } & NodeInternalMutation
 
 export type NodeProps<T = {}> = {
   node: Node
   selected: boolean
   selectedHandles: string[]
-  updateNodeInternals(): void
+  updateNodeInternal(): void
 } & T
 
 
@@ -68,10 +64,3 @@ export type FoldedNodeProps<T = {}> = {
 }
 
 
-export type NodeInternalInfo = { //
-  handles: {
-    source: HandleElement[]
-    target: HandleElement[]
-  }
-}
-export type MountedNodes = Map<string, NodeInternalInfo>

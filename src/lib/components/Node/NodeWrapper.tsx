@@ -60,7 +60,8 @@ class NodeWrapper extends Component<NodeWrapperProps, NodeWrapperState> {
   }
 
   componentWillUnmount() {
-
+    const { node: { id }, delistNodeEl } = this.props
+    delistNodeEl(id)
   }
 
   getHandlesPosition() {

@@ -10,6 +10,10 @@ export type Edge = {
 
 
 export type EdgeWrapperProps = {
+  sourceX: number
+  sourceY: number
+  targetX: number
+  targetY: number
   onClick?: (evt: MouseEvent, edge: Edge) => void
 }
 
