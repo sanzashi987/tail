@@ -6,13 +6,10 @@ import type { FoldedNodeProps } from '@types';
 
 class BasicFoldedNode<P extends FoldedNodeProps = FoldedNodeProps> extends Component<P>{
 
-  getName() {
-    return this.props.node.id
-  }
 
 
   render() {
-    const { } = this.props
+    const { id } = this.props.node
 
     return null;
   }

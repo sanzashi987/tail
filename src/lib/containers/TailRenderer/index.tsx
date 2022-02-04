@@ -2,8 +2,8 @@ import { Component, createRef } from "react";
 import NodeRenderer from "../NodeRenderer";
 import EdgeRenderer from "../EdgeRenderer";
 import InfiniteViewer from "../InfiniteViewer";
-import type { SelectedItemCollection, MountedNodes, NodeInternalInfo } from '@types'
-import { defaultState, StateProvider, InterfaceProvider, ConnectingStateValue, InterfaceValue, InterfaceMethodType } from '../../contexts/Connecting'
+import type { SelectedItemCollection, NodeInternals, NodeInternalInfo } from '@types'
+import { defaultState, StateProvider, InterfaceProvider, StateValue, InterfaceValue, InterfaceMethodType } from '@app/contexts/instance'
 
 type TailRenderState = {
   connecting: boolean
@@ -16,15 +16,15 @@ class TailRenderer extends Component<never, TailRenderState> implements Interfac
     selected: {}
   }
 
-  connectingPayload: ConnectingStateValue = defaultState
-  mountedNodes: MountedNodes = new Map()
+  contextState: StateValue = defaultState
+  nodeInternals: NodeInternals = new Map()
   edgeRendererRef = createRef<EdgeRenderer>()
   nodeRendererRef = createRef<NodeRenderer>()
 
-  connectingInterface: InterfaceValue
+  contextInterface: InterfaceValue
   constructor(props: never) {
     super(props)
-    this.connectingInterface = {
+    this.contextInterface = {
       startConnecting: this.startConnecting,
       onConnected: this.onConnected,
       startReconnecting: this.startReconnecting
@@ -41,11 +41,11 @@ class TailRenderer extends Component<never, TailRenderState> implements Interfac
   }
 
   registerNode = (id: string, node: NodeInternalInfo) => {
-    this.mountedNodes.set(id, node)
+    this.nodeInternals.set(id, node)
   }
 
   delistNode = (id: string) => {
-    this.mountedNodes.delete(id)
+    this.nodeInternals.delete(id)
   }
 
   startConnecting: InterfaceMethodType = (nodeId, handleId) => {
@@ -64,8 +64,8 @@ class TailRenderer extends Component<never, TailRenderState> implements Interfac
 
   render() {
     return <InfiniteViewer>
-      <StateProvider value={this.connectingPayload}>
-        <InterfaceProvider value={this.connectingInterface}>
+      <StateProvider value={this.contextState}>
+        <InterfaceProvider value={this.contextInterface}>
           <NodeRenderer ref={this.nodeRendererRef} />
         </InterfaceProvider>
         <EdgeRenderer

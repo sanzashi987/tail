@@ -1,5 +1,5 @@
 import React, { Component, FC } from "react";
-import { ConnectingInterface, InterfaceValue } from "../../contexts/Connecting";
+import { InstanceInterface, InterfaceValue } from "../../contexts/instance";
 import type { HandleProps } from "@types";
 import styles from './index.module.scss';
 
@@ -14,7 +14,7 @@ function getHanldeClassName(type: string, selected: boolean) {
 }
 class Handle extends Component<HandlePropsInner>{
 
-  static contextType = ConnectingInterface
+  static contextType = InstanceInterface
 
   onMouseDown = (e: React.MouseEvent) => {
     // e.stopPropagation()

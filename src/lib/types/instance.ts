@@ -14,13 +14,18 @@ type SelectedEdge = SelectedItem<'edge'>
 export type SelectedItemCollection = IObject<SelectedNode> | IObject<SelectedEdge>
 
 
+type HandleMap = {
+  [handleId: string]: HandleElement
+}
+
 export type NodeInternalInfo = { //
+  folded: boolean
   handles: {
-    source: HandleElement[]
-    target: HandleElement[]
+    source: HandleMap
+    target: HandleMap
   }
 }
-export type MountedNodes = Map<string, NodeInternalInfo>
+export type NodeInternals = Map<string, NodeInternalInfo>
 export interface NodeInternalMutation {
   registerNode(id: string, node: NodeInternalInfo): void
   delistNode(id: string): void

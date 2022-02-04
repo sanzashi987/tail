@@ -1,20 +1,22 @@
 import { createContext } from 'react';
-import type { HandleType } from '@types'
+import type { HandleType, NodeInternals } from '@types'
 
-export type ConnectingStateValue = {
+export type StateValue = {
   source: string
   sourceNode: string
+  nodeInternals: NodeInternals
 }
 
-export const defaultState: ConnectingStateValue = {
+export const defaultState: StateValue = {
   source: '',
   sourceNode: '',
+  nodeInternals: new Map()
 }
 
 
-export const ConnectingState = createContext<ConnectingStateValue>(defaultState);
-export const StateProvider = ConnectingState.Provider;
-export const StateConsumer = ConnectingState.Consumer;
+export const InstanceState = createContext<StateValue>(defaultState);
+export const StateProvider = InstanceState.Provider;
+export const StateConsumer = InstanceState.Consumer;
 
 // export default ConnectingContext;
 
@@ -43,8 +45,8 @@ const defaultInterface: InterfaceValue = {
   startReconnecting() { }
 }
 
-export const ConnectingInterface = createContext<InterfaceValue>(defaultInterface)
-export const InterfaceProvider = ConnectingInterface.Provider
-export const InterfaceConsumer = ConnectingInterface.Consumer
+export const InstanceInterface = createContext<InterfaceValue>(defaultInterface)
+export const InterfaceProvider = InstanceInterface.Provider
+export const InterfaceConsumer = InstanceInterface.Consumer
 
 

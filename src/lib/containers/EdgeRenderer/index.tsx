@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import type { EdgeRendererProps, NodeEdgeMap, Edge } from '@types'
-
+import { } from '@app/components/Edge'
 
 type EdgeRenderStates = {
 
@@ -11,18 +11,13 @@ class EdgeRenderer extends Component<EdgeRendererProps, EdgeRenderStates> {
 
   // edgeParsed:
 
-  componentDidMount() {
-
-  }
+  edgeInstances: React.ReactNode
 
   parseEdges(edge: Edge[]) {
 
   }
 
   componentDidUpdate(prevProps: EdgeRendererProps) {
-    if (prevProps.edges !== this.props.edges) {
-
-    }
 
   }
 
