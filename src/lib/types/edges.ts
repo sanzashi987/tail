@@ -17,4 +17,7 @@ export type EdgeWrapperProps = {
 
 export type EdgeRendererProps = {
   edges: Edge[]
+  connecting: boolean
 }
+
+// export type EdgeParsed = Map<string,>

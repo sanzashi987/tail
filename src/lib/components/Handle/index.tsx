@@ -1,45 +1,55 @@
-import { Component } from "react";
+import React, { Component, FC } from "react";
+import { ConnectingInterface, InterfaceValue } from "../../contexts/Connecting";
 import type { HandleProps } from "../../types/handles";
+import styles from './index.module.scss';
+
+type HandlePropsInner = HandleProps
 
 
 
-
-
-const Handle = () => {
-  return null
+function getHanldeClassName(type: string, selected: boolean) {
+  let className = `tail-handle__reserved ${styles.handle} ${type}`
+  if (selected) className += ' selected'
+  return className
 }
+class Handle extends Component<HandlePropsInner>{
 
+  static contextType = ConnectingInterface
 
-class SourceHandle extends Component<HandleProps>{
+  onMouseDown = (e: React.MouseEvent) => {
+    // e.stopPropagation()
+    const { startConnecting, startReconnecting } = this.context as InterfaceValue
+    const { type, handleId, nodeId } = this.props
+    if (type === 'source') {
+      startConnecting(nodeId, handleId)
+    } else if (type === 'target') {
+      startReconnecting(nodeId, handleId)
+    }
+
+  }
+
+  onMouseUp = (e: React.MouseEvent) => {
+    const { type, handleId, nodeId } = this.props
+    if (type === 'source') return
+    e.stopPropagation();
+    (this.context as InterfaceValue).onConnected(nodeId, handleId)
+  }
+
 
 
   render() {
-    const { id, type } = this.props
+    const { handleId, nodeId, type, selected = false } = this.props
     return <div
-      id={id}
-      className={"tail-handle " + type}
+      id={`${nodeId}.${handleId}`}
+      className={getHanldeClassName(type, selected)}
+      onMouseDown={this.onMouseDown}
+      onMouseUp={this.onMouseUp}
     >
 
     </div>
+
   }
 }
-
-
-
-class TargetHandle extends Component<HandleProps> {
-
-
-  render() {
-    const { id, type } = this.props
-    return <div
-      id={id}
-      className={"tail-handle " + type}
-    >
-
-    </div>
-  }
-}
-
 
 
 export default Handle

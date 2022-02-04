@@ -1,0 +1,13 @@
+.handle {
+  // :global {
+  width: 8px;
+  height: 8px;
+  border-radius: 8px;
+  background-color: white;
+  box-sizing: border-box;
+  
+  // }
+
+  &:global(.selected) {
+  }
+}

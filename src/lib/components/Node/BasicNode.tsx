@@ -8,6 +8,8 @@ class BasicNode extends Component<NodeProps> {
   // update when the number of handle changes
   sourceFold = true
   targetFole = true
+
+
 }
 
 

@@ -1,11 +1,13 @@
 import { rect } from "."
 import { coordinates } from "./dragger"
 
-type HandleType = 'target' | 'source'
+export type HandleType = 'target' | 'source'
 
 export type HandleProps = {
   type: HandleType
-  id: string
+  handleId: string
+  nodeId: string
+  selected?: boolean
 }
 
 export type StartHandlePayload = {

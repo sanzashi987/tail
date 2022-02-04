@@ -2,9 +2,21 @@ import { Component, createRef } from "react";
 import NodeRenderer from "../NodeRenderer";
 import EdgeRenderer from "../EdgeRenderer";
 import InfiniteViewer from "../InfiniteViewer";
-import type { MountedNodes, NodeInternalInfo } from '../../types'
+import type { SelectedItemCollection, MountedNodes, NodeInternalInfo } from '../../types'
+import { defaultState, StateProvider, InterfaceProvider, ConnectingStateValue } from '../../contexts/Connecting'
 
-class TailRenderer extends Component {
+type TailRenderState = {
+  connecting: boolean
+  selected: SelectedItemCollection
+}
+class TailRenderer extends Component<{}, TailRenderState> {
+
+  state: TailRenderState = {
+    connecting: false,
+    selected: {}
+  }
+  connectingPayload: ConnectingStateValue = defaultState
+
 
   mountedNodes: MountedNodes = new Map()
   edgeRendererRef = createRef<EdgeRenderer>()
@@ -33,8 +45,12 @@ class TailRenderer extends Component {
 
   render() {
     return <InfiniteViewer>
-      <NodeRenderer ref={this.nodeRendererRef} />
-      <EdgeRenderer ref={this.edgeRendererRef} />
+      <StateProvider value={this.connectingPayload}>
+        <InterfaceProvider>
+          <NodeRenderer ref={this.nodeRendererRef} />
+        </InterfaceProvider>
+        <EdgeRenderer ref={this.edgeRendererRef} />
+      </StateProvider>
     </InfiniteViewer>
   }
 }

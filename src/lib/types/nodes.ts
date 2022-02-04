@@ -57,6 +57,7 @@ export type NodeProps<T = {}> = {
   node: Node
   selected: boolean
   selectedHandles: string[]
+  updateNodeInternals(): void
 } & T
 
 
