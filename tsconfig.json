@@ -13,12 +13,25 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
+    "experimentalDecorators": true,
+    "downlevelIteration": true,
+    "noImplicitThis": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "declaration": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@app/*": [
+        "./src/lib/*"
+      ],
+      "@types": [
+        "./src/lib/types/index.ts"
+      ]
+    },
+    "baseUrl": "."
   },
   "include": [
     "src"

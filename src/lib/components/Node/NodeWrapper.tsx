@@ -1,6 +1,5 @@
 import React, { Component, createRef, CSSProperties } from 'react';
-import type { NodeWrapperProps } from '../../types';
-import type { coordinates } from '../../types/dragger';
+import type { NodeWrapperProps, coordinates } from '@types';
 import Dragger from './Dragger'
 
 function createStyleMemo() {

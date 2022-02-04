@@ -1,5 +1,5 @@
 import { Component } from "react";
-import type { NodeProps } from "../../types";
+import type { NodeProps } from "@types";
 
 
 

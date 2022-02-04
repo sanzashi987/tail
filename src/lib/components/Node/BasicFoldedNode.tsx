@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import type { FoldedNodeProps } from '../../types';
+import type { FoldedNodeProps } from '@types';
 
 
 

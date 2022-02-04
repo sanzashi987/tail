@@ -1,8 +1,7 @@
 import React from 'react'
 import { DraggerCore } from '../Dragger';
 import { getDraggerRelativeCoordinates } from '../Dragger/utils/calc';
-import type { NodeWrapperProps, DraggerCallbacks, Node } from '../../types';
-import type { coordinates, DraggerCoreBasic, DraggerIterState } from '../../types/dragger';
+import type { NodeWrapperProps, DraggerCallbacks, Node, coordinates, DraggerCoreBasic, DraggerIterState } from '@types';
 
 type DraggerProps = DraggerCallbacks & DraggerCoreBasic
 

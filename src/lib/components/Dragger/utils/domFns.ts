@@ -1,7 +1,6 @@
 // @flow
 import { findInArray } from '../../../utils';
-
-import type { coordinates, MouseTouchEvent } from '../../../types/dragger';
+import type { coordinates, MouseTouchEvent } from '@types';
 
 export function addEvent(el: any, event: string, handler: Function, inputOptions?: Object): void {
   if (!el) return;

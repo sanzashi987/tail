@@ -1,4 +1,4 @@
-import type { HandleElement } from '../../types'
+import type { HandleElement } from '@types'
 
 export const getHandleBounds = (nodeElement: HTMLDivElement, scale: number) => {
   const bounds = nodeElement.getBoundingClientRect();

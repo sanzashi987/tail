@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { HandleType } from '../types'
+import type { HandleType } from '@types'
 
 export type ConnectingStateValue = {
   source: string

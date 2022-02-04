@@ -1,6 +1,6 @@
 import React, { Component, ComponentType } from 'react';
 import { NodeWrapper, BasicNode, BasicFoldedNode } from '../../components/Node';
-import type { FoldedNodeProps, Node, NodeRendererProps, TemplateNodeClass } from '../../types';
+import type { FoldedNodeProps, Node, NodeRendererProps, TemplateNodeClass } from '@types';
 
 const defaultProps = {
   templateIdentifier: (node: Node) => node.type,

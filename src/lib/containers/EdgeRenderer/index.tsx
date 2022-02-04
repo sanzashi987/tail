@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import type { EdgeRendererProps, NodeEdgeMap, Edge } from '../../types'
+import type { EdgeRendererProps, NodeEdgeMap, Edge } from '@types'
 
 
 type EdgeRenderStates = {

@@ -1,5 +1,5 @@
 import type { MouseEvent as ReactMouseEvent } from 'react';
-import { coordinates, DraggerIterState } from '../../../types/dragger';
+import type { coordinates, DraggerIterState } from '@types';
 // import type ReactDragger from '../react-dragger/react-dragger';
 
 export const getCoordinatesFromParent = (

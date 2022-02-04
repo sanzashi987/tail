@@ -2,7 +2,7 @@ import { Component, createRef } from "react";
 import NodeRenderer from "../NodeRenderer";
 import EdgeRenderer from "../EdgeRenderer";
 import InfiniteViewer from "../InfiniteViewer";
-import type { SelectedItemCollection, MountedNodes, NodeInternalInfo } from '../../types'
+import type { SelectedItemCollection, MountedNodes, NodeInternalInfo } from '@types'
 import { defaultState, StateProvider, InterfaceProvider, ConnectingStateValue, InterfaceValue, InterfaceMethodType } from '../../contexts/Connecting'
 
 type TailRenderState = {
