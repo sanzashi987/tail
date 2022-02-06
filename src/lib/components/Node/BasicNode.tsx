@@ -1,7 +1,7 @@
 import { Component } from "react";
 import type { NodeProps } from "@types";
 import styles from './BasicNode.module.scss'
-import Handle from "../Handle";
+// import Handle from "../Handle";
 
 class BasicNode extends Component<NodeProps> {
   // display the source/target handle after folded
