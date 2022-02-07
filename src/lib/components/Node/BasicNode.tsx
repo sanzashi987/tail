@@ -8,7 +8,7 @@ class BasicNode extends Component<NodeProps> {
   // update when the number of handle changes
 
   render() {
-    return <div className={`tail-basic-node ${styles.node}`}>
+    return <div className={`tail-node__basic ${styles.node}`}>
       {this.props.node.id}
     </div>
   }

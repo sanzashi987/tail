@@ -1,17 +1,21 @@
 import { Component } from 'react'
 import type { FoldedNodeProps } from '@types';
+import Handle from '../Handle';
+import styles from './BasicNode.module.scss'
 
+const sourceId = 'foldedSource'
+const targetId = 'foldedTarget'
 
-
-
-class BasicFoldedNode<P extends FoldedNodeProps = FoldedNodeProps> extends Component<P>{
+class BasicFoldedNode<P extends FoldedNodeProps = FoldedNodeProps, S = {}> extends Component<P, S>{
 
 
 
   render() {
-    const { id } = this.props.node
+    const { node: { id }, hasSource, hasTarget } = this.props
+    
+    return <div className={`tail-node__folded ${styles.node}`}>
 
-    return null;
+    </div>;
   }
 }
 

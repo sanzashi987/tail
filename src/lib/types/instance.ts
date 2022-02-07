@@ -14,16 +14,18 @@ type SelectedEdge = SelectedItem<'edge'>
 export type SelectedItemCollection = IObject<SelectedNode> | IObject<SelectedEdge>
 
 
-type HandleMap = {
+export type HandleMap = {
   [handleId: string]: HandleElement
+}
+
+export type HandlesInfo = {
+  source: HandleMap
+  target: HandleMap
 }
 
 export type NodeInternalInfo = { //
   folded: boolean
-  handles: {
-    source: HandleMap
-    target: HandleMap
-  }
+  handles: HandlesInfo
 }
 export type NodeInternals = Map<string, NodeInternalInfo>
 export interface NodeInternalMutation {

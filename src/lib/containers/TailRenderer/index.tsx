@@ -2,14 +2,16 @@ import { Component, createRef } from "react";
 import NodeRenderer from "../NodeRenderer";
 import EdgeRenderer from "../EdgeRenderer";
 import InfiniteViewer from "../InfiniteViewer";
-import type { SelectedItemCollection, NodeInternals, NodeInternalInfo } from '@types'
+import type { SelectedItemCollection, NodeInternals, NodeInternalInfo, NodeInternalMutation } from '@types'
 import { defaultState, StateProvider, InterfaceProvider, StateValue, InterfaceValue, InterfaceMethodType } from '@app/contexts/instance'
 
 type TailRenderState = {
   connecting: boolean
   selected: SelectedItemCollection
 }
-class TailRenderer extends Component<never, TailRenderState> implements InterfaceValue {
+class TailRenderer
+  extends Component<never, TailRenderState>
+  implements InterfaceValue, NodeInternalMutation {
 
   state: TailRenderState = {
     connecting: false,

@@ -22,9 +22,11 @@ export type DraggerCallbacks = {
   onDragEnd?: (e: MouseEvent, c: coordinates) => boolean | void
 }
 
+export type NodeComponentType = ComponentType<NodeWrapperProps>
+
 export type TemplateNodeClass = {
-  default: ComponentType<NodeProps>
-  folded: ComponentType<FoldedNodeProps>
+  default: NodeComponentType
+  folded: NodeComponentType
 }
 
 
@@ -39,8 +41,6 @@ export type NodeWrapperProps<T = NodeMouseCallback> = {
   backgroundColor?: string
   node: Node
   selected: boolean
-  template: TemplateNodeClass['default'],
-  templateFolded: TemplateNodeClass['folded']
   onClick?: T
   // onMouseEnter?: T
   // onMouseLeave?: T
@@ -49,18 +49,17 @@ export type NodeWrapperProps<T = NodeMouseCallback> = {
     [key in keyof DraggerCallbacks]?: (e: MouseEventCollection, n: Node, c: coordinates) => boolean | void
   } & NodeInternalMutation
 
-export type NodeProps<T = {}> = {
-  node: Node
+export type NodeProps<T = {}, P = {}> = {
+  node: Node<T>
   selected: boolean
   selectedHandles: string[]
   updateNodeInternal(): void
-} & T
+} & P
 
 
-export type FoldedNodeProps<T = {}> = {
-  node: Node<T>,
-  sourceFold: boolean
-  targetFold: boolean
-}
+export type FoldedNodeProps<T = {}, P = {}> = {
+  hasSource: boolean
+  hasTarget: boolean
+} & NodeProps<T, P>
 
 

@@ -1,3 +1,3 @@
 export { default as BasicNode } from './BasicNode'
 export { default as BasicFoldedNode } from './BasicFoldedNode'
-export { default as NodeWrapper } from './NodeWrapper'
+export { default as NodeWrapper } from './wrapNode'

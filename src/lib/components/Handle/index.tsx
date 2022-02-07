@@ -17,7 +17,7 @@ class Handle extends Component<HandlePropsInner>{
   static contextType = InstanceInterface
 
   onMouseDown = (e: React.MouseEvent) => {
-    // e.stopPropagation()
+    e.stopPropagation()
     const { startConnecting, startReconnecting } = this.context as InterfaceValue
     const { type, handleId, nodeId } = this.props
     if (type === 'source') {
@@ -35,15 +35,24 @@ class Handle extends Component<HandlePropsInner>{
     (this.context as InterfaceValue).onConnected(nodeId, handleId)
   }
 
+  applyMouseActions = () => {
+    if (this.props.disable) return {}
+    return {
+      onMouseDown: this.onMouseDown,
+      onMouseUp: this.onMouseUp
+    } as const
+  }
+
 
 
   render() {
     const { handleId, nodeId, type, selected = false } = this.props
     return <div
-      id={`${nodeId}.${handleId}`}
+      data-handle-id={`${nodeId}.${handleId}`}
       className={getHanldeClassName(type, selected)}
-      onMouseDown={this.onMouseDown}
-      onMouseUp={this.onMouseUp}
+      // onMouseDown={this.onMouseDown}
+      // onMouseUp={this.onMouseUp}
+      {...this.applyMouseActions()}
     >
 
     </div>
