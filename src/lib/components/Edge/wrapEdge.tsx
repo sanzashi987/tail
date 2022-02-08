@@ -1,24 +1,34 @@
-import React, { ComponentType, PureComponent } from "react";
-import type { EdgeProps, EdgeWrpperProps } from "@app/types";
+import React, { FC, ComponentType, memo, useMemo, PureComponent, useCallback } from "react";
+import type { EdgeProps, EdgeWrapperProps } from "@app/types";
+
+
+const getMarkerId = (markerId?: string) => {
+  if (typeof markerId === 'string') return `url(#${markerId})`
+}
+
 
 const wrapEdge = (EdgeComponent: ComponentType<EdgeProps>) => {
-  const EdgeWrapper = class extends PureComponent<EdgeWrpperProps>{
-    onClick = (e: React.MouseEvent) => {
+  const EdgeWrapper: FC<EdgeWrapperProps> = ({
+    onClick,
+    markerEnd,
+    markerStart,
+    ...edgeProps
+  }) => {
+    const onEdgeClick = useCallback((e: React.MouseEvent) => {
       e.stopPropagation()
-      const { onClick, edge } = this.props
-      onClick?.(e, edge)
-    }
-
-    render() {
-      const { onClick, ...edgeProps } = this.props
-      return <g
-        onClick={this.onClick}
-      >
-        <EdgeComponent
-          {...edgeProps}
-        />
-      </g>
-    }
+      onClick?.(e, edgeProps.edge)
+    }, [onClick, edgeProps.edge])
+    const markerStartUrl = useMemo(() => getMarkerId(markerStart), [markerStart]);
+    const markerEndUrl = useMemo(() => getMarkerId(markerEnd), [markerEnd]);
+    return <g
+      onClick={onEdgeClick}
+    >
+      <EdgeComponent
+        markerStart={markerStartUrl}
+        markerEnd={markerEndUrl}
+        {...edgeProps}
+      />
+    </g>
   }
 
   return EdgeWrapper

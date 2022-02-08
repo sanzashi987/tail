@@ -27,19 +27,25 @@ class MarkerDefs extends Component<MarkerDefsProps> {
   // static supportedMarkers = defaultTemplates
   // static useMarkers = (templates: MarkerTemplatesType) => {}
 
+  renderMarker(markers: Marker[]) {
+    const { templates } = this.props
+    return markers.reduce<ReactNode[]>((lastRes, marker) => {
+      const { type, ...MarkerWrapperProps } = marker
+      const Marker = findTemplate(marker.type, templates)
+      if (Marker !== null) {
+        lastRes.push(
+          <Marker key={marker.id} {...MarkerWrapperProps} />
+        )
+      }
+      return lastRes
+    }, [])
+  }
+
   render() {
-    let { markers = defaultMarkers, templates } = this.props
+    const { markers = [] } = this.props
     return <defs>
-      {markers.reduce<ReactNode[]>((lastRes, marker) => {
-        const { type, ...MarkerWrapperProps } = marker
-        const Marker = findTemplate(marker.type, templates)
-        if (Marker !== null) {
-          lastRes.push(
-            <Marker key={marker.id} {...MarkerWrapperProps} />
-          )
-        }
-        return lastRes
-      }, [])}
+      {this.renderMarker(defaultMarkers)}
+      {this.renderMarker(markers)}
     </defs>
   }
 }
