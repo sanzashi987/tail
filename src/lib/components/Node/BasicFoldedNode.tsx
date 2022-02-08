@@ -12,9 +12,9 @@ class BasicFoldedNode<P extends FoldedNodeProps = FoldedNodeProps, S = {}> exten
 
   render() {
     const { node: { id }, hasSource, hasTarget } = this.props
-    
     return <div className={`tail-node__folded ${styles.node}`}>
-
+      {hasSource && <Handle nodeId={id} type='source' handleId={sourceId} />}
+      {hasTarget && <Handle nodeId={id} type='target' handleId={targetId} />}
     </div>;
   }
 }
