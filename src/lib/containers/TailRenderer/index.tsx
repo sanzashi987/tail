@@ -4,6 +4,8 @@ import EdgeRenderer from "../EdgeRenderer";
 import InfiniteViewer from "../InfiniteViewer";
 import type { SelectedItemCollection, NodeInternals, NodeInternalInfo, NodeInternalMutation } from '@types'
 import { defaultState, StateProvider, InterfaceProvider, StateValue, InterfaceValue, InterfaceMethodType } from '@app/contexts/instance'
+import MarkerDefs from '../MarkerDefs'
+
 
 type TailRenderState = {
   connecting: boolean
@@ -73,7 +75,9 @@ class TailRenderer
         <EdgeRenderer
           ref={this.edgeRendererRef}
           connecting={this.state.connecting}
-        />
+        >
+          <MarkerDefs />
+        </EdgeRenderer>
       </StateProvider>
     </InfiniteViewer>
   }

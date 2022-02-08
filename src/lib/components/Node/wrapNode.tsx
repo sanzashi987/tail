@@ -46,14 +46,15 @@ const wrapNode = (
 
     getProps() {
       const { node, selected } = this.props
-      const basicNodeProps = {
+      const NodeProps = {
         node,
         selected,
         updateNodeInternal: this.registerNode
       }
       if (isFold) {
-        
+
       }
+      return NodeProps
     }
 
 

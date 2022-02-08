@@ -27,6 +27,7 @@ class EdgeRenderer extends Component<EdgeRendererProps, EdgeRenderStates> {
     return <svg
       className="tail-edge-container"
     >
+      {this.props.children}
       {
       }
 

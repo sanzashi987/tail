@@ -1,5 +1,6 @@
 import type { EdgeProps } from "@app/types";
 import { Component } from "react";
+import { wrapEdge } from ".";
 
 //Straight Edge
 class BasicEdge extends Component<EdgeProps>{
@@ -13,7 +14,7 @@ class BasicEdge extends Component<EdgeProps>{
       markerStart
     } = this.props
     return <path
-      className="tail-edge-basic"
+      className="tail-edge__basic"
       d={`M ${sourceX},${sourceY}L ${targetX},${targetY}`}
       markerEnd={markerEnd}
       markerStart={markerStart}
@@ -21,4 +22,6 @@ class BasicEdge extends Component<EdgeProps>{
   }
 }
 
-export default BasicEdge
+
+export { BasicEdge }
+export default wrapEdge(BasicEdge)
