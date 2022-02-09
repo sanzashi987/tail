@@ -12,6 +12,9 @@ const NodeContainer: FC<NodeWrapperProps> = ({
   return <div
     className={`tail-node__container ${styles.container}`}
   >
-    
+
   </div>
 }
+
+
+export default NodeContainer

@@ -1,6 +1,7 @@
 import { Component } from "react";
 import type { NodeProps } from "@types";
 import styles from './BasicNode.module.scss'
+import wrapNode from "./wrapNode";
 // import Handle from "../Handle";
 
 class BasicNode extends Component<NodeProps> {
@@ -14,5 +15,5 @@ class BasicNode extends Component<NodeProps> {
   }
 }
 
-
-export default BasicNode
+export default wrapNode(BasicNode)
+export { BasicNode }

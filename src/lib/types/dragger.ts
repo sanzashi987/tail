@@ -17,7 +17,7 @@ export type rect = {
 
 export type DraggerCoreBasic = {
   disable?: boolean;
-  nodeRef?: React.RefObject<HTMLDivElement>;
+  nodeRef?: React.RefObject<HTMLDivElement> | React.MutableRefObject<HTMLDivElement>;
   getScale?: () => number;
 };
 

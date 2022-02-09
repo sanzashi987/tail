@@ -46,12 +46,7 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
         const type = templateIdentifier(node)
         if (!type || !fullTemplates[type]) return prev
         const { default: template, folded: templateFolded } = fullTemplates[type]
-        prev.push(<NodeWrapper
-          node={node}
-          template={template}
-          templateFolded={templateFolded}
-          {...otherProps}
-        />)
+        
         return prev
       }, [])}
     </div>

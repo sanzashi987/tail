@@ -1,132 +1,89 @@
-import React, { Component, ComponentType, createRef, CSSProperties } from 'react';
+import React, { FC, Component, ComponentType, createRef, CSSProperties, useRef, useMemo, useState, useCallback, useEffect } from 'react';
 import type { NodeWrapperProps, coordinates, NodeProps, FoldedNodeProps, HandlesInfo } from '@types';
 import Dragger from './Dragger'
-import { getHandleBounds } from './utils';
-
-function createStyleMemo() {
-  let lastX = NaN, lastY = NaN, lastRes: CSSProperties = {}
-  return function (x: number, y: number) {
-    if (x !== lastX || lastY !== y) {
-      [lastX, lastY] = [x, y]
-      lastRes = {
-        transform: `translate(${x}px,${y}px)`
-      }
-    }
-
-    return lastRes
-  }
-}
-
-const EmptyHandles = { source: {}, target: {} }
+import { getHandleBounds, getHandlesPosition } from './utils';
 
 
-type NodeWrapperState = coordinates
-type PossibleNodeClass = ComponentType<NodeProps> | ComponentType<FoldedNodeProps>
-
-const wrapNode = (
-  NodeTemplate: PossibleNodeClass,
-  isFold?: boolean
+const wrapNode = <T, P>(
+  NodeTemplate: ComponentType<NodeProps<T, P>>,
 ) => {
-  const NodeWrapper = class extends Component<NodeWrapperProps, NodeWrapperState> {
-    ref = createRef<HTMLDivElement>()
 
-    state = {
-      x: NaN,
-      y: NaN
-    }
-
-    getStyle: (x: number, y: number) => CSSProperties
-
-    constructor(props: NodeWrapperProps) {
-      super(props)
-      const { left, top } = props.node
-      this.state = { x: left, y: top }
-      this.getStyle = createStyleMemo()
-    }
-
-    getProps() {
-      const { node, selected } = this.props
-      const NodeProps = {
-        node,
-        selected,
-        updateNodeInternal: this.registerNode
-      }
-      if (isFold) {
-
-      }
-      return NodeProps
-    }
+  const NodeWrapper: FC<NodeWrapperProps<T, P>> = ({
+    backgroundColor,
+    onClick,
+    onDrag,
+    onDragEnd,
+    onDragStart,
+    node,
+    selected,
+    selectedHandles,
+    delistNode,
+    registerNode,
+    ...extendedProps
+  }) => {
+    const ref = useRef<HTMLDivElement>(null)
+    const [coordinate, setCoordinate] = useState({ x: node.left, y: node.top })
+    const style = useMemo(() => {
+      return {
+        transform: `translate(${coordinate.x}px,${coordinate.y}px)`
+      } as CSSProperties
+    }, [coordinate])
+    const extraProps = extendedProps as P
 
 
-    onDragStart = (e: React.MouseEvent, c: coordinates) => {
-      return this.props.onDragStart?.(e, this.props.node, c)
-    }
-    onDrag = (e: MouseEvent, c: coordinates) => {
-      this.setState(c)
-      return this.props.onDrag?.(e, this.props.node, c)
-    }
-    onDragEnd = (e: MouseEvent, c: coordinates) => {
-      this.setState(c)
-      return this.props.onDragEnd?.(e, this.props.node, c)
-    }
-
-
-    componentDidMount() {
-
-    }
-
-
-    componentDidUpdate(prevProps: NodeWrapperProps) {
-      // if()
-    }
-
-    componentWillUnmount() {
-      const { node: { id }, delistNode } = this.props
-      delistNode(id)
-    }
-
-
-    registerNode = () => {
-      const { node, registerNode } = this.props
-      const handles = this.getHandlesPosition();
+    //built-in event callbacks
+    const dragStart = useCallback((e: React.MouseEvent, c: coordinates) => {
+      return onDragStart?.(e, node, c)
+    }, [onDragStart, node])
+    const drag = useCallback((e: MouseEvent, c: coordinates) => {
+      setCoordinate(c)
+      return onDrag?.(e, node, c)
+    }, [onDrag, node])
+    const dragEnd = useCallback((e: MouseEvent, c: coordinates) => {
+      setCoordinate(c)
+      return onDragEnd?.(e, node, c)
+    }, [onDragEnd, node])
+    const updateNodeInternal = useCallback(() => {
+      const handles = getHandlesPosition(ref, node)
       registerNode(node.id, {
         folded: !!node.fold,
-        handles,
+        handles
       })
-    }
+    }, [registerNode, node])
 
-    getHandlesPosition(): HandlesInfo {
-      if (!this.ref.current) {
-        console.warn('fail to retrieve the DOM instance of', this.props.node);
-        return EmptyHandles
+
+    // built-in life cycle
+    useEffect(() => {
+      return () => {
+        delistNode(node.id)
       }
-      return getHandleBounds(this.ref.current, 1)
-    }
+    }, [delistNode, node.id])
 
-    render() {
-      const { node, selected } = this.props
-      const { onDragEnd, onDrag, onDragStart } = this
-      const { x, y } = this.state
-      const props = this.getProps()
-      return <Dragger
-        onDragStart={onDragStart}
-        onDrag={onDrag}
-        onDragEnd={onDragEnd}
-        nodeRef={this.ref}
+
+
+    return <Dragger
+      onDragStart={dragStart}
+      onDrag={drag}
+      onDragEnd={dragEnd}
+      nodeRef={ref}
+    >
+      <div
+        className="tail-node__wrapper"
+        style={style}
+        ref={ref}
       >
-        <div
-          className="tail-node-wrapper"
-          ref={this.ref}
-          style={this.getStyle(x, y)}
-        >
-          <NodeTemplate
-            {...props}
-          />
-        </div>
-      </Dragger>
+        <NodeTemplate
+          node={node}
+          selected={selected}
+          selectedHandles={selectedHandles}
+          updateNodeInternal={updateNodeInternal}
+          {...extraProps}
+        />
+      </div>
 
-    }
+    </Dragger>
   }
+
   return NodeWrapper
 }
 

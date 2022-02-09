@@ -1,7 +1,7 @@
 import type { ComponentType } from "react"
 import type { HandleElement, coordinates, NodeInternalMutation } from "."
 
-export type Node<T = {}> = {
+export type Node<T extends IObject = {}> = {
   id: string
   left: number
   top: number
@@ -22,11 +22,10 @@ export type DraggerCallbacks = {
   onDragEnd?: (e: MouseEvent, c: coordinates) => boolean | void
 }
 
-export type NodeComponentType = ComponentType<NodeWrapperProps>
 
 export type TemplateNodeClass = {
-  default: NodeComponentType
-  folded: NodeComponentType
+  default: ComponentType<NodeWrapperProps>
+  folded: ComponentType<NodeWrapperProps>
 }
 
 
@@ -37,29 +36,34 @@ export type NodeRendererProps = {
 } & Omit<NodeWrapperProps, 'node' | 'template' | 'templateFolded'>
 
 
-export type NodeWrapperProps<T = NodeMouseCallback> = {
+export type NodeWrapperProps<T extends IObject = {}, P extends IObject = {}, C = NodeMouseCallback> = {
   backgroundColor?: string
-  node: Node
-  selected: boolean
-  onClick?: T
+  onClick?: C
   // onMouseEnter?: T
   // onMouseLeave?: T
   // onContextMenu?: T
 } & {
     [key in keyof DraggerCallbacks]?: (e: MouseEventCollection, n: Node, c: coordinates) => boolean | void
-  } & NodeInternalMutation
+  } & NodeInternalMutation & Omit<NodeProps<T, P>, 'updateNodeInternal'>
 
-export type NodeProps<T = {}, P = {}> = {
-  node: Node<T>
-  selected: boolean
-  selectedHandles: string[]
-  updateNodeInternal(): void
-} & P
+export type NodeProps<
+  T extends IObject = {},
+  P extends IObject = {}
+  > = {
+    node: Node<T>
+    selected: boolean
+    selectedHandles: string[]
+    updateNodeInternal(): void
+  } & P
 
-
-export type FoldedNodeProps<T = {}, P = {}> = {
+type FoldedNodeExtras = {
   hasSource: boolean
   hasTarget: boolean
-} & NodeProps<T, P>
+}
+
+export type FoldedNodeProps<
+  T extends IObject = {},
+  P extends FoldedNodeExtras = FoldedNodeExtras
+  > = NodeProps<T, P>
 
 

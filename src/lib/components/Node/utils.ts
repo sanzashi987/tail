@@ -1,4 +1,5 @@
-import type { HandleElement, HandleMap } from '@types'
+import type { Node, HandleElement, HandleMap, HandlesInfo } from '@types'
+import React from 'react';
 
 export const getHandleBounds = (nodeElement: HTMLDivElement, scale: number) => {
   const bounds = nodeElement.getBoundingClientRect();
@@ -47,3 +48,17 @@ export const getHandleBoundsByHandleType = (
     return lastRes
   }, {});
 };
+
+const EmptyHandles = { source: {}, target: {} }
+
+export const getHandlesPosition = (
+  ref: React.RefObject<HTMLDivElement | undefined>,
+  node: Node
+): HandlesInfo => {
+  if (!ref.current) {
+    console.warn('fail to retrieve the DOM instance of', node);
+    return EmptyHandles
+  }
+  return getHandleBounds(ref.current, 1)
+
+}
