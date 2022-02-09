@@ -28,6 +28,10 @@ export type TemplateNodeClass = {
   folded: ComponentType<NodeWrapperProps>
 }
 
+export type NodeContainerProps = {
+
+} & TemplateNodeClass
+
 
 export type NodeRendererProps = {
   nodes: Node[],
@@ -56,14 +60,14 @@ export type NodeProps<
     updateNodeInternal(): void
   } & P
 
-type FoldedNodeExtras = {
+export type FoldedNodeExtras = {
   hasSource: boolean
   hasTarget: boolean
 }
 
 export type FoldedNodeProps<
   T extends IObject = {},
-  P extends FoldedNodeExtras = FoldedNodeExtras
+  P extends IObject = FoldedNodeExtras
   > = NodeProps<T, P>
 
 

@@ -1,16 +1,16 @@
-import React, { ReactNode, Component } from "react";
+import React, { ReactNode, PureComponent } from "react";
 import { BasicClosedMarker, BasicMarker } from "@app/components/Anchor";
 import type { Marker, MarkerDefsProps, MarkerTemplatesType, MarkerTemplateType } from "@app/types";
 
 
 const defaultTemplates: MarkerTemplatesType = {
-  'basic': BasicMarker,
-  'basicClosed': BasicClosedMarker
+  'tailBasic': BasicMarker,
+  'tailBasicClosed': BasicClosedMarker
 }
 
 const defaultMarkers: Marker[] = [
-  { id: 'tail-marker__basic', type: 'basic' },
-  { id: 'tail-marker__basic-closed', type: 'basicClosed' }
+  { id: 'tail-marker__basic', type: 'tailBasic' },
+  { id: 'tail-marker__basic-closed', type: 'tailBasicClosed' }
 ]
 
 function findTemplate(
@@ -21,9 +21,11 @@ function findTemplate(
 }
 
 
-class MarkerDefs extends Component<MarkerDefsProps> {
+class MarkerDefs extends PureComponent<MarkerDefsProps> {
 
   // optional approach to load user-developed markers
+  // but this runs as a singleton which will fail to render to tail instance
+  // simultaneously in one app
   // static supportedMarkers = defaultTemplates
   // static useMarkers = (templates: MarkerTemplatesType) => {}
 

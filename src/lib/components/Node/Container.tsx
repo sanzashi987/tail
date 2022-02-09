@@ -1,4 +1,4 @@
-import { NodeWrapperProps } from "@app/types";
+import { NodeContainerProps } from "@app/types";
 import { FC } from "react";
 import styles from './Container.module.scss'
 
@@ -6,8 +6,8 @@ import styles from './Container.module.scss'
 
 
 
-const NodeContainer: FC<NodeWrapperProps> = ({
-  node
+const NodeContainer: FC<NodeContainerProps> = ({
+  // node
 }) => {
   return <div
     className={`tail-node__container ${styles.container}`}

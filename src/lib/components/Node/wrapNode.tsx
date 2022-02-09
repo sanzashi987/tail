@@ -1,7 +1,7 @@
-import React, { FC, Component, ComponentType, createRef, CSSProperties, useRef, useMemo, useState, useCallback, useEffect } from 'react';
-import type { NodeWrapperProps, coordinates, NodeProps, FoldedNodeProps, HandlesInfo } from '@types';
+import React, { FC, ComponentType, CSSProperties, useRef, useMemo, useState, useCallback, useEffect } from 'react';
+import type { NodeWrapperProps, coordinates, NodeProps } from '@types';
 import Dragger from './Dragger'
-import { getHandleBounds, getHandlesPosition } from './utils';
+import { getHandlesPosition } from './utils';
 
 
 const wrapNode = <T, P>(

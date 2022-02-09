@@ -1,5 +1,5 @@
 import React, { Component, ComponentType } from 'react';
-import { NodeWrapper, BasicNode, BasicFoldedNode } from '../../components/Node';
+import { BasicNode, BasicFoldedNode } from '../../components/Node';
 import type { FoldedNodeProps, Node, NodeRendererProps, TemplateNodeClass } from '@types';
 
 const defaultProps = {
@@ -9,7 +9,7 @@ const defaultProps = {
 
 const defaultTemplate: TemplateNodeClass = {
   default: BasicNode,
-  folded: BasicFoldedNode as unknown as ComponentType<FoldedNodeProps>
+  folded: BasicFoldedNode as any
 }
 
 const defaultTemplates = { 'logical': defaultTemplate }
@@ -29,16 +29,22 @@ function createMemoTemplates() {
   }
 }
 
-const mergeTemplatesWithDefault = createMemoTemplates()
+// const mergeTemplatesWithDefault = createMemoTemplates()
 class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
-  
+
+  memoTemplates: ReturnType<typeof createMemoTemplates>
+
   static defaultProps = defaultProps
+  constructor(props: NodeRendererPropsWithDefaults) {
+    super(props)
+    this.memoTemplates = createMemoTemplates()
+  }
 
 
   render() {
     const { nodes, templates, templateIdentifier, ...otherProps } = this.props
 
-    const fullTemplates = mergeTemplatesWithDefault(templates)
+    const fullTemplates = this.memoTemplates(templates)
     return <div
       className="tail-node-container"
     >
@@ -46,7 +52,9 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
         const type = templateIdentifier(node)
         if (!type || !fullTemplates[type]) return prev
         const { default: template, folded: templateFolded } = fullTemplates[type]
-        
+        prev.push(
+          <NodeContainer key={node.id} />
+        )
         return prev
       }, [])}
     </div>
