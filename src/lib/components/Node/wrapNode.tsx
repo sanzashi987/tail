@@ -1,7 +1,8 @@
-import React, { FC, ComponentType, CSSProperties, useRef, useMemo, useState, useCallback, useEffect } from 'react';
+import React, { FC, ComponentType, CSSProperties, useRef, useMemo, useState, useCallback, useEffect, useContext, memo } from 'react';
 import type { NodeWrapperProps, coordinates, NodeProps } from '@types';
 import Dragger from './Dragger'
 import { getHandlesPosition } from './utils';
+import { InstanceInterface } from '@app/contexts/instance';
 
 
 const wrapNode = <T, P>(
@@ -11,14 +12,9 @@ const wrapNode = <T, P>(
   const NodeWrapper: FC<NodeWrapperProps<T, P>> = ({
     backgroundColor,
     onClick,
-    onDrag,
-    onDragEnd,
-    onDragStart,
     node,
     selected,
     selectedHandles,
-    delistNode,
-    registerNode,
     ...extendedProps
   }) => {
     const ref = useRef<HTMLDivElement>(null)
@@ -29,35 +25,36 @@ const wrapNode = <T, P>(
       } as CSSProperties
     }, [coordinate])
     const extraProps = extendedProps as P
+    const instanceInterface = useContext(InstanceInterface)
 
 
     //built-in event callbacks
     const dragStart = useCallback((e: React.MouseEvent, c: coordinates) => {
-      return onDragStart?.(e, node, c)
-    }, [onDragStart, node])
+      return instanceInterface.onDragStart?.(e, node, c)
+    }, [node])
     const drag = useCallback((e: MouseEvent, c: coordinates) => {
       setCoordinate(c)
-      return onDrag?.(e, node, c)
-    }, [onDrag, node])
+      return instanceInterface.onDrag?.(e, node, c)
+    }, [node])
     const dragEnd = useCallback((e: MouseEvent, c: coordinates) => {
       setCoordinate(c)
-      return onDragEnd?.(e, node, c)
-    }, [onDragEnd, node])
+      return instanceInterface.onDragEnd?.(e, node, c)
+    }, [node])
     const updateNodeInternal = useCallback(() => {
       const handles = getHandlesPosition(ref, node)
-      registerNode(node.id, {
+      instanceInterface.registerNode(node.id, {
         folded: !!node.fold,
         handles
       })
-    }, [registerNode, node])
+    }, [node])
 
 
     // built-in life cycle
     useEffect(() => {
       return () => {
-        delistNode(node.id)
+        instanceInterface.delistNode(node.id)
       }
-    }, [delistNode, node.id])
+    }, [node.id])
 
 
 
@@ -84,7 +81,7 @@ const wrapNode = <T, P>(
     </Dragger>
   }
 
-  return NodeWrapper
+  return memo(NodeWrapper)
 }
 
 

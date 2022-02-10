@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { HandleType, NodeInternals } from '@types'
+import type { InterfaceValue, NodeInternals } from '@types'
 
 export type StateValue = {
   source: string
@@ -28,16 +28,6 @@ export type ConnectedPayload = {
 }
 
 
-export type InterfaceMethodType = (nodeId: string, handleId: string) => void
-
-
-
-
-export interface InterfaceValue {
-  startConnecting: InterfaceMethodType
-  onConnected: InterfaceMethodType
-  startReconnecting: InterfaceMethodType
-}
 
 const defaultInterface: InterfaceValue = {
   startConnecting() { },

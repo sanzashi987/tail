@@ -1,6 +1,7 @@
 import React, { Component, ComponentType } from 'react';
 import { BasicNode, BasicFoldedNode } from '../../components/Node';
 import type { FoldedNodeProps, Node, NodeRendererProps, TemplateNodeClass } from '@types';
+import NodeContainer from '@app/components/Node/Container';
 
 const defaultProps = {
   templateIdentifier: (node: Node) => node.type,
@@ -53,7 +54,11 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
         if (!type || !fullTemplates[type]) return prev
         const { default: template, folded: templateFolded } = fullTemplates[type]
         prev.push(
-          <NodeContainer key={node.id} />
+          <NodeContainer
+            key={node.id}
+            default={template}
+            folded={templateFolded}
+          />
         )
         return prev
       }, [])}

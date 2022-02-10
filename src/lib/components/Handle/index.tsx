@@ -1,6 +1,6 @@
 import React, { Component, FC } from "react";
-import { InstanceInterface, InterfaceValue } from "../../contexts/instance";
-import type { HandleProps } from "@types";
+import { InstanceInterface } from "../../contexts/instance";
+import type { HandleProps, InterfaceValue } from "@types";
 import styles from './index.module.scss';
 
 type HandlePropsInner = HandleProps

@@ -2,8 +2,8 @@ import { Component, createRef } from "react";
 import NodeRenderer from "../NodeRenderer";
 import EdgeRenderer from "../EdgeRenderer";
 import InfiniteViewer from "../InfiniteViewer";
-import type { SelectedItemCollection, NodeInternals, NodeInternalInfo, NodeInternalMutation } from '@types'
-import { defaultState, StateProvider, InterfaceProvider, StateValue, InterfaceValue, InterfaceMethodType } from '@app/contexts/instance'
+import type { SelectedItemCollection, InterfaceValue, ConnectMethodType, NodeInternals, NodeInternalInfo, NodeInternalMutation } from '@types'
+import { defaultState, StateProvider, InterfaceProvider, StateValue, } from '@app/contexts/instance'
 import MarkerDefs from '../MarkerDefs'
 
 
@@ -31,7 +31,9 @@ class TailRenderer
     this.contextInterface = {
       startConnecting: this.startConnecting,
       onConnected: this.onConnected,
-      startReconnecting: this.startReconnecting
+      startReconnecting: this.startReconnecting,
+      registerNode: this.registerNode,
+      delistNode: this.delistNode
     }
   }
 
@@ -52,16 +54,16 @@ class TailRenderer
     this.nodeInternals.delete(id)
   }
 
-  startConnecting: InterfaceMethodType = (nodeId, handleId) => {
+  startConnecting: ConnectMethodType = (nodeId, handleId) => {
 
   }
 
-  onConnected: InterfaceMethodType = (nodeId, handleId) => {
+  onConnected: ConnectMethodType = (nodeId, handleId) => {
 
   }
 
 
-  startReconnecting: InterfaceMethodType = (nodeId, handleId) => {
+  startReconnecting: ConnectMethodType = (nodeId, handleId) => {
 
   }
 

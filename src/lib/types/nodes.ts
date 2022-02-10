@@ -16,11 +16,6 @@ type MouseEventCollection = React.MouseEvent | MouseEvent
 export type NodeMouseCallback = (e: MouseEventCollection, n: Node) => void
 export type DraggerMouseCallback = (e: MouseEventCollection, c: coordinates) => boolean | void
 
-export type DraggerCallbacks = {
-  onDragStart?: (e: React.MouseEvent, c: coordinates) => boolean | void
-  onDrag?: (e: MouseEvent, c: coordinates) => boolean | void
-  onDragEnd?: (e: MouseEvent, c: coordinates) => boolean | void
-}
 
 
 export type TemplateNodeClass = {
@@ -35,20 +30,16 @@ export type NodeContainerProps = {
 
 export type NodeRendererProps = {
   nodes: Node[],
+  foldable?: boolean
   templates?: IObject<TemplateNodeClass>
   templateIdentifier?: (node: Node) => string
-} & Omit<NodeWrapperProps, 'node' | 'template' | 'templateFolded'>
+} & Omit<NodeWrapperProps, 'node'>
 
 
 export type NodeWrapperProps<T extends IObject = {}, P extends IObject = {}, C = NodeMouseCallback> = {
   backgroundColor?: string
   onClick?: C
-  // onMouseEnter?: T
-  // onMouseLeave?: T
-  // onContextMenu?: T
-} & {
-    [key in keyof DraggerCallbacks]?: (e: MouseEventCollection, n: Node, c: coordinates) => boolean | void
-  } & NodeInternalMutation & Omit<NodeProps<T, P>, 'updateNodeInternal'>
+} & Omit<NodeProps<T, P>, 'updateNodeInternal'>
 
 export type NodeProps<
   T extends IObject = {},
