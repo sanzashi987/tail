@@ -1,5 +1,5 @@
 import type { ComponentType } from "react"
-import type { HandleElement, coordinates, NodeInternalMutation } from "."
+import type { HandleElement, coordinates, InternalMutation } from "."
 
 export type Node<T extends IObject = {}> = {
   id: string
@@ -36,10 +36,12 @@ export type NodeRendererProps = {
 } & Omit<NodeWrapperProps, 'node'>
 
 
-export type NodeWrapperProps<T extends IObject = {}, P extends IObject = {}, C = NodeMouseCallback> = {
-  backgroundColor?: string
-  onClick?: C
-} & Omit<NodeProps<T, P>, 'updateNodeInternal'>
+// export type NodeWrapperProps<T extends IObject = {}, P extends IObject = {}> = {
+// } & Omit<NodeProps<T, P>, 'updateNodeInternal'>
+
+export type NodeWrapperProps<T extends IObject = {}, P extends IObject = {}> = {
+  node: NodeProps<T, P>['node']
+}
 
 export type NodeProps<
   T extends IObject = {},

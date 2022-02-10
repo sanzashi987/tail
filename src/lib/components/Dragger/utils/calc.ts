@@ -14,8 +14,8 @@ export const getCoordinatesFromParent = (
   return { x, y };
 };
 
-export const getDraggerRelativeCoordinates = (state: DraggerIterState, coordinate: coordinates) => {
-  let { x, y, lastX, lastY } = state;
+export const getDraggerRelativeCoordinates = (x: number, y: number, lastX: number, lastY: number, coordinate: coordinates) => {
+  // let { x, y, lastX, lastY } = state;
   const [deltaX, deltaY] = [coordinate.x - lastX, coordinate.y - lastY];
   [lastX, lastY] = [coordinate.x, coordinate.y];
   [x, y] = [x + deltaX, y + deltaY];

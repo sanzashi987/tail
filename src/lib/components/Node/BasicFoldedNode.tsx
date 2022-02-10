@@ -1,7 +1,6 @@
 import { Component, ComponentType } from 'react'
 import type { FoldedNodeProps, NodeProps, Node, FoldedNodeExtras } from '@types';
 import Handle from '../Handle';
-import wrapNode from "./wrapNode";
 import styles from './BasicNode.module.scss'
 
 const sourceId = 'foldedSource'
@@ -20,7 +19,4 @@ class BasicFoldedNode<P extends FoldedNodeProps = FoldedNodeProps, S = {}> exten
   }
 }
 
-
-export { BasicFoldedNode }
-const WrappedBasicNode = wrapNode(BasicFoldedNode as ComponentType<FoldedNodeProps<{}, FoldedNodeExtras>>)
-export default WrappedBasicNode
+export default BasicFoldedNode

@@ -37,9 +37,9 @@ class DraggerCore<T extends DraggerCoreBasic = DraggerCoreBasic, S = any> extend
   }
 
   getEventCoordinate(e: MouseEvent | React.MouseEvent) {
-    const scale = this.props.getScale?.() ?? 1;
+    // const scale = this.props.getScale?.() ?? 1;
     const offsetParent = this.getOffsetRef();
-    return getCoordinatesFromParent(e, offsetParent, scale);
+    return getCoordinatesFromParent(e, offsetParent, 1);
   }
 
   _onMouseUp = (e: MouseEvent) => {

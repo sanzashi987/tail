@@ -1,6 +1,6 @@
 export type DraggerIterState = {
-  x: number,
-  y: number,
+  // x: number,
+  // y: number,
   lastX: number,
   lastY: number
 }
@@ -27,6 +27,14 @@ export type DraggerCoreProps<T> = {
   onStop: T;
   children?: any;
 } & DraggerCoreBasic;
+
+export interface DraggerInterface {
+  onDragStart?: (e: React.MouseEvent, c: coordinates) => boolean | void
+  onDrag?: (e: MouseEvent, c: coordinates) => boolean | void
+  onDragEnd?: (e: MouseEvent, c: coordinates) => boolean | void
+}
+
+export type DraggerProps = DraggerInterface & DraggerCoreBasic & coordinates
 
 export type BasicPosture = {
   x: number;

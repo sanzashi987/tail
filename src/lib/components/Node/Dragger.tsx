@@ -1,14 +1,12 @@
 import React from 'react'
 import { DraggerCore } from '../Dragger';
 import { getDraggerRelativeCoordinates } from '../Dragger/utils/calc';
-import type { NodeWrapperProps, DraggerCallbacks, Node, coordinates, DraggerCoreBasic, DraggerIterState } from '@types';
-
-type DraggerProps = DraggerCallbacks & DraggerCoreBasic
+import type { DraggerProps, coordinates, DraggerIterState } from '@types';
 
 class Dragger extends DraggerCore<DraggerProps, DraggerIterState> {
   state: DraggerIterState = {
-    x: NaN,
-    y: NaN,
+    // x: NaN,
+    // y: NaN,
     lastX: NaN,
     lastY: NaN
   }
@@ -18,7 +16,10 @@ class Dragger extends DraggerCore<DraggerProps, DraggerIterState> {
     const res = this.props.onDragStart?.(e, coordniate)
     if (res === false) return
     e.stopPropagation()
-    this.setState(coordniate)
+    this.setState({
+      lastX: coordniate.x,
+      lastY: coordniate.y
+    })
   }
 
   onDrag = (e: MouseEvent) => {
@@ -39,7 +40,8 @@ class Dragger extends DraggerCore<DraggerProps, DraggerIterState> {
 
 
   processDrag(coordinates: coordinates) {
-    const state = getDraggerRelativeCoordinates(this.state, coordinates);
+    const { props: { x, y }, state: { lastY, lastX } } = this
+    const state = getDraggerRelativeCoordinates(x, y, lastX, lastY, coordinates);
     this.setState(state);
     return {
       x: Math.round(state.x),

@@ -2,7 +2,7 @@ import { Component, createRef } from "react";
 import NodeRenderer from "../NodeRenderer";
 import EdgeRenderer from "../EdgeRenderer";
 import InfiniteViewer from "../InfiniteViewer";
-import type { SelectedItemCollection, InterfaceValue, ConnectMethodType, NodeInternals, NodeInternalInfo, NodeInternalMutation } from '@types'
+import type { SelectedItemCollection, InterfaceValue, ConnectMethodType, NodeInternals, NodeInternalInfo, InternalMutation } from '@types'
 import { defaultState, StateProvider, InterfaceProvider, StateValue, } from '@app/contexts/instance'
 import MarkerDefs from '../MarkerDefs'
 
@@ -13,7 +13,7 @@ type TailRenderState = {
 }
 class TailRenderer
   extends Component<never, TailRenderState>
-  implements InterfaceValue, NodeInternalMutation {
+  implements InterfaceValue, InternalMutation {
 
   state: TailRenderState = {
     connecting: false,
@@ -37,6 +37,9 @@ class TailRenderer
     }
   }
 
+  activateItem = (id: string) => {
+
+  }
 
   getEdgesFromNodeId = (node: string) => {
     return this.edgeRendererRef.current?.nodeToEdge.get(node)
