@@ -19,8 +19,8 @@ export type DraggerMouseCallback = (e: MouseEventCollection, c: coordinates) => 
 
 
 export type TemplateNodeClass = {
-  default: ComponentType<NodeWrapperProps>
-  folded: ComponentType<NodeWrapperProps>
+  default: ComponentType<NodeProps>
+  folded: ComponentType<NodeProps>
 }
 
 export type NodeContainerProps = {
