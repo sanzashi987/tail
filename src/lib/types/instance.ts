@@ -1,9 +1,20 @@
-import type { HandleElement, Node, coordinates, DraggerInterface } from "."
+import type { HandleElement, Node, coordinates, DraggerInterface, Edge, TemplateNodeClass, EdgeTemplatesType, NodeTemplatesType, MarkerTemplatesType } from "."
 
 export type NodeEdgeMap = Map<string, IObject<string>>
 
 
-type SelectedItem<T> = {
+export type TailRendererProps = {
+  nodes: Node[]
+  edges: Edge[]
+  nodeTemplates?: NodeTemplatesType
+  edgeTemplates?: EdgeTemplatesType
+  markerTemplates?: MarkerTemplatesType
+  onNodeDragStart?: () => void
+  onNodeDrag?: () => void
+  onNodeDragEnd?: () => void
+}
+
+export type SelectedItem<T> = {
   id: string,
   type: T
 }
@@ -29,7 +40,7 @@ export type NodeInternalInfo = { //
 }
 export type NodeInternals = Map<string, NodeInternalInfo>
 export interface InternalMutation {
-  activateItem(id: string, item: SelectedItem<'node' | 'edge'>): void
+  activateItem(id: string, item: SelectedItem<'node' | 'edge'>, append?: boolean): void
   registerNode(id: string, node: NodeInternalInfo): void
   delistNode(id: string): void
 }

@@ -1,20 +1,16 @@
 import { createContext } from 'react';
-import type { InterfaceValue, NodeInternals } from '@types'
+import type { InterfaceValue, Node, NodeInternals } from '@types'
 
 export type StateValue = {
   source: string
   sourceNode: string
+  sourceNodeConfig?: Node
   nodeInternals: NodeInternals
-}
-
-export const defaultState: StateValue = {
-  source: '',
-  sourceNode: '',
-  nodeInternals: new Map()
-}
+} | null
 
 
-export const InstanceState = createContext<StateValue>(defaultState);
+
+export const InstanceState = createContext<StateValue>(null);
 export const StateProvider = InstanceState.Provider;
 export const StateConsumer = InstanceState.Consumer;
 
@@ -28,14 +24,7 @@ export type ConnectedPayload = {
 }
 
 
-
-const defaultInterface: InterfaceValue = {
-  startConnecting() { },
-  onConnected() { },
-  startReconnecting() { }
-}
-
-export const InstanceInterface = createContext<InterfaceValue>(defaultInterface)
+export const InstanceInterface = createContext<InterfaceValue | null>(null)
 export const InterfaceProvider = InstanceInterface.Provider
 export const InterfaceConsumer = InstanceInterface.Consumer
 

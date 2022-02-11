@@ -16,7 +16,7 @@ type MouseEventCollection = React.MouseEvent | MouseEvent
 export type NodeMouseCallback = (e: MouseEventCollection, n: Node) => void
 export type DraggerMouseCallback = (e: MouseEventCollection, c: coordinates) => boolean | void
 
-
+export type NodeTemplatesType = IObject<TemplateNodeClass>
 
 export type TemplateNodeClass = {
   default: ComponentType<NodeProps>

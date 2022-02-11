@@ -2,8 +2,8 @@ import { Component, createRef } from "react";
 import NodeRenderer from "../NodeRenderer";
 import EdgeRenderer from "../EdgeRenderer";
 import InfiniteViewer from "../InfiniteViewer";
-import type { SelectedItemCollection, InterfaceValue, ConnectMethodType, NodeInternals, NodeInternalInfo, InternalMutation } from '@types'
-import { defaultState, StateProvider, InterfaceProvider, StateValue, } from '@app/contexts/instance'
+import type { SelectedItem, SelectedItemCollection, InterfaceValue, ConnectMethodType, NodeInternals, NodeInternalInfo, InternalMutation, TailRendererProps, WrapperDraggerInterface } from '@types'
+import { StateProvider, InterfaceProvider, StateValue, } from '@app/contexts/instance'
 import MarkerDefs from '../MarkerDefs'
 
 
@@ -12,33 +12,44 @@ type TailRenderState = {
   selected: SelectedItemCollection
 }
 class TailRenderer
-  extends Component<never, TailRenderState>
-  implements InterfaceValue, InternalMutation {
+  extends Component<TailRendererProps, TailRenderState>
+  implements InterfaceValue {
 
   state: TailRenderState = {
     connecting: false,
     selected: {}
   }
 
-  contextState: StateValue = defaultState
+  contextState: StateValue = null
   nodeInternals: NodeInternals = new Map()
   edgeRendererRef = createRef<EdgeRenderer>()
   nodeRendererRef = createRef<NodeRenderer>()
 
   contextInterface: InterfaceValue
-  constructor(props: never) {
+  constructor(props: TailRendererProps) {
     super(props)
     this.contextInterface = {
       startConnecting: this.startConnecting,
       onConnected: this.onConnected,
       startReconnecting: this.startReconnecting,
       registerNode: this.registerNode,
-      delistNode: this.delistNode
+      delistNode: this.delistNode,
+      activateItem: this.activateItem
     }
   }
 
-  activateItem = (id: string) => {
-
+  activateItem = (id: string, item: SelectedItem<'node' | 'edge'>, append?: boolean) => {
+    if (!!append) {
+      this.setState((prev) => {
+        return {
+          ...prev,
+          selected: {
+            ...prev.selected,
+            [id]: item
+          }
+        }
+      })
+    }
   }
 
   getEdgesFromNodeId = (node: string) => {
@@ -67,6 +78,16 @@ class TailRenderer
 
 
   startReconnecting: ConnectMethodType = (nodeId, handleId) => {
+
+  }
+
+  onDrag() {
+
+  }
+  onDragEnd() {
+
+  }
+  onDragStart() {
 
   }
 

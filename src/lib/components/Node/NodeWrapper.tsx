@@ -12,7 +12,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({
   // ...extendedProps
 }) => {
   const ref = useRef<HTMLDivElement>(null)
-  const instanceInterface = useContext(InstanceInterface)
+  const instanceInterface = useContext(InstanceInterface)!
   const [{ x, y }, setCoordinate] = useState({ x: node.left, y: node.top })
   if (node.left !== x || node.top !== y) {
     setCoordinate({ x: node.left, y: node.top })
@@ -37,6 +37,10 @@ const NodeWrapper: FC<NodeWrapperProps> = ({
   const dragEnd = useCallback((e: MouseEvent, c: coordinates) => {
     setCoordinate(c)
     return instanceInterface.onDragEnd?.(e, node, c)
+  }, [node])
+  const onNodeSelect = useCallback((e: React.MouseEvent) => {
+    // if()
+    // instanceInterface.activateItem()
   }, [node])
   const updateNodeInternal = useCallback(() => {
     const handles = getHandlesPosition(ref, node)
@@ -68,6 +72,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({
       className={`tail-node__wrapper ${styles.wrapper}`}
       style={style}
       ref={ref}
+      onClick={onNodeSelect}
     >
       {React.cloneElement(children as any, {
         updateNodeInternal: updateNodeInternal

@@ -33,10 +33,12 @@ export type EdgeWrapperProps = {
 
 // }
 
+export type EdgeTemplatesType = IObject<ComponentType<EdgeWrapperProps>>
+
 export type EdgeRendererProps = {
-  edges: Edge[]
+  edges: IObject<Edge>
   connecting: boolean
-  templates?: IObject<ComponentType<EdgeWrapperProps>>
+  templates?: EdgeTemplatesType
 }
 
 // export type EdgeParsed = Map<string,>
