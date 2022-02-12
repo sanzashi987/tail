@@ -16,8 +16,8 @@ export type EdgeBasicProps = {
   sourceY: number
   targetX: number
   targetY: number
-  markerStart?: string
-  markerEnd?: string
+  // markerStart?: string
+  // markerEnd?: string
 }
 
 export type EdgeProps = {
@@ -71,3 +71,8 @@ export type MarkerDefsProps = {
   markers?: Marker[]
   templates?: MarkerTemplatesType
 }
+
+type NodeId = string
+type HandleId = string
+type EdgeId = string
+export type EdgeTree = Map<NodeId, Map<HandleId, Map<EdgeId,EdgeId>>>

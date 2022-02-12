@@ -1,8 +1,5 @@
 import type { HandleElement, Node, coordinates, DraggerInterface, Edge, TemplateNodeClass, EdgeTemplatesType, NodeTemplatesType, MarkerTemplatesType } from "."
 
-export type NodeEdgeMap = Map<string, IObject<string>>
-
-
 export type TailRendererProps = {
   nodes: Node[]
   edges: Edge[]
