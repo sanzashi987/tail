@@ -26,8 +26,9 @@ export type EdgeProps = {
 } & EdgeBasicProps
 
 export type EdgeWrapperProps = {
-  onClick?: (evt: React.MouseEvent, edge: Edge) => void
-} & EdgeProps
+  // onClick?: (evt: React.MouseEvent, edge: Edge) => void
+  id: string
+} /* & EdgeProps */
 
 // export type templateEdgeClass = {
 
@@ -75,4 +76,4 @@ export type MarkerDefsProps = {
 type NodeId = string
 type HandleId = string
 type EdgeId = string
-export type EdgeTree = Map<NodeId, Map<HandleId, Map<EdgeId,EdgeId>>>
+export type EdgeTree = Map<NodeId, Map<HandleId, Map<EdgeId, EdgeId>>>

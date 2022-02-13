@@ -52,10 +52,6 @@ class TailRenderer
     }
   }
 
-  getEdgesFromNodeId = (node: string) => {
-    return this.edgeRendererRef.current?.nodeToEdge.get(node)
-  }
-
   findUnreachableItems = () => {
 
   }
@@ -89,6 +85,11 @@ class TailRenderer
   }
   onDragStart() {
 
+  }
+
+
+  tryConnect(nodeId: string) {
+    
   }
 
 
