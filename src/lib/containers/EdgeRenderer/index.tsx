@@ -1,42 +1,11 @@
-import React, { FC, Component, useRef, useState, ReactNode, useMemo, useImperativeHandle } from 'react';
+import React, { Component, } from 'react';
 import type { EdgeRendererProps, EdgeTree, Edge, EdgeTemplatesType } from '@types'
 import { EdgeInProgress, BasicEdge } from '@app/components/Edge'
-
+import { registerChild, removeChild } from './utils'
 
 type Edges = EdgeRendererProps['edges']
-
-// type EdgeRenderStates = {
-//   memoEdges: Edges
-// }
-
-function removeChild(edgeTree: EdgeTree, edge: Edge) {
-  const { source, sourceNode, target, targetNode, id } = edge
-  edgeTree.get(sourceNode)?.get(source)?.delete(id)
-  edgeTree.get(targetNode)?.get(target)?.delete(id)
-}
-
-function ensureParent(tree: Map<string, any>, parentId: string) {
-  if (tree.get(parentId) === undefined) {
-    tree.set(parentId, new Map())
-  }
-}
-
-function setChild(edgeTree: EdgeTree, nodeId: string, handleId: string, edgeId: string) {
-  ensureParent(edgeTree, nodeId)
-  const nodeMap = edgeTree.get(nodeId)!
-  ensureParent(nodeMap, handleId)
-  nodeMap.get(handleId)!.set(edgeId, edgeId)
-}
-
-function registerChild(edgeTree: EdgeTree, edge: Edge) {
-  const { source, sourceNode, target, targetNode, id } = edge
-  setChild(edgeTree, sourceNode, source, id)
-  setChild(edgeTree, targetNode, target, id)
-}
-
-
 class EdgeRenderer extends Component<EdgeRendererProps> {
-  
+
   edgeTree: EdgeTree = new Map()
   edgeInstances: IObject<React.ReactNode> = {}
 
@@ -47,8 +16,7 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
 
   parseEdges(edges: Edges) {
     Object.keys(edges).forEach(key => {
-      const edge = edges[key]
-      this.mountEdge(edge)
+      this.mountEdge(edges[key])
     })
   }
 
@@ -97,7 +65,7 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
       className="tail-edge-container"
     >
       {this.props.children}
-      {Object.values(this.edgeInstances)}
+      {Object.keys(this.edgeInstances).map(k => this.edgeInstances[k])}
       {connecting && <EdgeInProgress />}
     </svg>
   }

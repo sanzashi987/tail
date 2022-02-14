@@ -8,12 +8,7 @@ const getMarkerId = (markerId?: string) => {
 
 
 const wrapEdge = (EdgeComponent: ComponentType<EdgeProps>) => {
-  const EdgeWrapper: FC<EdgeWrapperProps> = ({
-    onClick,
-    markerEnd,
-    markerStart,
-    ...edgeProps
-  }) => {
+  const EdgeWrapper: FC<EdgeWrapperProps> = ({ }) => {
     const onEdgeClick = useCallback((e: React.MouseEvent) => {
       e.stopPropagation()
       onClick?.(e, edgeProps.edge)

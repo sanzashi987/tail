@@ -5,6 +5,8 @@ import InfiniteViewer from "../InfiniteViewer";
 import type { SelectedItem, SelectedItemCollection, InterfaceValue, ConnectMethodType, NodeInternals, NodeInternalInfo, InternalMutation, TailRendererProps, WrapperDraggerInterface } from '@types'
 import { StateProvider, InterfaceProvider, StateValue, } from '@app/contexts/instance'
 import MarkerDefs from '../MarkerDefs'
+import { RecoilRoot } from 'recoil'
+
 
 
 type TailRenderState = {
@@ -89,23 +91,25 @@ class TailRenderer
 
 
   tryConnect(nodeId: string) {
-    
+
   }
 
 
   render() {
     return <InfiniteViewer>
-      <StateProvider value={this.contextState}>
-        <InterfaceProvider value={this.contextInterface}>
-          <NodeRenderer ref={this.nodeRendererRef} />
-        </InterfaceProvider>
-        <EdgeRenderer
-          ref={this.edgeRendererRef}
-          connecting={this.state.connecting}
-        >
-          <MarkerDefs />
-        </EdgeRenderer>
-      </StateProvider>
+      <RecoilRoot>
+        <StateProvider value={this.contextState}>
+          <InterfaceProvider value={this.contextInterface}>
+            <NodeRenderer ref={this.nodeRendererRef} />
+            <EdgeRenderer
+              ref={this.edgeRendererRef}
+              connecting={this.state.connecting}
+            >
+              <MarkerDefs />
+            </EdgeRenderer>
+          </InterfaceProvider>
+        </StateProvider>
+      </RecoilRoot>
     </InfiniteViewer>
   }
 }

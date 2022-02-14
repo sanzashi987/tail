@@ -3,10 +3,9 @@ import { atom } from 'recoil'
 
 
 
-function createNodeAtom(id: string, node: Node) {
-
+export function createNodeAtom(id: string, node: Node) {
   return atom({
-    key: id,
+    key: `${id}__node`,
     default: {
       node,
       selected: false,
