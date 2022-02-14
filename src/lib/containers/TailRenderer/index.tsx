@@ -2,11 +2,11 @@ import { Component, createRef } from "react";
 import NodeRenderer from "../NodeRenderer";
 import EdgeRenderer from "../EdgeRenderer";
 import InfiniteViewer from "../InfiniteViewer";
-import type { SelectedItem, SelectedItemCollection, InterfaceValue, ConnectMethodType, NodeInternals, NodeInternalInfo, InternalMutation, TailRendererProps, WrapperDraggerInterface } from '@types'
+import type { RecoilNexusInterface, SelectedItem, SelectedItemCollection, InterfaceValue, ConnectMethodType, NodeInternals, NodeInternalInfo, InternalMutation, TailRendererProps, WrapperDraggerInterface } from '@types'
 import { StateProvider, InterfaceProvider, StateValue, } from '@app/contexts/instance'
 import MarkerDefs from '../MarkerDefs'
 import { RecoilRoot } from 'recoil'
-
+import { RecoilNexus } from '@app/utils'
 
 
 type TailRenderState = {
@@ -26,6 +26,7 @@ class TailRenderer
   nodeInternals: NodeInternals = new Map()
   edgeRendererRef = createRef<EdgeRenderer>()
   nodeRendererRef = createRef<NodeRenderer>()
+  recoilInterface = createRef<RecoilNexusInterface>()
 
   contextInterface: InterfaceValue
   constructor(props: TailRendererProps) {
@@ -98,6 +99,7 @@ class TailRenderer
   render() {
     return <InfiniteViewer>
       <RecoilRoot>
+        <RecoilNexus ref={this.recoilInterface} />
         <StateProvider value={this.contextState}>
           <InterfaceProvider value={this.contextInterface}>
             <NodeRenderer ref={this.nodeRendererRef} />

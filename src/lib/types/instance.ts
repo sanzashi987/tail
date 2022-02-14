@@ -1,4 +1,5 @@
 import type { HandleElement, Node, coordinates, DraggerInterface, Edge, TemplateNodeClass, EdgeTemplatesType, NodeTemplatesType, MarkerTemplatesType } from "."
+import { RecoilValue, RecoilState } from 'recoil';
 
 export type TailRendererProps = {
   nodes: Node[]
@@ -67,4 +68,11 @@ export type DraggerCallbacksType = {
 
 export interface WrapperDraggerInterface extends DraggerCallbacksType {
 
+}
+
+export interface RecoilNexusInterface {
+  get: <T>(atom: RecoilValue<T>) => T
+  getPromise: <T>(atom: RecoilValue<T>) => Promise<T>
+  set: <T>(atom: RecoilState<T>, valOrUpdater: T | ((currVal: T) => T)) => void
+  reset: (atom: RecoilState<any>) => void
 }

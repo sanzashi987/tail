@@ -1,15 +1,19 @@
 import { Node } from '@app/types'
-import { atom } from 'recoil'
+import { atom, selectorFamily } from 'recoil'
 
 
 
-export function createNodeAtom(id: string, node: Node) {
+export function createNodeAtom<T>(node: Node<T>) {
   return atom({
-    key: `${id}__node`,
+    key: `${node.id}__node`,
     default: {
       node,
       selected: false,
-      selectedHandles: []
+      selectedHandles: [],
+      handles: {
+        source: {},
+        target: {}
+      }
     }
   })
 }
