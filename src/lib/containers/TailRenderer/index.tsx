@@ -22,6 +22,9 @@ class TailRenderer
     selected: {}
   }
 
+  edgeAtoms = {}
+  nodeAtoms = {}
+
   contextState: StateValue = null
   nodeInternals: NodeInternals = new Map()
   edgeRendererRef = createRef<EdgeRenderer>()

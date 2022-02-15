@@ -1,10 +1,10 @@
-import { Node } from '@app/types'
-import { atom, selectorFamily } from 'recoil'
+import type { Node, NodeAtomType } from '@app/types'
+import { atom, RecoilState } from 'recoil'
 
 
 
 export function createNodeAtom<T>(node: Node<T>) {
-  return atom({
+  return atom<NodeAtomType<T>>({
     key: `${node.id}__node`,
     default: {
       node,
@@ -13,7 +13,8 @@ export function createNodeAtom<T>(node: Node<T>) {
       handles: {
         source: {},
         target: {}
-      }
+      },
+      forceRender: 0
     }
   })
 }

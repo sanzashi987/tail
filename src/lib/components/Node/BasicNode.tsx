@@ -4,9 +4,6 @@ import styles from './BasicNode.module.scss'
 // import Handle from "../Handle";
 
 class BasicNode extends Component<NodeProps> {
-  // display the source/target handle after folded
-  // update when the number of handle changes
-
   render() {
     return <div className={`tail-node__basic ${styles.node}`}>
       {this.props.node.id}

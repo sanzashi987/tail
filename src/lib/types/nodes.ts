@@ -1,5 +1,6 @@
 import type { ComponentType } from "react"
 import type { HandleElement, coordinates, InternalMutation } from "."
+import { HandlesInfo } from "./instance"
 
 export type Node<T extends IObject = {}> = {
   id: string
@@ -29,10 +30,10 @@ export type NodeContainerProps = {
 
 
 export type NodeRendererProps = {
-  nodes: Node[],
+  nodes: string[],
   foldable?: boolean
   templates?: IObject<TemplateNodeClass>
-  templateIdentifier?: (node: Node) => string
+  templatePicker?: (node: Node) => [string, string]
 } & Omit<NodeWrapperProps, 'node'>
 
 
@@ -40,9 +41,8 @@ export type NodeRendererProps = {
 // } & Omit<NodeProps<T, P>, 'updateNodeInternal'>
 
 export type NodeWrapperProps<T extends IObject = {}, P extends IObject = {}> = {
-  node: NodeProps<T, P>['node']
+  id: string
 }
-
 export type NodeProps<
   T extends IObject = {},
   P extends IObject = {}
@@ -53,14 +53,8 @@ export type NodeProps<
     updateNodeInternal(): void
   } & P
 
-export type FoldedNodeExtras = {
-  hasSource: boolean
-  hasTarget: boolean
+
+export type NodeAtomType<T extends IObject = {}> = Omit<NodeProps<T, {}>, 'updateNodeInternal'> & {
+  handles: HandlesInfo,
+  forceRender: number
 }
-
-export type FoldedNodeProps<
-  T extends IObject = {},
-  P extends IObject = FoldedNodeExtras
-  > = NodeProps<T, P>
-
-

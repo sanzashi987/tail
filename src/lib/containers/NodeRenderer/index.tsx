@@ -1,8 +1,8 @@
 import React, { Component, ComponentType } from 'react';
-import { BasicNode, BasicFoldedNode } from '../../components/Node';
-import type { FoldedNodeProps, Node, NodeRendererProps, TemplateNodeClass } from '@types';
+import { BasicNode, BasicFoldedNode, NodeWrapper } from '../../components/Node';
+import type { Node, NodeRendererProps, TemplateNodeClass } from '@types';
 const defaultProps = {
-  templateIdentifier: (node: Node) => node.type,
+  templatePicker: (node: Node) => [node.type, node.fold ? 'folded' : 'default'],
   templates: {}
 } as const
 
@@ -41,25 +41,11 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
 
 
   render() {
-    const { nodes, templates, templateIdentifier, ...otherProps } = this.props
-
-    const fullTemplates = this.memoTemplates(templates)
+    const { nodes, templates, templatePicker, ...otherProps } = this.props
     return <div
       className="tail-node-container"
     >
-      {nodes.reduce<React.ReactNode[]>((prev, node) => {
-        const type = templateIdentifier(node)
-        if (!type || !fullTemplates[type]) return prev
-        const { default: template, folded: templateFolded } = fullTemplates[type]
-        prev.push(
-          <NodeContainer
-            key={node.id}
-            default={template}
-            folded={templateFolded}
-          />
-        )
-        return prev
-      }, [])}
+      {nodes.map((id) => <NodeWrapper key={id} id={id} />)}
     </div>
   }
 }
