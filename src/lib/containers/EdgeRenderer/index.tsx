@@ -1,13 +1,18 @@
-import React, { Component, } from 'react';
-import type { EdgeRendererProps, EdgeTree, Edge, EdgeTemplatesType } from '@types'
+import React, { Component, ReactNode } from 'react';
+import type { EdgeRendererProps, EdgeAtom, EdgeTree, Edge } from '@types'
 import { EdgeInProgress, BasicEdge } from '@app/components/Edge'
 import { registerChild, removeChild } from './utils'
+import type { RecoilState } from 'recoil'
+import { createEdgeAtom } from '@app/atoms/edges';
 
 type Edges = EdgeRendererProps['edges']
 class EdgeRenderer extends Component<EdgeRendererProps> {
 
   edgeTree: EdgeTree = new Map()
-  edgeInstances: IObject<React.ReactNode> = {}
+  edgeInstances: IObject<ReactNode> = {}
+  edgeAtoms: IObject<RecoilState<EdgeAtom>> = {}
+
+  memoEdges: ReactNode
 
   constructor(props: EdgeRendererProps) {
     super(props)
@@ -18,29 +23,43 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
     Object.keys(edges).forEach(key => {
       this.mountEdge(edges[key])
     })
+    this.updateEdgesNode()
   }
 
   shouldComponentUpdate(nextProps: EdgeRendererProps) {
     if (nextProps.edges !== this.props.edges) {
-      const curr = nextProps.edges, last = this.props.edges
-      const deleted = { ...last }
-      for (const key in nextProps.edges) {
-        const val = curr[key], lastVal = last[key]
-        if (lastVal === undefined) {
-          this.mountEdge(val)
-        } else {
-          delete deleted[key]
-          if (lastVal !== val) {
-            this.updateEdge(lastVal, val)
-          }
-        }
-      }
-      for (const key in deleted) {
-        this.unmountEdge(last[key])
-      }
+      this.diffEdges(nextProps.edges, this.props.edges)
+      return true
     }
     return true
   }
+
+  updateEdgesNode() {
+    this.memoEdges = Object.keys(this.edgeInstances).map(k => this.edgeInstances[k])
+  }
+
+  diffEdges(nextEdges: Edges, lastEdges: Edges) {
+    let dirty = false
+    const deleted = { ...lastEdges }
+    for (const key in nextEdges) {
+      const val = nextEdges[key], lastVal = lastEdges[key]
+      if (lastVal === undefined) {
+        !dirty && (dirty = true)
+        this.mountEdge(val)
+      } else {
+        delete deleted[key]
+        if (lastVal !== val) {
+          this.updateEdge(lastVal, val)
+        }
+      }
+    }
+    for (const key in deleted) {
+      !dirty && (dirty = true)
+      this.unmountEdge(lastEdges[key])
+    }
+    dirty && this.updateEdgesNode()
+  }
+
 
   updateEdge = (lastEdge: Edge, newEdge: Edge) => {
     removeChild(this.edgeTree, lastEdge)
@@ -48,15 +67,17 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
   }
 
   mountEdge = (edge: Edge) => {
-    registerChild(this.edgeTree, edge)
     const { type = '', id } = edge
+    this.edgeAtoms[id] = createEdgeAtom(edge)
+    registerChild(this.edgeTree, edge)
     const EdgeWrapper = this.props.templates?.[type] ?? BasicEdge
-    this.edgeInstances[id] = <EdgeWrapper id={id} key={id} />
+    this.edgeInstances[id] = <EdgeWrapper atom={this.edgeAtoms[id]} key={id} />
   }
 
   unmountEdge = (edge: Edge) => {
     removeChild(this.edgeTree, edge)
     delete this.edgeInstances[edge.id]
+    delete this.edgeAtoms[edge.id]
   }
 
   render() {
@@ -65,7 +86,7 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
       className="tail-edge-container"
     >
       {this.props.children}
-      {Object.keys(this.edgeInstances).map(k => this.edgeInstances[k])}
+      {this.memoEdges}
       {connecting && <EdgeInProgress />}
     </svg>
   }

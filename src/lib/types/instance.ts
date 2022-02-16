@@ -2,8 +2,8 @@ import type { HandleElement, Node, coordinates, DraggerInterface, Edge, Template
 import { RecoilValue, RecoilState } from 'recoil';
 
 export type TailRendererProps = {
-  nodes: Node[]
-  edges: Edge[]
+  nodes: IObject<Node>
+  edges: IObject<Edge>
   nodeTemplates?: NodeTemplatesType
   edgeTemplates?: EdgeTemplatesType
   markerTemplates?: MarkerTemplatesType
@@ -39,26 +39,21 @@ export type NodeInternalInfo = { //
 export type NodeInternals = Map<string, NodeInternalInfo>
 export interface InternalMutation {
   activateItem(id: string, item: SelectedItem<'node' | 'edge'>, append?: boolean): void
-  registerNode(id: string, node: NodeInternalInfo): void
-  delistNode(id: string): void
+  // registerNode(id: string, node: NodeInternalInfo): void
+  // delistNode(id: string): void
 }
 export type ConnectMethodType = (nodeId: string, handleId: string) => void
 export interface InterfaceValue
   extends ConnectInterface,
   WrapperDraggerInterface,
   InternalMutation {
-
+  recoilInterface: () => RecoilNexusInterface
 }
 export interface ConnectInterface {
   startConnecting: ConnectMethodType
   onConnected: ConnectMethodType
   startReconnecting: ConnectMethodType
 }
-// export interface DraggerInterface {
-//   onDragStart?: (e: React.MouseEvent, c: coordinates) => boolean | void
-//   onDrag?: (e: MouseEvent, c: coordinates) => boolean | void
-//   onDragEnd?: (e: MouseEvent, c: coordinates) => boolean | void
-// }
 
 type MouseEventCollection = React.MouseEvent | MouseEvent
 
@@ -75,4 +70,8 @@ export interface RecoilNexusInterface {
   getPromise: <T>(atom: RecoilValue<T>) => Promise<T>
   set: <T>(atom: RecoilState<T>, valOrUpdater: T | ((currVal: T) => T)) => void
   reset: (atom: RecoilState<any>) => void
+}
+
+export type AtomForceRender = {
+  forceRender: number
 }

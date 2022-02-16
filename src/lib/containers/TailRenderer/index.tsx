@@ -26,10 +26,9 @@ class TailRenderer
   nodeAtoms = {}
 
   contextState: StateValue = null
-  nodeInternals: NodeInternals = new Map()
   edgeRendererRef = createRef<EdgeRenderer>()
   nodeRendererRef = createRef<NodeRenderer>()
-  recoilInterface = createRef<RecoilNexusInterface>()
+  nexusRef = createRef<RecoilNexusInterface>()
 
   contextInterface: InterfaceValue
   constructor(props: TailRendererProps) {
@@ -38,36 +37,27 @@ class TailRenderer
       startConnecting: this.startConnecting,
       onConnected: this.onConnected,
       startReconnecting: this.startReconnecting,
-      registerNode: this.registerNode,
-      delistNode: this.delistNode,
-      activateItem: this.activateItem
+      // registerNode: this.registerNode,
+      // delistNode: this.delistNode,
+      activateItem: this.activateItem,
+      recoilInterface: this.recoilInterface
     }
+  }
+
+  recoilInterface = () => {
+    return this.nexusRef.current!
   }
 
   activateItem = (id: string, item: SelectedItem<'node' | 'edge'>, append?: boolean) => {
-    if (!!append) {
-      this.setState((prev) => {
-        return {
-          ...prev,
-          selected: {
-            ...prev.selected,
-            [id]: item
-          }
+    this.setState((prev) => {
+      return {
+        ...prev,
+        selected: {
+          ...(!!append ? prev.selected : {}),
+          [id]: item
         }
-      })
-    }
-  }
-
-  findUnreachableItems = () => {
-
-  }
-
-  registerNode = (id: string, node: NodeInternalInfo) => {
-    this.nodeInternals.set(id, node)
-  }
-
-  delistNode = (id: string) => {
-    this.nodeInternals.delete(id)
+      }
+    })
   }
 
   startConnecting: ConnectMethodType = (nodeId, handleId) => {
@@ -100,13 +90,17 @@ class TailRenderer
 
 
   render() {
+    const { nodes, edges } = this.props
     return <InfiniteViewer>
       <RecoilRoot>
-        <RecoilNexus ref={this.recoilInterface} />
+        <RecoilNexus ref={this.nexusRef} />
         <StateProvider value={this.contextState}>
           <InterfaceProvider value={this.contextInterface}>
-            <NodeRenderer ref={this.nodeRendererRef} />
+            <NodeRenderer
+              nodes={nodes}
+              ref={this.nodeRendererRef} />
             <EdgeRenderer
+              edges={edges}
               ref={this.edgeRendererRef}
               connecting={this.state.connecting}
             >

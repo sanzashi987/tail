@@ -1,5 +1,6 @@
 import React, { ComponentType } from "react"
 import type { RecoilState } from 'recoil'
+import { AtomForceRender } from "."
 export type Edge = {
   id: string,
   source: string,
@@ -20,16 +21,18 @@ export type EdgeBasicProps = {
   // markerEnd?: string
 }
 
-export type EdgeRawProps = {
+export type EdgeAtomRaw = {
   edge: Edge
   selected: boolean
 }
 
-export type EdgeProps = EdgeRawProps & EdgeBasicProps
+export type EdgeAtom = EdgeAtomRaw & AtomForceRender
+
+export type EdgeProps = EdgeAtomRaw & EdgeBasicProps
 
 export type EdgeWrapperProps = {
   // id: string
-  atom: RecoilState<EdgeRawProps>
+  atom: RecoilState<EdgeAtom>
   // onClick?: (evt: React.MouseEvent, edge: Edge) => void
 } /* & EdgeProps */
 

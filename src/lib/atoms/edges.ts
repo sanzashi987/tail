@@ -1,11 +1,11 @@
-import { Edge } from '@app/types';
+import { Edge, EdgeAtom } from '@app/types';
 import { atom, selectorFamily } from 'recoil';
 
 
 
-export function createEdgeAtom(id: string, edge: Edge) {
-  return atom({
-    key: `${id}__edge`,
+export function createEdgeAtom(edge: Edge) {
+  return atom<EdgeAtom>({
+    key: `${edge.id}__edge`,
     default: {
       edge,
       selected: false,
@@ -13,7 +13,7 @@ export function createEdgeAtom(id: string, edge: Edge) {
     }
   })
 }
-export const EdgeWrapperSelector = selectorFamily({
+export const ComputedEdgeState = selectorFamily({
   key: 'edgeWrapperSelector',
   get: () => {
 

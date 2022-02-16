@@ -1,6 +1,7 @@
-import React, { Component, ComponentType } from 'react';
+import React, { Component, ComponentType, ReactNode } from 'react';
 import { BasicNode, BasicFoldedNode, NodeWrapper } from '../../components/Node';
-import type { Node, NodeRendererProps, TemplateNodeClass } from '@types';
+import type { Node, NodeAtom, NodeRendererProps, TemplateNodeClass } from '@types';
+import { RecoilState } from 'recoil';
 const defaultProps = {
   templatePicker: (node: Node) => [node.type, node.fold ? 'folded' : 'default'],
   templates: {}
@@ -8,14 +9,14 @@ const defaultProps = {
 
 const defaultTemplate: TemplateNodeClass = {
   default: BasicNode,
-  folded: BasicFoldedNode as any
+  folded: BasicFoldedNode
 }
 
 const defaultTemplates = { 'logical': defaultTemplate }
 
 type NodeRendererPropsWithDefaults = NodeRendererProps & typeof defaultProps
 
-
+type Nodes = NodeRendererProps['nodes']
 
 function createMemoTemplates() {
   let lastTemplates: IObject<TemplateNodeClass>, lastRes: IObject<TemplateNodeClass>
@@ -30,13 +31,47 @@ function createMemoTemplates() {
 
 // const mergeTemplatesWithDefault = createMemoTemplates()
 class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
+  static defaultProps = defaultProps
 
   memoTemplates: ReturnType<typeof createMemoTemplates>
 
-  static defaultProps = defaultProps
+  nodeAtoms: IObject<RecoilState<NodeAtom>> = {}
+  nodeInstances: IObject<ReactNode> = {}
+  memoNodes: ReactNode
+
   constructor(props: NodeRendererPropsWithDefaults) {
     super(props)
     this.memoTemplates = createMemoTemplates()
+  }
+
+  shouldComponentUpdate(nextProps: NodeRendererPropsWithDefaults) {
+    if (nextProps.nodes !== this.props.nodes) {
+      this.diffNodes(nextProps.nodes, this.props.nodes)
+      return true
+    }
+    return true
+  }
+
+  updateNodesNode = () => {
+    this.memoNodes = Object.keys(this.nodeInstances).map(k => this.nodeInstances[k])
+  }
+
+  diffNodes(nextNodes: Nodes, lastNodes: Nodes) {
+
+  }
+
+
+  mountNode = (node: Node) => {
+    const { id } = node
+    
+  }
+
+  updateNode = (lastNode: Node, newNode: Node) => {
+
+  }
+
+  unmountNode = (node: Node) => {
+
   }
 
 
@@ -45,7 +80,7 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
     return <div
       className="tail-node-container"
     >
-      {nodes.map((id) => <NodeWrapper key={id} id={id} />)}
+      {this.memoNodes}
     </div>
   }
 }

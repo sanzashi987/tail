@@ -1,4 +1,4 @@
-import type { Edge, EdgeTree } from "@types"
+import type { Edge, EdgeTree, EdgeRendererProps } from "@types"
 export function removeChild(edgeTree: EdgeTree, edge: Edge) {
   const { source, sourceNode, target, targetNode, id } = edge
   edgeTree.get(sourceNode)?.get(source)?.delete(id)
