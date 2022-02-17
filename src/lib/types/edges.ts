@@ -33,6 +33,7 @@ export type EdgeProps = EdgeAtomRaw & EdgeBasicProps
 export type EdgeWrapperProps = {
   // id: string
   atom: RecoilState<EdgeAtom>
+  templates: EdgeTemplatesType
   // onClick?: (evt: React.MouseEvent, edge: Edge) => void
 } /* & EdgeProps */
 

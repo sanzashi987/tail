@@ -14,21 +14,16 @@ export type Node<T extends IObject = {}> = {
 } & T
 
 
-type MouseEventCollection = React.MouseEvent | MouseEvent
+export type MouseEventCollection = React.MouseEvent | MouseEvent
 
 export type NodeMouseCallback = (e: MouseEventCollection, n: Node) => void
 export type DraggerMouseCallback = (e: MouseEventCollection, c: coordinates) => boolean | void
 
 export type NodeTemplatesType = IObject<TemplateNodeClass>
 
-export type TemplateNodeClass = {
-  default: typeof BasicNode
-  folded: typeof BasicNode
-}
+export type NodeCom = typeof BasicNode
 
-export type NodeContainerProps = {
-
-} & TemplateNodeClass
+export type TemplateNodeClass = IObject<NodeCom>
 
 
 export type NodeRendererProps = {
@@ -43,8 +38,13 @@ export type NodeRendererProps = {
 // } & Omit<NodeProps<T, P>, 'updateNodeInternal'>
 
 export type NodeWrapperProps<T extends IObject = {}, P extends IObject = {}> = {
-  atom: RecoilState<NodeAtom>
+  atom: RecoilState<NodeAtom<T>>
+  templates: IObject<TemplateNodeClass>
+  templatePicker: (node: Node) => [string, string]
 }
+
+export type Nodes = NodeRendererProps['nodes'];
+
 export type NodeProps<
   T extends IObject = {},
   P extends IObject = {}

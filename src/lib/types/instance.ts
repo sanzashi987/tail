@@ -12,15 +12,15 @@ export type TailRendererProps = {
   onNodeDragEnd?: () => void
 }
 
-export type SelectedItem<T> = {
-  id: string,
-  type: T
-}
 
-type SelectedNode = SelectedItem<'node'>
-type SelectedEdge = SelectedItem<'edge'>
+export type SelectedItemPayload = Node | Edge
 
-export type SelectedItemCollection = IObject<SelectedNode | SelectedEdge>
+export type SelectedItemType = 'node' | 'edge'
+
+export type SelectedItemCollection = IObject<{
+  value: SelectedItemPayload,
+  type: SelectedItemType
+}>
 
 
 export type HandleMap = {
@@ -38,7 +38,7 @@ export type NodeInternalInfo = { //
 }
 export type NodeInternals = Map<string, NodeInternalInfo>
 export interface InternalMutation {
-  activateItem(id: string, item: SelectedItem<'node' | 'edge'>, append?: boolean): void
+  activateItem(e: React.MouseEvent, type: SelectedItemType, item: SelectedItemPayload): void
   // registerNode(id: string, node: NodeInternalInfo): void
   // delistNode(id: string): void
 }
@@ -47,7 +47,7 @@ export interface InterfaceValue
   extends ConnectInterface,
   WrapperDraggerInterface,
   InternalMutation {
-  recoilInterface: () => RecoilNexusInterface
+  /*  recoilInterface: () => RecoilNexusInterface */
 }
 export interface ConnectInterface {
   startConnecting: ConnectMethodType

@@ -1,88 +1,112 @@
-import React, { Component, ComponentType, ReactNode } from 'react';
-import { BasicNode, BasicFoldedNode, NodeWrapper } from '../../components/Node';
-import type { Node, NodeAtom, NodeRendererProps, TemplateNodeClass } from '@types';
+import React, { Component, createRef, ReactNode } from 'react';
+import type {
+  Nodes,
+  Node,
+  NodeAtom,
+  NodeRendererProps,
+  TemplateNodeClass,
+  RecoilNexusInterface,
+} from '@types';
 import { RecoilState } from 'recoil';
-const defaultProps = {
-  templatePicker: (node: Node) => [node.type, node.fold ? 'folded' : 'default'],
-  templates: {}
-} as const
+import { createNodeAtom } from '@app/atoms/nodes';
+import { NodeWrapper } from '@app/components/Node';
+import { defaultProps, createMemoTemplates } from './utils';
+import { RecoilNexus } from '@app/utils';
 
-const defaultTemplate: TemplateNodeClass = {
-  default: BasicNode,
-  folded: BasicFoldedNode
-}
+type NodeRendererPropsWithDefaults = NodeRendererProps & typeof defaultProps;
 
-const defaultTemplates = { 'logical': defaultTemplate }
-
-type NodeRendererPropsWithDefaults = NodeRendererProps & typeof defaultProps
-
-type Nodes = NodeRendererProps['nodes']
-
-function createMemoTemplates() {
-  let lastTemplates: IObject<TemplateNodeClass>, lastRes: IObject<TemplateNodeClass>
-  return function (templates: IObject<TemplateNodeClass>) {
-    if (templates !== lastTemplates) {
-      lastTemplates = templates
-      lastRes = { ...defaultTemplates, ...templates }
-    }
-    return lastRes
-  }
-}
-
-// const mergeTemplatesWithDefault = createMemoTemplates()
 class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
-  static defaultProps = defaultProps
+  static defaultProps = defaultProps;
 
-  memoTemplates: ReturnType<typeof createMemoTemplates>
+  memoTemplates: ReturnType<typeof createMemoTemplates>;
 
-  nodeAtoms: IObject<RecoilState<NodeAtom>> = {}
-  nodeInstances: IObject<ReactNode> = {}
-  memoNodes: ReactNode
+  nodeAtoms: IObject<RecoilState<NodeAtom>> = {};
+  nodeInstances: IObject<ReactNode> = {};
+  memoNodes: ReactNode;
+
+  recoilInterface = createRef<RecoilNexusInterface>();
 
   constructor(props: NodeRendererPropsWithDefaults) {
-    super(props)
-    this.memoTemplates = createMemoTemplates()
+    super(props);
+    this.memoTemplates = createMemoTemplates();
+    this.diffNodes(props.nodes, {});
   }
 
   shouldComponentUpdate(nextProps: NodeRendererPropsWithDefaults) {
     if (nextProps.nodes !== this.props.nodes) {
-      this.diffNodes(nextProps.nodes, this.props.nodes)
-      return true
+      this.diffNodes(nextProps.nodes, this.props.nodes);
+      return true;
     }
-    return true
+    return true;
   }
 
   updateNodesNode = () => {
-    this.memoNodes = Object.keys(this.nodeInstances).map(k => this.nodeInstances[k])
-  }
+    this.memoNodes = Object.keys(this.nodeInstances).map((k) => this.nodeInstances[k]);
+  };
 
   diffNodes(nextNodes: Nodes, lastNodes: Nodes) {
-
+    let dirty = false;
+    const deleted = { ...lastNodes };
+    for (const key in nextNodes) {
+      const nextNode = nextNodes[key],
+        lastNode = lastNodes[key];
+      if (lastNode === undefined) {
+        !dirty && (dirty = true);
+        this.mountNode(nextNode);
+      } else {
+        delete deleted[key];
+        if (nextNode !== lastNode) {
+          this.updateNode(lastNode, nextNode);
+        }
+      }
+    }
+    for (const key in deleted) {
+      !dirty && (dirty = true);
+      this.unmountNode(deleted[key]);
+    }
+    dirty && this.updateNodesNode();
   }
-
 
   mountNode = (node: Node) => {
-    const { id } = node
-    
-  }
+    const { id } = node;
+    this.nodeAtoms[id] = createNodeAtom(node);
+    const { templatePicker, templates } = this.props;
+    this.nodeInstances[id] = (
+      <NodeWrapper
+        key={id}
+        atom={this.nodeAtoms[id]}
+        templates={templates}
+        templatePicker={templatePicker}
+      />
+    );
+  };
 
-  updateNode = (lastNode: Node, newNode: Node) => {
-
-  }
+  updateNode = (lastNode: Node, nextNode: Node) => {
+    if (lastNode.id !== nextNode.id) {
+      console.log('error input ==>', lastNode, nextNode);
+      throw new Error('fail to update the edge as their id is different');
+    }
+    this.recoilInterface.current?.set(this.nodeAtoms[nextNode.id], (prev) => {
+      return {
+        ...prev,
+        node: nextNode,
+      };
+    });
+  };
 
   unmountNode = (node: Node) => {
-
-  }
-
+    delete this.nodeInstances[node.id];
+    delete this.nodeAtoms[node.id];
+  };
 
   render() {
-    const { nodes, templates, templatePicker, ...otherProps } = this.props
-    return <div
-      className="tail-node-container"
-    >
-      {this.memoNodes}
-    </div>
+    return (
+      <div className="tail-node-container">
+        {this.memoNodes}
+        <RecoilNexus ref={this.recoilInterface} />
+      </div>
+    );
   }
 }
 
-export default NodeRenderer
+export default NodeRenderer;
