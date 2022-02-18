@@ -1,7 +1,5 @@
-import type { Node, NodeAtom } from '@app/types'
-import { atom, RecoilState } from 'recoil'
-
-
+import type { Node, NodeAtom } from '@app/types';
+import { atom, RecoilState } from 'recoil';
 
 export function createNodeAtom<T>(node: Node<T>) {
   return atom<NodeAtom<T>>({
@@ -12,9 +10,9 @@ export function createNodeAtom<T>(node: Node<T>) {
       selectedHandles: [],
       handles: {
         source: {},
-        target: {}
+        target: {},
       },
-      forceRender: 0
-    }
-  })
+      forceRender: 0,
+    },
+  });
 }

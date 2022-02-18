@@ -1,26 +1,18 @@
 import React, { Component, createRef, ReactNode } from 'react';
-import type {
-  Nodes,
-  Node,
-  NodeAtom,
-  NodeRendererProps,
-  TemplateNodeClass,
-  RecoilNexusInterface,
-} from '@types';
-import { RecoilState } from 'recoil';
+import type { Nodes, Node, NodeRendererProps, RecoilNexusInterface, NodeAtomsType } from '@types';
 import { createNodeAtom } from '@app/atoms/nodes';
 import { NodeWrapper } from '@app/components/Node';
-import { defaultProps, createMemoTemplates } from './utils';
 import { RecoilNexus } from '@app/utils';
+import { defaultProps, createMemoTemplates } from './utils';
 
 type NodeRendererPropsWithDefaults = NodeRendererProps & typeof defaultProps;
 
 class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
   static defaultProps = defaultProps;
 
-  memoTemplates: ReturnType<typeof createMemoTemplates>;
+  // memoTemplates: ReturnType<typeof createMemoTemplates>;
 
-  nodeAtoms: IObject<RecoilState<NodeAtom>> = {};
+  nodeAtoms: NodeAtomsType = {};
   nodeInstances: IObject<ReactNode> = {};
   memoNodes: ReactNode;
 
@@ -28,7 +20,7 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
 
   constructor(props: NodeRendererPropsWithDefaults) {
     super(props);
-    this.memoTemplates = createMemoTemplates();
+    // this.memoTemplates = createMemoTemplates();
     this.diffNodes(props.nodes, {});
   }
 

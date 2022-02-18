@@ -1,21 +1,23 @@
-import { Component, ComponentType } from 'react'
+import React, { Component, ComponentType } from 'react';
 import type { NodeProps } from '@types';
+import styles from './BasicNode.module.scss';
 import Handle from '../Handle';
-import styles from './BasicNode.module.scss'
 
-const sourceId = 'foldedSource'
-const targetId = 'foldedTarget'
+const sourceId = 'foldedSource';
+const targetId = 'foldedTarget';
 
-class BasicFoldedNode<P extends NodeProps = NodeProps, S = {}> extends Component<P, S>{
-
-
+class BasicFoldedNode extends Component<NodeProps> {
   render() {
-    const { node: { id } } = this.props
-    return <div className={`tail-node__folded ${styles.node}`}>
-      <Handle nodeId={id} type='source' handleId={sourceId} />
-      <Handle nodeId={id} type='target' handleId={targetId} />
-    </div>;
+    const {
+      node: { id },
+    } = this.props;
+    return (
+      <div className={`tail-node__folded ${styles.node}`}>
+        <Handle nodeId={id} type="source" handleId={sourceId} />
+        <Handle nodeId={id} type="target" handleId={targetId} />
+      </div>
+    );
   }
 }
 
-export default BasicFoldedNode
+export default BasicFoldedNode;

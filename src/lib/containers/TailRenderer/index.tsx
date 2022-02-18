@@ -71,6 +71,10 @@ class TailRenderer extends Component<TailRendererProps, TailRenderState> impleme
 
   startReconnecting: ConnectMethodType = (nodeId, handleId) => {};
 
+  getNodeAtoms = () => {
+    return this.nodeRendererRef.current?.nodeAtoms ?? {};
+  };
+
   onDrag() {}
   onDragEnd() {}
   onDragStart() {}
@@ -89,6 +93,7 @@ class TailRenderer extends Component<TailRendererProps, TailRenderState> impleme
                 edges={edges}
                 ref={this.edgeRendererRef}
                 connecting={this.state.connecting}
+                getNodeAtoms={this.getNodeAtoms}
               >
                 <MarkerDefs />
               </EdgeRenderer>

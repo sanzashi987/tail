@@ -5,7 +5,7 @@ export type StateValue = {
   source: string
   sourceNode: string
   sourceNodeConfig?: Node
-  nodeInternals: NodeInternals
+  // nodeInternals: NodeInternals
 } | null
 
 

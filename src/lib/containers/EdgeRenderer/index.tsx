@@ -1,10 +1,10 @@
 import React, { Component, ReactNode, createRef } from 'react';
 import type { EdgeRendererProps, EdgeAtom, EdgeTree, Edge, RecoilNexusInterface } from '@types';
-import { EdgeInProgress, BasicEdge } from '@app/components/Edge';
-import { registerChild, removeChild } from './utils';
+import { EdgeInProgress, BasicEdge, EdgeWrapper } from '@app/components/Edge';
 import type { RecoilState } from 'recoil';
 import { createEdgeAtom } from '@app/atoms/edges';
 import { RecoilNexus } from '@app/utils';
+import { registerChild, removeChild } from './utils';
 
 type Edges = EdgeRendererProps['edges'];
 class EdgeRenderer extends Component<EdgeRendererProps> {
@@ -74,8 +74,16 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
     const { type = '', id } = edge;
     this.edgeAtoms[id] = createEdgeAtom(edge);
     registerChild(this.edgeTree, edge);
-    const EdgeWrapper = this.props.templates?.[type] ?? BasicEdge;
-    this.edgeInstances[id] = <EdgeWrapper atom={this.edgeAtoms[id]} key={id} />;
+    const EdgeComponent = this.props.templates?.[type] ?? BasicEdge;
+    const NodeAtoms = this.props.getNodeAtoms();
+    this.edgeInstances[id] = (
+      <EdgeWrapper
+        key={id}
+        nodeAtoms={NodeAtoms}
+        atom={this.edgeAtoms[id]}
+        template={EdgeComponent}
+      />
+    );
   };
 
   unmountEdge = (edge: Edge) => {

@@ -1,5 +1,5 @@
-import type { Node, HandleElement, HandleMap, HandlesInfo } from '@types'
 import React from 'react';
+import type { Node, HandleMap, HandlesInfo } from '@types';
 
 export const getHandleBounds = (nodeElement: HTMLDivElement, scale: number) => {
   const bounds = nodeElement.getBoundingClientRect();
@@ -45,11 +45,11 @@ export const getHandleBoundsByHandleType = (
       y: (bounds.top - parentBounds.top) / k,
       ...dimensions,
     };
-    return lastRes
+    return lastRes;
   }, {});
 };
 
-const EmptyHandles = { source: {}, target: {} }
+const EmptyHandles = { source: {}, target: {} };
 
 export const getHandlesPosition = (
   ref: React.RefObject<HTMLDivElement | undefined>,
@@ -57,8 +57,8 @@ export const getHandlesPosition = (
 ): HandlesInfo => {
   if (!ref.current) {
     console.warn('fail to retrieve the DOM instance of', node);
-    return EmptyHandles
+    return EmptyHandles;
   }
-  return getHandleBounds(ref.current, 1)
+  return getHandleBounds(ref.current, 1);
 
-}
+};

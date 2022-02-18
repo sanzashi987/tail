@@ -9,18 +9,18 @@ import React, {
   useContext,
   memo,
 } from 'react';
-import type { NodeWrapperProps, coordinates, NodeProps } from '@types';
+import type { NodeWrapperProps, coordinates, NodeCom } from '@types';
+import { InstanceInterface } from '@app/contexts/instance';
+import { useRecoilState } from 'recoil';
 import Dragger from './Dragger';
 import { getHandlesPosition } from './utils';
-import { InstanceInterface } from '@app/contexts/instance';
 import styles from './Wrapper.module.scss';
-import { useRecoilState } from 'recoil';
+import { BasicNode } from '.';
 
-const NodeWrapper: FC<NodeWrapperProps> = ({ atom, children }) => {
-  const [nodeInternal, setNodeInternal] = useRecoilState(atom);
+const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) => {
+  const [{ node, selected, selectedHandles }, setNodeInternal] = useRecoilState(atom);
   const ref = useRef<HTMLDivElement>(null);
-  const instanceInterface = useContext(InstanceInterface)!;
-  const { node, selected, selectedHandles } = nodeInternal;
+  const rootInterface = useContext(InstanceInterface)!;
   const [{ x, y }, setCoordinate] = useState({ x: node.left, y: node.top });
   if (node.left !== x || node.top !== y) {
     setCoordinate({ x: node.left, y: node.top });
@@ -30,33 +30,32 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, children }) => {
       transform: `translate(${x}px,${y}px)`,
     } as CSSProperties;
   }, [x, y]);
-  // const extraProps = extendedProps as P
 
   //built-in event callbacks
   const dragStart = useCallback(
     (e: React.MouseEvent, c: coordinates) => {
-      return instanceInterface.onDragStart?.(e, node, c);
+      return rootInterface.onDragStart?.(e, node, c);
     },
     [node],
   );
   const drag = useCallback(
     (e: MouseEvent, c: coordinates) => {
       setCoordinate(c);
-      return instanceInterface.onDrag?.(e, node, c);
+      return rootInterface.onDrag?.(e, node, c);
     },
     [node],
   );
   const dragEnd = useCallback(
     (e: MouseEvent, c: coordinates) => {
       setCoordinate(c);
-      return instanceInterface.onDragEnd?.(e, node, c);
+      return rootInterface.onDragEnd?.(e, node, c);
     },
     [node],
   );
   const onNodeSelect = useCallback(
     (e: React.MouseEvent) => {
       if (selected) {
-        instanceInterface.activateItem(e, 'node', node);
+        rootInterface.activateItem(e, 'node', node);
       }
     },
     [node],
@@ -66,18 +65,20 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, children }) => {
     setNodeInternal((prev) => {
       return {
         ...prev,
-        handles: handles,
+        handles,
       };
     });
-  }, []);
+  }, [node]);
 
   // built-in life cycle
-  // useEffect(() => {
-  //   return () => {
-  //     instanceInterface.delistNode(node.id);
-  //   };
-  // }, [node.id]);
+  useEffect(() => {
+    updateNodeInternal();
+  }, [updateNodeInternal]);
 
+  const NodeComponent: NodeCom = templatePicker(node).reduce<any>((last, val) => {
+    if (last[val]) return last[val];
+    return BasicNode;
+  }, templates);
   return (
     <Dragger x={x} y={y} onDragStart={dragStart} onDrag={drag} onDragEnd={dragEnd} nodeRef={ref}>
       <div
@@ -86,12 +87,16 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, children }) => {
         ref={ref}
         onClick={onNodeSelect}
       >
-        {/* {React.cloneElement(children as any, {
-          updateNodeInternal: updateNodeInternal,
-        })} */}
+        <NodeComponent
+          node={node}
+          selected={selected}
+          selectedHandles={selectedHandles}
+          updateNodeInternal={updateNodeInternal}
+        />
       </div>
     </Dragger>
   );
 };
 
-export default memo(NodeWrapper);
+// export default memo(NodeWrapper);
+export default NodeWrapper;
