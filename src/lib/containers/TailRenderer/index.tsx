@@ -1,11 +1,7 @@
-import { Component, createRef } from 'react';
-import NodeRenderer from '../NodeRenderer';
-import EdgeRenderer from '../EdgeRenderer';
-import InfiniteViewer from '../InfiniteViewer';
+import React, { Component, createRef } from 'react';
 import { StateProvider, InterfaceProvider, StateValue } from '@app/contexts/instance';
-import MarkerDefs from '../MarkerDefs';
 import { RecoilRoot } from 'recoil';
-import { CtrlOrCmd, isModifierExact, RecoilNexus } from '@app/utils';
+import { CtrlOrCmd, isModifierExact } from '@app/utils';
 import type {
   RecoilNexusInterface,
   SelectedItemCollection,
@@ -19,6 +15,10 @@ import type {
   SelectedItemType,
   SelectedItemPayload,
 } from '@types';
+import NodeRenderer from '../NodeRenderer';
+import EdgeRenderer from '../EdgeRenderer';
+import InfiniteViewer from '../InfiniteViewer';
+import MarkerDefs from '../MarkerDefs';
 
 type TailRenderState = {
   connecting: boolean;
@@ -55,7 +55,7 @@ class TailRenderer extends Component<TailRendererProps, TailRenderState> impleme
       return {
         ...prev,
         selected: {
-          ...(!!append ? prev.selected : {}),
+          ...(append ? prev.selected : {}),
           [item.id]: {
             value: item,
             type,

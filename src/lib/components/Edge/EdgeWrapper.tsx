@@ -10,9 +10,17 @@ const getMarkerId = (markerId?: string) => {
 };
 
 const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, template: EdgeComponent }) => {
-  const { edge, selected, ...sourceTarget } = useRecoilValue(
+  const { edge, selected, sourceX, sourceY, targetX, targetY } = useRecoilValue(
     computedEdgeSelector({ edge: atom, nodeAtoms }),
   );
+  if (
+    [sourceX, sourceY, targetX, targetY].reduce(
+      (last, val) => (typeof val === 'number' && !isNaN(val) ? last || false : true),
+      false,
+    )
+  )
+    return null;
+
   const rootInterface = useContext(InstanceInterface);
   const onClick = useCallback(
     (e: React.MouseEvent) => {
@@ -32,7 +40,10 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, template: EdgeComp
       <EdgeComponent
         edge={edge}
         selected={selected}
-        {...sourceTarget}
+        sourceX={sourceX}
+        sourceY={sourceY}
+        targetX={targetX}
+        targetY={targetY}
         markerEnd={markerEndUrl}
         markerStart={markerStartUrl}
       />
