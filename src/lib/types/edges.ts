@@ -2,7 +2,7 @@ import React, { ComponentType } from 'react';
 import type { RecoilState } from 'recoil';
 import { AtomForceRender, NodeAtomsType } from '.';
 
-export type Edge = {
+export type Edge<T extends IObject = {}> = {
   id: string;
   source: string;
   sourceNode: string;
@@ -12,7 +12,7 @@ export type Edge = {
   type?: string;
   markerStart?: string;
   markerEnd?: string;
-};
+} & T;
 export type EdgeBasicProps = {
   sourceX: number;
   sourceY: number;
@@ -22,9 +22,10 @@ export type EdgeBasicProps = {
   // markerEnd?: string
 };
 
-export type EdgeAtomRaw = {
-  edge: Edge;
+export type EdgeAtomRaw<T extends IObject = {}> = {
+  edge: Edge<T>;
   selected: boolean;
+  reconnect: boolean;
 };
 
 export type EdgePropsFromWrapper = {
@@ -32,15 +33,19 @@ export type EdgePropsFromWrapper = {
   markerEnd?: string;
 };
 
-export type EdgeAtom = EdgeAtomRaw & AtomForceRender;
+export interface EdgeMouseInterface {
+  onEdgeClick?: (e: React.MouseEvent, edge: Edge) => void;
+}
+
+export type EdgeAtom<T extends IObject = {}> = EdgeAtomRaw<T> & AtomForceRender;
 
 export type ComputedEdgeAtom = EdgeAtom & EdgeBasicProps;
 
-export type EdgeProps = EdgeAtomRaw & EdgeBasicProps & EdgePropsFromWrapper;
+export type EdgeProps = Omit<EdgeAtomRaw, 'reconnect'> & EdgeBasicProps & EdgePropsFromWrapper;
 
-export type EdgeWrapperProps = {
+export type EdgeWrapperProps<T extends IObject = {}> = {
   // id: string
-  atom: RecoilState<EdgeAtom>;
+  atom: RecoilState<EdgeAtom<T>>;
   nodeAtoms: NodeAtomsType;
   template: EdgeComponentType;
   // onClick?: (evt: React.MouseEvent, edge: Edge) => void

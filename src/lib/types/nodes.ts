@@ -2,7 +2,7 @@
 import type { ComponentType } from 'react';
 import type { RecoilState } from 'recoil';
 import type { HandlesInfo } from './instance';
-import type { coordinates, AtomForceRender } from '.';
+import type { coordinates, AtomForceRender, DraggerInterface } from '.';
 
 export type Node<T extends IObject = {}> = {
   id: string;
@@ -33,6 +33,7 @@ export type NodeRendererProps = {
 
 export type NodeWrapperProps<T extends IObject = {}> = {
   atom: RecoilState<NodeAtom<T>>;
+  // atom: RecoilState<NodeAtom>;
   templates: IObject<TemplateNodeClass>;
   templatePicker: (node: Node) => [string, string];
 };
@@ -42,14 +43,29 @@ export type Nodes = NodeRendererProps['nodes'];
 export type NodeProps<T extends IObject = {}> = {
   node: Node<T>;
   selected: boolean;
-  selectedHandles: string[];
+  selectedHandles: IObject<string>;
   updateNodeInternal(): void;
 };
+
+export interface NodeMouseInterface extends WrapperDraggerInterface {
+  onNodeClick?: (e: React.MouseEvent, node: Node) => void;
+}
+
+export type DraggerCallbacksType = {
+  [key in keyof DraggerInterface]?: (
+    e: MouseEventCollection,
+    n: Node,
+    c: coordinates,
+  ) => boolean | void;
+};
+
+export interface WrapperDraggerInterface extends DraggerCallbacksType {}
 
 export type NodeAtomRaw<T extends IObject = {}> = Omit<NodeProps<T>, 'updateNodeInternal'> & {
   handles: HandlesInfo;
 };
 
 export type NodeAtom<T extends IObject = {}> = NodeAtomRaw<T> & AtomForceRender;
+// export type NodeAtom = NodeAtomRaw & AtomForceRender;
 
 export type NodeAtomsType = IObject<RecoilState<NodeAtom>>;

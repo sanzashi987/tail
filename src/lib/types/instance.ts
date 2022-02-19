@@ -10,6 +10,8 @@ import type {
   MarkerTemplatesType,
 } from '.';
 import { RecoilValue, RecoilState } from 'recoil';
+import { NodeMouseInterface } from './nodes';
+import { EdgeMouseInterface } from './edges';
 
 export type TailRendererProps = {
   nodes: IObject<Node>;
@@ -17,10 +19,8 @@ export type TailRendererProps = {
   nodeTemplates?: NodeTemplatesType;
   edgeTemplates?: EdgeTemplatesType;
   markerTemplates?: MarkerTemplatesType;
-  onNodeDragStart?: () => void;
-  onNodeDrag?: () => void;
-  onNodeDragEnd?: () => void;
-};
+} & NodeMouseInterface &
+  EdgeMouseInterface;
 
 export type SelectedItemPayload = Node | Edge;
 
@@ -46,17 +46,13 @@ export type NodeInternalInfo = {
   handles: HandlesInfo;
 };
 export type NodeInternals = Map<string, NodeInternalInfo>;
-export interface InternalMutation {
+export interface GeneralMethods extends ConnectInterface {
   activateItem(e: React.MouseEvent, type: SelectedItemType, item: SelectedItemPayload): void;
-  // registerNode(id: string, node: NodeInternalInfo): void
-  // delistNode(id: string): void
 }
 export type ConnectMethodType = (nodeId: string, handleId: string) => void;
-export interface InterfaceValue
-  extends ConnectInterface,
-    WrapperDraggerInterface,
-    InternalMutation {
-  /*  recoilInterface: () => RecoilNexusInterface */
+export interface InterfaceValue extends GeneralMethods {
+  edge: EdgeMouseInterface;
+  node: NodeMouseInterface;
 }
 export interface ConnectInterface {
   startConnecting: ConnectMethodType;
@@ -65,16 +61,6 @@ export interface ConnectInterface {
 }
 
 type MouseEventCollection = React.MouseEvent | MouseEvent;
-
-export type DraggerCallbacksType = {
-  [key in keyof DraggerInterface]?: (
-    e: MouseEventCollection,
-    n: Node,
-    c: coordinates,
-  ) => boolean | void;
-};
-
-export interface WrapperDraggerInterface extends DraggerCallbacksType {}
 
 export interface RecoilNexusInterface {
   get: <T>(atom: RecoilValue<T>) => T;

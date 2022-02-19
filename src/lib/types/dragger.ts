@@ -1,3 +1,5 @@
+import React from "react";
+
 export type DraggerIterState = {
   // x: number,
   // y: number,

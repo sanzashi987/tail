@@ -7,7 +7,14 @@ import { RecoilNexus } from '@app/utils';
 import { registerChild, removeChild } from './utils';
 
 type Edges = EdgeRendererProps['edges'];
-class EdgeRenderer extends Component<EdgeRendererProps> {
+
+const defaultProps = { templates: {} };
+
+type EdgeRendererPropsWithDefaults = EdgeRendererProps & typeof defaultProps;
+
+class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
+  static defaultProps = defaultProps;
+
   edgeTree: EdgeTree = new Map();
   edgeInstances: IObject<ReactNode> = {};
   edgeAtoms: IObject<RecoilState<EdgeAtom>> = {};
@@ -15,7 +22,7 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
   memoEdges: ReactNode;
   recoilInterface = createRef<RecoilNexusInterface>();
 
-  constructor(props: EdgeRendererProps) {
+  constructor(props: EdgeRendererPropsWithDefaults) {
     super(props);
     this.diffEdges(props.edges, {});
   }
@@ -74,7 +81,7 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
     const { type = '', id } = edge;
     this.edgeAtoms[id] = createEdgeAtom(edge);
     registerChild(this.edgeTree, edge);
-    const EdgeComponent = this.props.templates?.[type] ?? BasicEdge;
+    const EdgeComponent = this.props.templates[type] ?? BasicEdge;
     const NodeAtoms = this.props.getNodeAtoms();
     this.edgeInstances[id] = (
       <EdgeWrapper

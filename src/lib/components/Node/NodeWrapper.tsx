@@ -34,21 +34,21 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   //built-in event callbacks
   const dragStart = useCallback(
     (e: React.MouseEvent, c: coordinates) => {
-      return rootInterface.onDragStart?.(e, node, c);
+      return rootInterface.node.onDragStart?.(e, node, c);
     },
     [node],
   );
   const drag = useCallback(
     (e: MouseEvent, c: coordinates) => {
       setCoordinate(c);
-      return rootInterface.onDrag?.(e, node, c);
+      return rootInterface.node.onDrag?.(e, node, c);
     },
     [node],
   );
   const dragEnd = useCallback(
     (e: MouseEvent, c: coordinates) => {
       setCoordinate(c);
-      return rootInterface.onDragEnd?.(e, node, c);
+      return rootInterface.node.onDragEnd?.(e, node, c);
     },
     [node],
   );
@@ -57,6 +57,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
       if (selected) {
         rootInterface.activateItem(e, 'node', node);
       }
+      rootInterface.node.onNodeClick?.(e, node);
     },
     [node],
   );

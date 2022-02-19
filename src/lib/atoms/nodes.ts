@@ -7,7 +7,7 @@ export function createNodeAtom<T>(node: Node<T>) {
     default: {
       node,
       selected: false,
-      selectedHandles: [],
+      selectedHandles: {},
       handles: {
         source: {},
         target: {},

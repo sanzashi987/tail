@@ -7,6 +7,7 @@ export function createEdgeAtom(edge: Edge) {
     default: {
       edge,
       selected: false,
+      reconnect: false,
       forceRender: 0,
     },
   });
@@ -25,33 +26,31 @@ const emptyHandle = {
 
 export const computedEdgeSelector = selectorFamily({
   key: 'edgeWrapperSelector',
-  get:
-    (input: any) =>
-    ({ get }) => {
-      const { edge, nodeAtoms } = input as SelectorInput;
-      const edgeState = get(edge);
-      const {
-        edge: { sourceNode, targetNode, source, target },
-      } = edgeState;
-      const sourceAtom = nodeAtoms[sourceNode],
-        targetAtom = nodeAtoms[targetNode];
-      if (!sourceAtom || !targetAtom) {
-        return {
-          ...edgeState,
-          ...emptySourceTarget,
-        };
-      }
-      const { x: sourceX, y: sourceY } = get(sourceAtom).handles.source[source] ?? emptyHandle;
-      const { x: targetX, y: targetY } = get(targetAtom).handles.target[target] ?? emptyHandle;
-
+  get: (input: any) => ({ get }) => {
+    const { edge, nodeAtoms } = input as SelectorInput;
+    const edgeState = get(edge);
+    const {
+      edge: { sourceNode, targetNode, source, target },
+    } = edgeState;
+    const sourceAtom = nodeAtoms[sourceNode],
+      targetAtom = nodeAtoms[targetNode];
+    if (!sourceAtom || !targetAtom) {
       return {
         ...edgeState,
-        sourceX,
-        sourceY,
-        targetX,
-        targetY,
+        ...emptySourceTarget,
       };
-    },
+    }
+    const { x: sourceX, y: sourceY } = get(sourceAtom).handles.source[source] ?? emptyHandle;
+    const { x: targetX, y: targetY } = get(targetAtom).handles.target[target] ?? emptyHandle;
+
+    return {
+      ...edgeState,
+      sourceX,
+      sourceY,
+      targetX,
+      targetY,
+    };
+  },
   // set: () => () => {
 
   // }

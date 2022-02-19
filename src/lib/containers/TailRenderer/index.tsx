@@ -1,19 +1,15 @@
 import React, { Component, createRef } from 'react';
 import { StateProvider, InterfaceProvider, StateValue } from '@app/contexts/instance';
 import { RecoilRoot } from 'recoil';
-import { CtrlOrCmd, isModifierExact } from '@app/utils';
+import { CtrlOrCmd, isModifierExact, RecoilNexus } from '@app/utils';
 import type {
-  RecoilNexusInterface,
   SelectedItemCollection,
   InterfaceValue,
   ConnectMethodType,
-  NodeInternals,
-  NodeInternalInfo,
-  InternalMutation,
   TailRendererProps,
-  WrapperDraggerInterface,
   SelectedItemType,
   SelectedItemPayload,
+  RecoilNexusInterface,
 } from '@types';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
@@ -22,48 +18,84 @@ import MarkerDefs from '../MarkerDefs';
 
 type TailRenderState = {
   connecting: boolean;
-  selected: SelectedItemCollection;
+  // selected: SelectedItemCollection;
 };
-class TailRenderer extends Component<TailRendererProps, TailRenderState> implements InterfaceValue {
+class TailRenderer extends Component<TailRendererProps, TailRenderState> {
   state: TailRenderState = {
     connecting: false,
-    selected: {},
   };
 
+  activeItems: SelectedItemCollection = {};
   activeHandles = {};
 
   contextState: StateValue = null;
   edgeRendererRef = createRef<EdgeRenderer>();
   nodeRendererRef = createRef<NodeRenderer>();
+  recoilInterface = createRef<RecoilNexusInterface>();
 
   contextInterface: InterfaceValue;
   constructor(props: TailRendererProps) {
     super(props);
+    const { onEdgeClick, onDragEnd, onDragStart, onDrag, onNodeClick } = props;
     this.contextInterface = {
+      edge: { onEdgeClick },
+      node: { onDrag, onDragStart, onDragEnd, onNodeClick },
       startConnecting: this.startConnecting,
       onConnected: this.onConnected,
       startReconnecting: this.startReconnecting,
-      // registerNode: this.registerNode,
-      // delistNode: this.delistNode,
       activateItem: this.activateItem,
     };
   }
 
   activateItem = (e: React.MouseEvent, type: SelectedItemType, item: SelectedItemPayload) => {
     const append = isModifierExact(e) && CtrlOrCmd(e);
-    this.setState((prev) => {
-      return {
-        ...prev,
-        selected: {
-          ...(append ? prev.selected : {}),
-          [item.id]: {
-            value: item,
-            type,
-          },
-        },
-      };
-    });
+    if (!append) this.deactivateLast();
+    this.activateAtom(type, item);
   };
+
+  activateAtom(type: SelectedItemType, item: SelectedItemPayload) {
+    
+  }
+
+  deactivateLast() {
+    Object.keys(this.activeItems).forEach((key) => {
+      const {
+        value: { id },
+        type,
+      } = this.activeItems[key];
+      this.deactivateAtom(id, type);
+    });
+    this.activeItems = {}
+  }
+
+  deactivateNodeAtom(id: string) {
+    const atom = this.nodeRendererRef.current?.nodeAtoms[id];
+    if (!atom) throw Error('fail to fetch atom pool');
+    this.recoilInterface.current?.set(atom, (prev) => {
+      const next = { ...prev };
+      next.selected = false;
+      next.selectedHandles = {};
+      return next;
+    });
+  }
+
+  deactivateEdgeAtom(id: string) {
+    const atom = this.edgeRendererRef.current?.edgeAtoms[id];
+    if (!atom) throw Error('fail to fetch atom pool');
+    this.recoilInterface.current?.set(atom, (prev) => {
+      const next = { ...prev };
+      next.selected = false;
+      return next;
+    });
+  }
+
+  deactivateAtom(id: string, type: SelectedItemType) {
+    if (type === 'edge') {
+      this.deactivateEdgeAtom(id);
+    } else if (type === 'node') {
+      this.deactivateNodeAtom(id);
+    }
+  }
 
   startConnecting: ConnectMethodType = (nodeId, handleId) => {};
 
@@ -75,10 +107,6 @@ class TailRenderer extends Component<TailRendererProps, TailRenderState> impleme
     return this.nodeRendererRef.current?.nodeAtoms ?? {};
   };
 
-  onDrag() {}
-  onDragEnd() {}
-  onDragStart() {}
-
   tryConnect(nodeId: string) {}
 
   render() {
@@ -86,6 +114,7 @@ class TailRenderer extends Component<TailRendererProps, TailRenderState> impleme
     return (
       <InfiniteViewer>
         <RecoilRoot>
+          <RecoilNexus ref={this.recoilInterface} />
           <StateProvider value={this.contextState}>
             <InterfaceProvider value={this.contextInterface}>
               <NodeRenderer nodes={nodes} ref={this.nodeRendererRef} />

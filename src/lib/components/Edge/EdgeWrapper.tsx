@@ -10,14 +10,14 @@ const getMarkerId = (markerId?: string) => {
 };
 
 const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, template: EdgeComponent }) => {
-  const { edge, selected, sourceX, sourceY, targetX, targetY } = useRecoilValue(
+  const { edge, selected, sourceX, sourceY, targetX, targetY, reconnect } = useRecoilValue(
     computedEdgeSelector({ edge: atom, nodeAtoms }),
   );
   if (
     [sourceX, sourceY, targetX, targetY].reduce(
       (last, val) => (typeof val === 'number' && !isNaN(val) ? last || false : true),
       false,
-    )
+    ) || reconnect
   )
     return null;
 
