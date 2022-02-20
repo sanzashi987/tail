@@ -1,7 +1,14 @@
 import React, { Component, ReactNode, createRef } from 'react';
-import type { EdgeRendererProps, EdgeAtom, EdgeTree, Edge, RecoilNexusInterface } from '@types';
+import type {
+  EdgeRendererProps,
+  EdgeAtomsType,
+  EdgeAtom,
+  EdgeTree,
+  Edge,
+  RecoilNexusInterface,
+} from '@types';
 import { EdgeInProgress, BasicEdge, EdgeWrapper } from '@app/components/Edge';
-import type { RecoilState } from 'recoil';
+
 import { createEdgeAtom } from '@app/atoms/edges';
 import { RecoilNexus } from '@app/utils';
 import { registerChild, removeChild } from './utils';
@@ -17,7 +24,7 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
 
   edgeTree: EdgeTree = new Map();
   edgeInstances: IObject<ReactNode> = {};
-  edgeAtoms: IObject<RecoilState<EdgeAtom>> = {};
+  edgeAtoms: EdgeAtomsType = {};
 
   memoEdges: ReactNode;
   recoilInterface = createRef<RecoilNexusInterface>();
@@ -100,13 +107,12 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
   };
 
   render() {
-    const { connecting } = this.props;
     return (
       <svg className="tail-edge-container">
         <RecoilNexus ref={this.recoilInterface} />
         {this.props.children /*for marker definition */}
         {this.memoEdges}
-        {connecting && <EdgeInProgress />}
+        {<EdgeInProgress />}
       </svg>
     );
   }

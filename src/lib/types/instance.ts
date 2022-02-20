@@ -22,12 +22,10 @@ export type TailRendererProps = {
 } & NodeMouseInterface &
   EdgeMouseInterface;
 
-export type SelectedItemPayload = Node | Edge;
-
 export type SelectedItemType = 'node' | 'edge';
 
 export type SelectedItemCollection = IObject<{
-  value: SelectedItemPayload;
+  id: string;
   type: SelectedItemType;
 }>;
 
@@ -47,7 +45,7 @@ export type NodeInternalInfo = {
 };
 export type NodeInternals = Map<string, NodeInternalInfo>;
 export interface GeneralMethods extends ConnectInterface {
-  activateItem(e: React.MouseEvent, type: SelectedItemType, item: SelectedItemPayload): void;
+  activateItem(e: React.MouseEvent, type: SelectedItemType, id: string): void;
 }
 export type ConnectMethodType = (nodeId: string, handleId: string) => void;
 export interface InterfaceValue extends GeneralMethods {

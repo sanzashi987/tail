@@ -39,6 +39,8 @@ export interface EdgeMouseInterface {
 
 export type EdgeAtom<T extends IObject = {}> = EdgeAtomRaw<T> & AtomForceRender;
 
+export type EdgeAtomsType = IObject<RecoilState<EdgeAtom>>
+
 export type ComputedEdgeAtom = EdgeAtom & EdgeBasicProps;
 
 export type EdgeProps = Omit<EdgeAtomRaw, 'reconnect'> & EdgeBasicProps & EdgePropsFromWrapper;
@@ -62,7 +64,7 @@ export type EdgeTemplatesType = IObject<EdgeComponentType>;
 
 export type EdgeRendererProps = {
   edges: IObject<Edge>;
-  connecting: boolean;
+  // connecting: boolean;
   templates?: EdgeTemplatesType;
   getNodeAtoms(): NodeAtomsType;
 };
@@ -100,3 +102,10 @@ type NodeId = string;
 type HandleId = string;
 type EdgeId = string;
 export type EdgeTree = Map<NodeId, Map<HandleId, Map<EdgeId, EdgeId>>>;
+
+export type EdgeInPrgressAtom = {
+  sourceNode: string;
+  source: string;
+  active: boolean;
+} & EdgeBasicProps;
+export type EdgeInProgressProps = {};

@@ -1,4 +1,4 @@
-import { Edge, EdgeAtom, SelectorInput } from '@app/types';
+import { Edge, EdgeAtom, EdgeInPrgressAtom, SelectorInput } from '@app/types';
 import { atom, selectorFamily } from 'recoil';
 
 export function createEdgeAtom(edge: Edge) {
@@ -55,3 +55,14 @@ export const computedEdgeSelector = selectorFamily({
 
   // }
 });
+
+export const EdgeInProgressAtom = atom<EdgeInPrgressAtom>({
+  key: 'tailEdgeInProgress',
+  default: {
+    active: false,
+    source: '',
+    sourceNode: '',
+    ...emptySourceTarget,
+  },
+});
+
