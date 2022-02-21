@@ -1,4 +1,4 @@
-import { Edge, EdgeAtom, EdgeInPrgressAtom, SelectorInput } from '@app/types';
+import { Edge, EdgeAtom, EdgeInProgressAtomType, SelectorInput } from '@app/types';
 import { atom, selectorFamily } from 'recoil';
 
 export function createEdgeAtom(edge: Edge) {
@@ -26,37 +26,36 @@ const emptyHandle = {
 
 export const computedEdgeSelector = selectorFamily({
   key: 'edgeWrapperSelector',
-  get: (input: any) => ({ get }) => {
-    const { edge, nodeAtoms } = input as SelectorInput;
-    const edgeState = get(edge);
-    const {
-      edge: { sourceNode, targetNode, source, target },
-    } = edgeState;
-    const sourceAtom = nodeAtoms[sourceNode],
-      targetAtom = nodeAtoms[targetNode];
-    if (!sourceAtom || !targetAtom) {
+  get:
+    (input: any) =>
+    ({ get }) => {
+      const { edge, nodeAtoms } = input as SelectorInput;
+      const edgeState = get(edge);
+      const {
+        edge: { sourceNode, targetNode, source, target },
+      } = edgeState;
+      const sourceAtom = nodeAtoms[sourceNode],
+        targetAtom = nodeAtoms[targetNode];
+      if (!sourceAtom || !targetAtom) {
+        return {
+          ...edgeState,
+          ...emptySourceTarget,
+        };
+      }
+      const { x: sourceX, y: sourceY } = get(sourceAtom).handles.source[source] ?? emptyHandle;
+      const { x: targetX, y: targetY } = get(targetAtom).handles.target[target] ?? emptyHandle;
+
       return {
         ...edgeState,
-        ...emptySourceTarget,
+        sourceX,
+        sourceY,
+        targetX,
+        targetY,
       };
-    }
-    const { x: sourceX, y: sourceY } = get(sourceAtom).handles.source[source] ?? emptyHandle;
-    const { x: targetX, y: targetY } = get(targetAtom).handles.target[target] ?? emptyHandle;
-
-    return {
-      ...edgeState,
-      sourceX,
-      sourceY,
-      targetX,
-      targetY,
-    };
-  },
-  // set: () => () => {
-
-  // }
+    },
 });
 
-export const EdgeInProgressAtom = atom<EdgeInPrgressAtom>({
+export const edgeInProgressAtom = atom<EdgeInProgressAtomType>({
   key: 'tailEdgeInProgress',
   default: {
     active: false,
@@ -65,4 +64,3 @@ export const EdgeInProgressAtom = atom<EdgeInPrgressAtom>({
     ...emptySourceTarget,
   },
 });
-

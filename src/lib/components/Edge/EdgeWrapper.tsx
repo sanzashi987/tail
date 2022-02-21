@@ -25,10 +25,10 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, template: EdgeComp
   const onClick = useCallback(
     (e: React.MouseEvent) => {
       if (!selected) {
-        rootInterface?.activateItem(e, 'edge', edge);
+        rootInterface?.activateItem(e, 'edge', edge.id);
       }
     },
-    [selected, edge],
+    [selected, edge.id],
   );
 
   const { markerEnd, markerStart } = edge;

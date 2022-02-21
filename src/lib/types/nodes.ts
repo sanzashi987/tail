@@ -43,7 +43,7 @@ export type Nodes = NodeRendererProps['nodes'];
 export type NodeProps<T extends IObject = {}> = {
   node: Node<T>;
   selected: boolean;
-  selectedHandles: IObject<string>;
+  selectedHandles: IObject<number>;
   updateNodeInternal(): void;
 };
 
@@ -59,7 +59,7 @@ export type DraggerCallbacksType = {
   ) => boolean | void;
 };
 
-export interface WrapperDraggerInterface extends DraggerCallbacksType {}
+export type WrapperDraggerInterface = DraggerCallbacksType
 
 export type NodeAtomRaw<T extends IObject = {}> = Omit<NodeProps<T>, 'updateNodeInternal'> & {
   handles: HandlesInfo;

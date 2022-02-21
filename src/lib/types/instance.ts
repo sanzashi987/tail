@@ -1,17 +1,14 @@
+import { RecoilValue, RecoilState } from 'recoil';
+import { NodeMouseInterface } from './nodes';
+import { EdgeMouseInterface } from './edges';
 import type {
   HandleElement,
   Node,
-  coordinates,
-  DraggerInterface,
   Edge,
-  TemplateNodeClass,
   EdgeTemplatesType,
   NodeTemplatesType,
   MarkerTemplatesType,
 } from '.';
-import { RecoilValue, RecoilState } from 'recoil';
-import { NodeMouseInterface } from './nodes';
-import { EdgeMouseInterface } from './edges';
 
 export type TailRendererProps = {
   nodes: IObject<Node>;
@@ -21,6 +18,18 @@ export type TailRendererProps = {
   markerTemplates?: MarkerTemplatesType;
 } & NodeMouseInterface &
   EdgeMouseInterface;
+
+export interface NodeMutation {
+  onNodeCreate(): void;
+  onNodeUpdate(): void;
+  onNodeDelete(): void;
+}
+
+export interface EdgeMutation {
+  onEdgeCreate(): void;
+  onEdgeUpdate(): void;
+  onEdgeDelete(): void;
+}
 
 export type SelectedItemType = 'node' | 'edge';
 

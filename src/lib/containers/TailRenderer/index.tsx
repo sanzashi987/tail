@@ -12,18 +12,19 @@ import type {
   EdgeAtom,
   NodeAtom,
 } from '@types';
+import { edgeInProgressAtom } from '@app/atoms/edges';
+import { getAtom, immutableSelectedHandles, activateHandle, deactivateHandle } from './mutation';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
 import InfiniteViewer from '../InfiniteViewer';
 import MarkerDefs from '../MarkerDefs';
-import { getAtom } from './mutation';
 
 class TailRenderer extends Component<TailRendererProps> {
   activeItems: SelectedItemCollection = {};
 
-  edgeRendererRef = createRef<EdgeRenderer>();
-  nodeRendererRef = createRef<NodeRenderer>();
-  recoilInterface = createRef<RecoilNexusInterface>();
+  edgeRef = createRef<EdgeRenderer>();
+  nodeRef = createRef<NodeRenderer>();
+  nexus = createRef<RecoilNexusInterface>();
 
   contextInterface: InterfaceValue;
   constructor(props: TailRendererProps) {
@@ -47,68 +48,86 @@ class TailRenderer extends Component<TailRendererProps> {
 
   activateNext(type: SelectedItemType, id: string) {
     this.activeItems[id] = { id, type };
+    const atom = this.setSelectedAtom(type, id, true);
     if (type === 'edge') {
-      this.activateEdgeAtom(id);
-    } else if (type === 'node') {
-      this.activateNodeAtom(id);
+      const {
+        edge: { sourceNode, target, targetNode, source },
+      } = this.recoilGet(atom as RecoilState<EdgeAtom>)!;
+      this.setSelectedHandle(sourceNode, source, activateHandle);
+      this.setSelectedHandle(targetNode, target, activateHandle);
     }
-  }
-
-  activateEdgeAtom(id: string) {
-    const atom = getAtom(id, this.nodeRendererRef.current?.nodeAtoms);
-  }
-
-  activateNodeAtom(id: string) {
-    const atom = getAtom(id, this.edgeRendererRef.current?.edgeAtoms);
   }
 
   deactivateLast() {
     Object.keys(this.activeItems).forEach((key) => {
       const { id, type } = this.activeItems[key];
-      // this.deactivateAtom(id, type);
+      this.deactivateAtom(type, id);
     });
     this.activeItems = {};
   }
 
-  deactivateAtom(id: string, type: SelectedItemType) {
-    const atomPool =
-      type === 'edge'
-        ? this.edgeRendererRef.current?.edgeAtoms
-        : this.nodeRendererRef.current?.nodeAtoms;
-    const atom = getAtom(id, atomPool);
-    this.reocoilSet<NodeAtom | EdgeAtom>(atom, (prev) => {
-      const next = { ...prev };
-      next.selected = false;
+  deactivateAtom(type: SelectedItemType, id: string) {
+    const atom = this.setSelectedAtom(type, id, false);
+    if (type === 'edge') {
+      const {
+        edge: { sourceNode, target, targetNode, source },
+      } = this.recoilGet(atom as RecoilState<EdgeAtom>)!;
+      this.setSelectedHandle(sourceNode, source, deactivateHandle);
+      this.setSelectedHandle(targetNode, target, deactivateHandle);
+    }
+  }
+
+  setSelectedHandle(
+    nodeId: string,
+    handleId: string,
+    cb: (next: NodeAtom, handleId: string) => void,
+  ) {
+    const atom = getAtom(nodeId, this.nodeRef.current?.nodeAtoms);
+    this.reocoilSet(atom as RecoilState<NodeAtom>, (prev) => {
+      const next = immutableSelectedHandles(prev);
+      cb(next, handleId);
       return next;
     });
   }
 
-  deactivateHandle(nodeId: string, handleId: string) {
-    const atom = getAtom(nodeId, this.nodeRendererRef.current?.nodeAtoms);
-    this.reocoilSet(atom as RecoilState<NodeAtom>, (prev) => {
+  setSelectedAtom(type: SelectedItemType, id: string, bol: boolean) {
+    const atom = this.getAtom(type, id);
+    this.reocoilSet(atom, (prev) => {
       const next = { ...prev };
-      next.selectedHandles = { ...next.selectedHandles };
-      delete next.selectedHandles[handleId];
+      next.selected = bol;
       return next;
     });
+    return atom;
+  }
+
+  getAtom(type: SelectedItemType, id: string) {
+    const atomPool =
+      type === 'edge' ? this.edgeRef.current?.edgeAtoms : this.nodeRef.current?.nodeAtoms;
+    return getAtom(id, atomPool);
   }
 
   reocoilSet<T>(atom: RecoilState<T>, updater: (cur: T) => T) {
-    return this.recoilInterface.current?.set<T>(atom, updater);
+    return this.nexus.current?.set<T>(atom, updater);
   }
 
   recoilGet<T>(atom: RecoilValue<T>) {
-    return this.recoilInterface.current?.get<T>(atom);
+    return this.nexus.current?.get<T>(atom);
   }
 
   startConnecting: ConnectMethodType = (nodeId, handleId) => {};
 
-  onConnected: ConnectMethodType = (nodeId, handleId) => {};
+  onConnected: ConnectMethodType = (nodeId, handleId) => {
+    const { active, sourceNode, source } = this.recoilGet(edgeInProgressAtom)!;
+    if (active) {
+    }
+
+    this.nexus.current?.reset(edgeInProgressAtom);
+  };
 
   startReconnecting: ConnectMethodType = (nodeId, handleId) => {};
 
   getNodeAtoms = () => {
-    return this.nodeRendererRef.current?.nodeAtoms ?? {};
+    return this.nodeRef.current?.nodeAtoms ?? {};
   };
 
   tryConnect(nodeId: string) {}
@@ -118,10 +137,10 @@ class TailRenderer extends Component<TailRendererProps> {
     return (
       <InfiniteViewer>
         <RecoilRoot>
-          <RecoilNexus ref={this.recoilInterface} />
+          <RecoilNexus ref={this.nexus} />
           <InterfaceProvider value={this.contextInterface}>
-            <NodeRenderer nodes={nodes} ref={this.nodeRendererRef} />
-            <EdgeRenderer edges={edges} ref={this.edgeRendererRef} getNodeAtoms={this.getNodeAtoms}>
+            <NodeRenderer nodes={nodes} ref={this.nodeRef} />
+            <EdgeRenderer edges={edges} ref={this.edgeRef} getNodeAtoms={this.getNodeAtoms}>
               <MarkerDefs />
             </EdgeRenderer>
           </InterfaceProvider>
