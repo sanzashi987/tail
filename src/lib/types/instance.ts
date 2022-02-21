@@ -1,6 +1,6 @@
 import { RecoilValue, RecoilState } from 'recoil';
 import { NodeMouseInterface } from './nodes';
-import { EdgeMouseInterface } from './edges';
+import { EdgeBasic, EdgeMouseInterface } from './edges';
 import type {
   HandleElement,
   Node,
@@ -9,15 +9,23 @@ import type {
   NodeTemplatesType,
   MarkerTemplatesType,
 } from '.';
+import React from 'react';
+
+export type TailRendererOptionalProps = {
+  nodeTemplates: NodeTemplatesType;
+  edgeTemplates: EdgeTemplatesType;
+  markerTemplates: MarkerTemplatesType;
+} & NodeMutation &
+  EdgeMutation &
+  NodeMouseInterface &
+  EdgeMouseInterface;
 
 export type TailRendererProps = {
   nodes: IObject<Node>;
   edges: IObject<Edge>;
-  nodeTemplates?: NodeTemplatesType;
-  edgeTemplates?: EdgeTemplatesType;
-  markerTemplates?: MarkerTemplatesType;
 } & NodeMouseInterface &
-  EdgeMouseInterface;
+  EdgeMouseInterface &
+  TailRendererOptionalProps;
 
 export interface NodeMutation {
   onNodeCreate(): void;
@@ -26,7 +34,7 @@ export interface NodeMutation {
 }
 
 export interface EdgeMutation {
-  onEdgeCreate(): void;
+  onEdgeCreate(edgeBasic: EdgeBasic): void;
   onEdgeUpdate(): void;
   onEdgeDelete(): void;
 }
@@ -55,6 +63,7 @@ export type NodeInternalInfo = {
 export type NodeInternals = Map<string, NodeInternalInfo>;
 export interface GeneralMethods extends ConnectInterface {
   activateItem(e: React.MouseEvent, type: SelectedItemType, id: string): void;
+  getScale(): number;
 }
 export type ConnectMethodType = (nodeId: string, handleId: string) => void;
 export interface InterfaceValue extends GeneralMethods {
@@ -62,7 +71,7 @@ export interface InterfaceValue extends GeneralMethods {
   node: NodeMouseInterface;
 }
 export interface ConnectInterface {
-  startConnecting: ConnectMethodType;
+  startConnecting: (e: React.MouseEvent, nodeId: string, handleId: string) => void;
   onConnected: ConnectMethodType;
   startReconnecting: ConnectMethodType;
 }

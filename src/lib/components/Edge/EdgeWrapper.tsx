@@ -17,18 +17,20 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, template: EdgeComp
     [sourceX, sourceY, targetX, targetY].reduce(
       (last, val) => (typeof val === 'number' && !isNaN(val) ? last || false : true),
       false,
-    ) || reconnect
+    ) ||
+    reconnect
   )
     return null;
 
-  const rootInterface = useContext(InstanceInterface);
+  const rootInterface = useContext(InstanceInterface)!;
   const onClick = useCallback(
     (e: React.MouseEvent) => {
       if (!selected) {
-        rootInterface?.activateItem(e, 'edge', edge.id);
+        rootInterface.activateItem(e, 'edge', edge.id);
       }
+      rootInterface.edge.onEdgeClick(e, edge);
     },
-    [selected, edge.id],
+    [selected, edge],
   );
 
   const { markerEnd, markerStart } = edge;

@@ -31,9 +31,9 @@ export type DraggerCoreProps<T> = {
 } & DraggerCoreBasic;
 
 export interface DraggerInterface {
-  onDragStart?: (e: React.MouseEvent, c: coordinates) => boolean | void
-  onDrag?: (e: MouseEvent, c: coordinates) => boolean | void
-  onDragEnd?: (e: MouseEvent, c: coordinates) => boolean | void
+  onDragStart: (e: React.MouseEvent, c: coordinates) => boolean | void
+  onDrag: (e: MouseEvent, c: coordinates) => boolean | void
+  onDragEnd: (e: MouseEvent, c: coordinates) => boolean | void
 }
 
 export type DraggerProps = DraggerInterface & DraggerCoreBasic & coordinates

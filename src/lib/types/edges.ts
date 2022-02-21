@@ -2,17 +2,22 @@ import React, { ComponentType } from 'react';
 import type { RecoilState } from 'recoil';
 import { AtomForceRender, NodeAtomsType } from '.';
 
-export type Edge<T extends IObject = {}> = {
-  id: string;
+export type EdgeBasic = {
   source: string;
   sourceNode: string;
   target: string;
   targetNode: string;
+};
+
+export type Edge<T extends IObject = {}> = {
+  id: string;
   disable?: boolean;
   type?: string;
   markerStart?: string;
   markerEnd?: string;
-} & T;
+} & EdgeBasic &
+  T;
+
 export type EdgeBasicProps = {
   sourceX: number;
   sourceY: number;
@@ -34,7 +39,7 @@ export type EdgePropsFromWrapper = {
 };
 
 export interface EdgeMouseInterface {
-  onEdgeClick?: (e: React.MouseEvent, edge: Edge) => void;
+  onEdgeClick: (e: React.MouseEvent, edge: Edge) => void;
 }
 
 export type EdgeAtom<T extends IObject = {}> = EdgeAtomRaw<T> & AtomForceRender;

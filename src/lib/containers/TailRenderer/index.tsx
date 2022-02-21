@@ -13,7 +13,13 @@ import type {
   NodeAtom,
 } from '@types';
 import { edgeInProgressAtom } from '@app/atoms/edges';
-import { getAtom, immutableSelectedHandles, activateHandle, deactivateHandle } from './mutation';
+import {
+  getAtom,
+  immutableSelectedHandles,
+  activateHandle,
+  deactivateHandle,
+  activateEgdeInProgress,
+} from './mutation';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
 import InfiniteViewer from '../InfiniteViewer';
@@ -22,6 +28,7 @@ import MarkerDefs from '../MarkerDefs';
 class TailRenderer extends Component<TailRendererProps> {
   activeItems: SelectedItemCollection = {};
 
+  viewer = createRef<InfiniteViewer>();
   edgeRef = createRef<EdgeRenderer>();
   nodeRef = createRef<NodeRenderer>();
   nexus = createRef<RecoilNexusInterface>();
@@ -37,6 +44,7 @@ class TailRenderer extends Component<TailRendererProps> {
       onConnected: this.onConnected,
       startReconnecting: this.startReconnecting,
       activateItem: this.activateItem,
+      getScale: this.getScale,
     };
   }
 
@@ -106,7 +114,7 @@ class TailRenderer extends Component<TailRendererProps> {
     return getAtom(id, atomPool);
   }
 
-  reocoilSet<T>(atom: RecoilState<T>, updater: (cur: T) => T) {
+  reocoilSet<T>(atom: RecoilState<T>, updater: T | ((cur: T) => T)) {
     return this.nexus.current?.set<T>(atom, updater);
   }
 
@@ -114,13 +122,31 @@ class TailRenderer extends Component<TailRendererProps> {
     return this.nexus.current?.get<T>(atom);
   }
 
-  startConnecting: ConnectMethodType = (nodeId, handleId) => {};
+  startConnecting = (e: React.MouseEvent, nodeId: string, handleId: string) => {
+    const handles = this.recoilGet(this.getAtom('node', nodeId) as RecoilState<NodeAtom>)?.handles;
+    if (!handles || !handles.source[handleId]) {
+      throw new Error('fail to fetch start handle info');
+    }
+    const { x, y } = handles.source[handleId];
+    this.reocoilSet(edgeInProgressAtom, activateEgdeInProgress(x, y, nodeId, handleId));
+    document.addEventListener('mousemove', this.onConnecting);
+    document.addEventListener('mouseup', this.onConnectEnd);
+  };
+
+  onConnecting = (e: MouseEvent) => {};
+
+  onConnectEnd = (e: MouseEvent) => {};
 
   onConnected: ConnectMethodType = (nodeId, handleId) => {
     const { active, sourceNode, source } = this.recoilGet(edgeInProgressAtom)!;
     if (active) {
+      this.props.onEdgeCreate({
+        source,
+        sourceNode,
+        target: handleId,
+        targetNode: nodeId,
+      });
     }
-
     this.nexus.current?.reset(edgeInProgressAtom);
   };
 
@@ -130,12 +156,16 @@ class TailRenderer extends Component<TailRendererProps> {
     return this.nodeRef.current?.nodeAtoms ?? {};
   };
 
-  tryConnect(nodeId: string) {}
+  getScale = () => {
+    return this.viewer.current?.getScale() || 1;
+  };
+
+  stopConnect(nodeId: string) {}
 
   render() {
     const { nodes, edges } = this.props;
     return (
-      <InfiniteViewer>
+      <InfiniteViewer ref={this.viewer}>
         <RecoilRoot>
           <RecoilNexus ref={this.nexus} />
           <InterfaceProvider value={this.contextInterface}>

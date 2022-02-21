@@ -34,32 +34,32 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   //built-in event callbacks
   const dragStart = useCallback(
     (e: React.MouseEvent, c: coordinates) => {
-      return rootInterface.node.onDragStart?.(e, node, c);
+      return rootInterface.node.onDragStart(e, node, c);
     },
     [node],
   );
   const drag = useCallback(
     (e: MouseEvent, c: coordinates) => {
       setCoordinate(c);
-      return rootInterface.node.onDrag?.(e, node, c);
+      return rootInterface.node.onDrag(e, node, c);
     },
     [node],
   );
   const dragEnd = useCallback(
     (e: MouseEvent, c: coordinates) => {
       setCoordinate(c);
-      return rootInterface.node.onDragEnd?.(e, node, c);
+      return rootInterface.node.onDragEnd(e, node, c);
     },
     [node],
   );
   const onNodeSelect = useCallback(
     (e: React.MouseEvent) => {
       if (selected) {
-        rootInterface.activateItem(e, 'node', node);
+        rootInterface.activateItem(e, 'node', node.id);
       }
-      rootInterface.node.onNodeClick?.(e, node);
+      rootInterface.node.onNodeClick(e, node);
     },
-    [node],
+    [node.id],
   );
   const updateNodeInternal = useCallback(() => {
     const handles = getHandlesPosition(ref, node);
@@ -81,7 +81,15 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
     return BasicNode;
   }, templates);
   return (
-    <Dragger x={x} y={y} onDragStart={dragStart} onDrag={drag} onDragEnd={dragEnd} nodeRef={ref}>
+    <Dragger
+      x={x}
+      y={y}
+      getScale={rootInterface.getScale}
+      onDragStart={dragStart}
+      onDrag={drag}
+      onDragEnd={dragEnd}
+      nodeRef={ref}
+    >
       <div
         className={`tail-node__wrapper ${styles.wrapper}`}
         style={style}
