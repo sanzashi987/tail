@@ -8,9 +8,9 @@ import type {
   RecoilNexusInterface,
 } from '@types';
 import { EdgeInProgress, BasicEdge, EdgeWrapper } from '@app/components/Edge';
-
 import { createEdgeAtom } from '@app/atoms/edges';
 import { RecoilNexus } from '@app/utils';
+import styles from './index.module.scss';
 import { registerChild, removeChild } from './utils';
 
 type Edges = EdgeRendererProps['edges'];
@@ -31,7 +31,6 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
 
   constructor(props: EdgeRendererPropsWithDefaults) {
     super(props);
-    console.log(this.props.getNodeAtoms());
     this.diffEdges({}, props.edges);
   }
 
@@ -109,7 +108,7 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
 
   render() {
     return (
-      <svg className="tail-edge-container">
+      <svg className={`tail-edge-container ${styles['edge-container']}`}>
         <RecoilNexus ref={this.recoilInterface} />
         {this.props.children /*for marker definition */}
         {this.memoEdges}

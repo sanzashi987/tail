@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import type { ComponentType } from 'react';
+import { Component, ComponentType } from 'react';
 import type { RecoilState } from 'recoil';
 import type { HandlesInfo } from './instance';
 import type { coordinates, AtomForceRender, DraggerInterface } from '.';
@@ -45,7 +45,7 @@ export type NodeProps<T extends IObject = {}> = {
   node: Node<T>;
   selected: boolean;
   selectedHandles: IObject<number>;
-  updateNodeInternal(): void;
+  updateNodeHandles(): void;
 };
 
 export interface NodeMouseInterface extends WrapperDraggerInterface {
@@ -63,7 +63,7 @@ export type DraggerCallbacksType = {
 };
 
 
-export type NodeAtomRaw<T extends IObject = {}> = Omit<NodeProps<T>, 'updateNodeInternal'> & {
+export type NodeAtomRaw<T extends IObject = {}> = Omit<NodeProps<T>, 'updateNodeHandles'> & {
   handles: HandlesInfo;
 };
 

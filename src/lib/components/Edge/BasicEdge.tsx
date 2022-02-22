@@ -9,8 +9,10 @@ class BasicEdge extends Component<EdgeProps> {
       <path
         className="tail-edge__basic"
         d={`M ${sourceX},${sourceY}L ${targetX},${targetY}`}
-        markerEnd={markerEnd}
+        // markerEnd={markerEnd}
+        markerEnd="url(#tail-marker__basic)"
         markerStart={markerStart}
+        stroke="black"
       />
     );
   }

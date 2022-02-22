@@ -63,7 +63,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
     },
     [node.id],
   );
-  const updateNodeInternal = useCallback(() => {
+  const updateNodeHandles = useCallback(() => {
     const handles = getHandlesPosition(ref, node);
     setNodeInternal((prev) => {
       return {
@@ -75,8 +75,8 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
 
   // built-in life cycle
   useEffect(() => {
-    updateNodeInternal();
-  }, [updateNodeInternal]);
+    updateNodeHandles();
+  }, []);
 
   const NodeComponent: NodeCom = templatePicker(node).reduce<any>((last, val) => {
     if (last[val]) return last[val];
@@ -102,7 +102,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
           node={node}
           selected={selected}
           selectedHandles={selectedHandles}
-          updateNodeInternal={updateNodeInternal}
+          updateNodeHandles={updateNodeHandles}
         />
       </div>
     </Dragger>

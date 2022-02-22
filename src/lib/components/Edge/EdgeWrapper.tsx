@@ -19,8 +19,9 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, template: EdgeComp
       false,
     ) ||
     reconnect
-  )
+  ) {
     return null;
+  }
 
   const rootInterface = useContext(InstanceInterface)!;
   const onClick = useCallback(

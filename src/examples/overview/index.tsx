@@ -36,7 +36,7 @@ function Overview() {
     const { id } = n;
     setNodeState((pre) => {
       const val = { ...pre[id] };
-      [val.top, val.left] = [c.x, c.y];
+      [val.left, val.top] = [c.x, c.y];
       return {
         ...pre,
         [id]: val,
@@ -57,7 +57,7 @@ function Overview() {
       onEdgeCreate={noop}
       onEdgeUpdate={noop}
       onEdgeDelete={noop}
-      onDragStart={onDrag}
+      onDragStart={noop}
       onDrag={onDrag}
       onDragEnd={onDrag}
       nodeTemplates={{}}

@@ -43,7 +43,8 @@ class Handle extends Component<HandlePropsInner> {
     const { handleId, nodeId, type, selected = false } = this.props;
     return (
       <div
-        data-handle-id={`${nodeId}.${handleId}`}
+        data-node-id={nodeId}
+        data-handle-id={handleId}
         className={getHanldeClassName(type, selected)}
         // onMouseDown={this.onMouseDown}
         // onMouseUp={this.onMouseUp}

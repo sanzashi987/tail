@@ -6,4 +6,16 @@
   // align-items: center;
   position: relative;
   border: 1px solid black;
+  :global {
+    .target {
+      position: absolute;
+      left: -4px;
+      top: calc(50% - 4px);
+    }
+    .source {
+      position: absolute;
+      right: -4px;
+      top: calc(50% - 4px);
+    }
+  }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Node, HandleMap, HandlesInfo } from '@types';
+import type { Node, HandleElement, HandleMap, HandlesInfo, coordinates } from '@types';
 
 export const getHandleBounds = (nodeElement: HTMLDivElement, scale: number) => {
   const bounds = nodeElement.getBoundingClientRect();
@@ -10,12 +10,11 @@ export const getHandleBounds = (nodeElement: HTMLDivElement, scale: number) => {
   };
 };
 
-
 export const getHandleBoundsByHandleType = (
   selector: string,
   nodeElement: HTMLDivElement,
   parentBounds: DOMRect,
-  k: number
+  k: number,
 ): HandleMap => {
   const handles = nodeElement.querySelectorAll(selector);
 
@@ -41,8 +40,8 @@ export const getHandleBoundsByHandleType = (
     lastRes[handleId!] = {
       id: handleId!,
       // position: handlePosition,
-      x: (bounds.left - parentBounds.left) / k,
-      y: (bounds.top - parentBounds.top) / k,
+      x: (bounds.left - parentBounds.left + dimensions.width / 2) / k,
+      y: (bounds.top - parentBounds.top + dimensions.height / 2) / k,
       ...dimensions,
     };
     return lastRes;
@@ -53,12 +52,11 @@ const EmptyHandles = { source: {}, target: {} };
 
 export const getHandlesPosition = (
   ref: React.RefObject<HTMLDivElement | undefined>,
-  node: Node
+  node: Node,
 ): HandlesInfo => {
   if (!ref.current) {
     console.warn('fail to retrieve the DOM instance of', node);
     return EmptyHandles;
   }
   return getHandleBounds(ref.current, 1);
-
 };

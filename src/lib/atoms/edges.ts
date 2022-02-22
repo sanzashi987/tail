@@ -42,15 +42,24 @@ export const computedEdgeSelector = selectorFamily({
           ...emptySourceTarget,
         };
       }
-      const { x: sourceX, y: sourceY } = get(sourceAtom).handles.source[source] ?? emptyHandle;
-      const { x: targetX, y: targetY } = get(targetAtom).handles.target[target] ?? emptyHandle;
+      const {
+        handles: { source: sourceHandles },
+        node: { left: sourceLeft, top: sourceTop },
+      } = get(sourceAtom);
+      const {
+        handles: { target: targetHandles },
+        node: { left: targetLeft, top: targetTop },
+      } = get(targetAtom);
+
+      const { x: sourceX, y: sourceY } = sourceHandles[source] ?? emptyHandle;
+      const { x: targetX, y: targetY } = targetHandles[target] ?? emptyHandle;
 
       return {
         ...edgeState,
-        sourceX,
-        sourceY,
-        targetX,
-        targetY,
+        sourceX: sourceX + sourceLeft,
+        sourceY: sourceY + sourceTop,
+        targetX: targetX + targetLeft,
+        targetY: targetY + targetTop,
       };
     },
 });

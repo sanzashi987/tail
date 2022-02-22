@@ -10,20 +10,25 @@ export const getCoordinatesFromParent = (
   const { left, top } = parent.getBoundingClientRect();
   const x = (e.clientX + parent.scrollLeft - left) / scale;
   const y = (e.clientY + parent.scrollTop - top) / scale;
-  // console.log(e.clientX, e.clientY, left, top)
   return { x, y };
 };
 
-export const getDraggerRelativeCoordinates = (x: number, y: number, lastX: number, lastY: number, coordinate: coordinates) => {
+export const getDraggerRelativeCoordinates = (
+  x: number,
+  y: number,
+  lastX: number,
+  lastY: number,
+  coordinate: coordinates,
+) => {
   // let { x, y, lastX, lastY } = state;
+  // console.log(x, y, lastX, lastY);
   const [deltaX, deltaY] = [coordinate.x - lastX, coordinate.y - lastY];
-  [lastX, lastY] = [coordinate.x, coordinate.y];
-  [x, y] = [x + deltaX, y + deltaY];
+  const [lastXNext, lastYNext] = [coordinate.x, coordinate.y];
   return {
-    lastX,
-    lastY,
-    x,
-    y,
+    lastX: lastXNext,
+    lastY: lastYNext,
+    x: x + deltaX,
+    y: y + deltaY,
   };
 };
 
