@@ -20,7 +20,7 @@ class Handle extends Component<HandlePropsInner> {
     if (type === 'source') {
       startConnecting(e, nodeId, handleId);
     } else if (type === 'target') {
-      startReconnecting(nodeId, handleId);
+      startReconnecting(e, nodeId, handleId);
     }
   };
 
@@ -28,7 +28,7 @@ class Handle extends Component<HandlePropsInner> {
     const { type, handleId, nodeId } = this.props;
     if (type === 'source') return;
     e.stopPropagation();
-    (this.context as InterfaceValue).onConnected(nodeId, handleId);
+    (this.context as InterfaceValue).onConnected(e, nodeId, handleId);
   };
 
   applyMouseActions = () => {

@@ -65,13 +65,13 @@ export interface GeneralMethods extends ConnectInterface {
   activateItem(e: React.MouseEvent, type: SelectedItemType, id: string): void;
   getScale(): number;
 }
-export type ConnectMethodType = (nodeId: string, handleId: string) => void;
+export type ConnectMethodType = (e: React.MouseEvent, nodeId: string, handleId: string) => void;
 export interface InterfaceValue extends GeneralMethods {
   edge: EdgeMouseInterface;
   node: NodeMouseInterface;
 }
 export interface ConnectInterface {
-  startConnecting: (e: React.MouseEvent, nodeId: string, handleId: string) => void;
+  startConnecting: ConnectMethodType;
   onConnected: ConnectMethodType;
   startReconnecting: ConnectMethodType;
 }

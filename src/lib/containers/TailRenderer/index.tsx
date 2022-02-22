@@ -126,6 +126,10 @@ class TailRenderer extends Component<TailRendererProps> {
     return this.nexus.current?.getRecoil<T>(atom);
   }
 
+  recoilReset(atom: RecoilState<any>) {
+    return this.nexus.current?.resetRecoil(atom);
+  }
+
   startConnecting = (e: React.MouseEvent, nodeId: string, handleId: string) => {
     const handles = this.recoilGet(this.getAtom('node', nodeId) as RecoilState<NodeAtom>)?.handles;
     if (!handles || !handles.source[handleId]) {
@@ -142,10 +146,12 @@ class TailRenderer extends Component<TailRendererProps> {
   };
 
   onConnectEnd = (e: MouseEvent) => {
-    return;
+    this.recoilReset(edgeInProgressAtom);
+    document.removeEventListener('mousemove', this.onConnecting);
+    document.removeEventListener('mouseup', this.onConnectEnd);
   };
 
-  onConnected: ConnectMethodType = (nodeId, handleId) => {
+  onConnected: ConnectMethodType = (e, nodeId, handleId) => {
     const { active, sourceNode, source } = this.recoilGet(edgeInProgressAtom)!;
     if (active) {
       this.props.onEdgeCreate({
@@ -155,10 +161,10 @@ class TailRenderer extends Component<TailRendererProps> {
         targetNode: nodeId,
       });
     }
-    this.nexus.current?.resetRecoil(edgeInProgressAtom);
+    this.recoilReset(edgeInProgressAtom);
   };
 
-  startReconnecting: ConnectMethodType = (nodeId, handleId) => {
+  startReconnecting: ConnectMethodType = (e, nodeId, handleId) => {
     return;
   };
 
