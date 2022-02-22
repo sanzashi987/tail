@@ -6,18 +6,18 @@ import type { Marker, MarkerDefsProps, MarkerTemplatesType, MarkerTemplateType }
 const defaultTemplates: MarkerTemplatesType = {
   'tailBasic': BasicMarker,
   'tailBasicClosed': BasicClosedMarker
-}
+};
 
 const defaultMarkers: Marker[] = [
   { id: 'tail-marker__basic', type: 'tailBasic' },
   { id: 'tail-marker__basic-closed', type: 'tailBasicClosed' }
-]
+];
 
 function findTemplate(
   type: string,
   passedTemplates?: MarkerTemplatesType
 ): MarkerTemplateType | null {
-  return passedTemplates?.[type] ?? defaultTemplates[type] ?? null
+  return passedTemplates?.[type] ?? defaultTemplates[type] ?? null;
 }
 
 
@@ -30,26 +30,26 @@ class MarkerDefs extends PureComponent<MarkerDefsProps> {
   // static useMarkers = (templates: MarkerTemplatesType) => {}
 
   renderMarker(markers: Marker[]) {
-    const { templates } = this.props
+    const { templates } = this.props;
     return markers.reduce<ReactNode[]>((lastRes, marker) => {
-      const { type, ...MarkerWrapperProps } = marker
-      const Marker = findTemplate(marker.type, templates)
+      const { type, ...MarkerWrapperProps } = marker;
+      const Marker = findTemplate(marker.type, templates);
       if (Marker !== null) {
         lastRes.push(
           <Marker key={marker.id} {...MarkerWrapperProps} />
-        )
+        );
       }
-      return lastRes
-    }, [])
+      return lastRes;
+    }, []);
   }
 
   render() {
-    const { markers = [] } = this.props
+    const { markers = [] } = this.props;
     return <defs>
       {this.renderMarker(defaultMarkers)}
       {this.renderMarker(markers)}
-    </defs>
+    </defs>;
   }
 }
 
-export default MarkerDefs
+export default MarkerDefs;

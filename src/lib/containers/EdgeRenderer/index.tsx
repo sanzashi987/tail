@@ -31,12 +31,13 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
 
   constructor(props: EdgeRendererPropsWithDefaults) {
     super(props);
-    this.diffEdges(props.edges, {});
+    console.log(this.props.getNodeAtoms());
+    this.diffEdges({}, props.edges);
   }
 
   shouldComponentUpdate(nextProps: EdgeRendererProps) {
     if (nextProps.edges !== this.props.edges) {
-      this.diffEdges(nextProps.edges, this.props.edges);
+      this.diffEdges(this.props.edges, nextProps.edges);
       return true;
     }
     return true;
@@ -46,7 +47,7 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
     this.memoEdges = Object.keys(this.edgeInstances).map((k) => this.edgeInstances[k]);
   }
 
-  diffEdges(nextEdges: Edges, lastEdges: Edges) {
+  diffEdges(lastEdges: Edges, nextEdges: Edges) {
     let dirty = false;
     const deleted = { ...lastEdges };
     for (const key in nextEdges) {
@@ -76,7 +77,7 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
     }
     removeChild(this.edgeTree, lastEdge);
     registerChild(this.edgeTree, nextEdge);
-    this.recoilInterface.current?.set(this.edgeAtoms[nextEdge.id], (prev) => {
+    this.recoilInterface.current?.setRecoil(this.edgeAtoms[nextEdge.id], (prev) => {
       return {
         ...prev,
         edge: nextEdge,
@@ -112,7 +113,7 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
         <RecoilNexus ref={this.recoilInterface} />
         {this.props.children /*for marker definition */}
         {this.memoEdges}
-        {<EdgeInProgress />}
+        {/* <EdgeInProgress /> */}
       </svg>
     );
   }

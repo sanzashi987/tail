@@ -29,6 +29,7 @@ export type NodeRendererProps = {
   foldable?: boolean;
   templates?: IObject<TemplateNodeClass>;
   templatePicker?: (node: Node) => [string, string];
+  mounted():void
 };
 
 export type NodeWrapperProps<T extends IObject = {}> = {

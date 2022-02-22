@@ -33,6 +33,10 @@ class TailRenderer extends Component<TailRendererProps> {
   nodeRef = createRef<NodeRenderer>();
   nexus = createRef<RecoilNexusInterface>();
 
+  state = {
+    nodesReady: false,
+  };
+
   contextInterface: InterfaceValue;
   constructor(props: TailRendererProps) {
     super(props);
@@ -115,11 +119,11 @@ class TailRenderer extends Component<TailRendererProps> {
   }
 
   reocoilSet<T>(atom: RecoilState<T>, updater: T | ((cur: T) => T)) {
-    return this.nexus.current?.set<T>(atom, updater);
+    return this.nexus.current?.setRecoil<T>(atom, updater);
   }
 
   recoilGet<T>(atom: RecoilValue<T>) {
-    return this.nexus.current?.get<T>(atom);
+    return this.nexus.current?.getRecoil<T>(atom);
   }
 
   startConnecting = (e: React.MouseEvent, nodeId: string, handleId: string) => {
@@ -133,9 +137,13 @@ class TailRenderer extends Component<TailRendererProps> {
     document.addEventListener('mouseup', this.onConnectEnd);
   };
 
-  onConnecting = (e: MouseEvent) => {};
+  onConnecting = (e: MouseEvent) => {
+    return;
+  };
 
-  onConnectEnd = (e: MouseEvent) => {};
+  onConnectEnd = (e: MouseEvent) => {
+    return;
+  };
 
   onConnected: ConnectMethodType = (nodeId, handleId) => {
     const { active, sourceNode, source } = this.recoilGet(edgeInProgressAtom)!;
@@ -147,10 +155,12 @@ class TailRenderer extends Component<TailRendererProps> {
         targetNode: nodeId,
       });
     }
-    this.nexus.current?.reset(edgeInProgressAtom);
+    this.nexus.current?.resetRecoil(edgeInProgressAtom);
   };
 
-  startReconnecting: ConnectMethodType = (nodeId, handleId) => {};
+  startReconnecting: ConnectMethodType = (nodeId, handleId) => {
+    return;
+  };
 
   getNodeAtoms = () => {
     return this.nodeRef.current?.nodeAtoms ?? {};
@@ -160,7 +170,9 @@ class TailRenderer extends Component<TailRendererProps> {
     return this.viewer.current?.getScale() || 1;
   };
 
-  stopConnect(nodeId: string) {}
+  stopConnect(nodeId: string) {
+    return;
+  }
 
   render() {
     const { nodes, edges } = this.props;
@@ -169,10 +181,16 @@ class TailRenderer extends Component<TailRendererProps> {
         <RecoilRoot>
           <RecoilNexus ref={this.nexus} />
           <InterfaceProvider value={this.contextInterface}>
-            <NodeRenderer nodes={nodes} ref={this.nodeRef} />
-            <EdgeRenderer edges={edges} ref={this.edgeRef} getNodeAtoms={this.getNodeAtoms}>
-              <MarkerDefs />
-            </EdgeRenderer>
+            <NodeRenderer
+              nodes={nodes}
+              ref={this.nodeRef}
+              mounted={() => this.setState({ nodesReady: true })}
+            />
+            {this.state.nodesReady && (
+              <EdgeRenderer edges={edges} ref={this.edgeRef} getNodeAtoms={this.getNodeAtoms}>
+                <MarkerDefs />
+              </EdgeRenderer>
+            )}
           </InterfaceProvider>
         </RecoilRoot>
       </InfiniteViewer>

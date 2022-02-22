@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 // @flow
 // @credits https://gist.github.com/rogozhnikoff/a43cfed27c41e4e68cdc
 export function findInArray(array: Array<any> | TouchList, callback: Function): any {

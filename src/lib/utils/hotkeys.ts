@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 type EventCollection = MouseEvent | React.MouseEvent
 
@@ -19,12 +19,12 @@ export const isMac = getOS() === 'mac';
 
 export function isModifierExact(e: EventCollection) {
   return [e.ctrlKey, e.metaKey, e.altKey, e.shiftKey].reduce((val, key) => {
-    if (!!key) ++val
-    return val
-  }, 0) === 1
+    if (key) ++val;
+    return val;
+  }, 0) === 1;
 
 }
 
 export function CtrlOrCmd(e: EventCollection) {
-  return getOS() ? e.metaKey : e.ctrlKey
+  return getOS() ? e.metaKey : e.ctrlKey;
 }

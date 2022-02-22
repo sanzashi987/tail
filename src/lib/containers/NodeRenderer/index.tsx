@@ -32,6 +32,10 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
     return true;
   }
 
+  componentDidMount() {
+    this.props.mounted();
+  }
+
   updateNodesNode = () => {
     this.memoNodes = Object.keys(this.nodeInstances).map((k) => this.nodeInstances[k]);
   };
@@ -78,7 +82,7 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
       console.log('error input ==>', lastNode, nextNode);
       throw new Error('fail to update the edge as their id is different');
     }
-    this.recoilInterface.current?.set(this.nodeAtoms[nextNode.id], (prev) => {
+    this.recoilInterface.current?.setRecoil(this.nodeAtoms[nextNode.id], (prev) => {
       return {
         ...prev,
         node: nextNode,

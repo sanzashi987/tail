@@ -1,3 +1,4 @@
+import React from 'react';
 import { RecoilValue, RecoilState } from 'recoil';
 import { NodeMouseInterface } from './nodes';
 import { EdgeBasic, EdgeMouseInterface } from './edges';
@@ -9,7 +10,6 @@ import type {
   NodeTemplatesType,
   MarkerTemplatesType,
 } from '.';
-import React from 'react';
 
 export type TailRendererOptionalProps = {
   nodeTemplates: NodeTemplatesType;
@@ -29,7 +29,7 @@ export type TailRendererProps = {
 
 export interface NodeMutation {
   onNodeCreate(): void;
-  onNodeUpdate(): void;
+  // onNodeUpdate(): void;
   onNodeDelete(): void;
 }
 
@@ -79,10 +79,10 @@ export interface ConnectInterface {
 type MouseEventCollection = React.MouseEvent | MouseEvent;
 
 export interface RecoilNexusInterface {
-  get: <T>(atom: RecoilValue<T>) => T;
-  getPromise: <T>(atom: RecoilValue<T>) => Promise<T>;
-  set: <T>(atom: RecoilState<T>, valOrUpdater: T | ((currVal: T) => T)) => void;
-  reset: (atom: RecoilState<any>) => void;
+  getRecoil: <T>(atom: RecoilValue<T>) => T;
+  getRecoilPromise: <T>(atom: RecoilValue<T>) => Promise<T>;
+  setRecoil: <T>(atom: RecoilState<T>, valOrUpdater: T | ((currVal: T) => T)) => void;
+  resetRecoil: (atom: RecoilState<any>) => void;
 }
 
 export type AtomForceRender = {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import React, { ComponentType } from 'react';
 import type { RecoilState } from 'recoil';
 import { AtomForceRender, NodeAtomsType } from '.';

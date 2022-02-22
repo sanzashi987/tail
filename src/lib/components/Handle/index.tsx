@@ -18,7 +18,7 @@ class Handle extends Component<HandlePropsInner> {
     const { startConnecting, startReconnecting } = this.context as InterfaceValue;
     const { type, handleId, nodeId } = this.props;
     if (type === 'source') {
-      startConnecting(nodeId, handleId);
+      startConnecting(e, nodeId, handleId);
     } else if (type === 'target') {
       startReconnecting(nodeId, handleId);
     }

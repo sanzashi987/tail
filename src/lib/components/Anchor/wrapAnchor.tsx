@@ -1,7 +1,5 @@
-import { MarkerWrapperProps, AnchorProps } from "@app/types"
-import { ComponentType, FC } from "react"
-
-
+import React, { ComponentType, FC } from 'react';
+import { MarkerWrapperProps, AnchorProps } from '@app/types';
 
 const wrapAnchor = (Symbol: ComponentType<AnchorProps>) => {
   const MarkerWrapper: FC<MarkerWrapperProps> = ({
@@ -13,23 +11,24 @@ const wrapAnchor = (Symbol: ComponentType<AnchorProps>) => {
     strokeWidth,
     orient = 'auto',
   }) => {
-    return <marker
-      className="tail-marker"
-      id={id}
-      markerWidth={width}
-      markerHeight={height}
-      viewBox="-10 -10 20 20"
-      markerUnits={markerUnits}
-      orient={orient}
-      refX="0"
-      refY="0"
-    >
-      <Symbol color={color} strokeWidth={strokeWidth} />
-    </marker>
+    return (
+      <marker
+        className="tail-marker"
+        id={id}
+        markerWidth={width}
+        markerHeight={height}
+        viewBox="-10 -10 20 20"
+        markerUnits={markerUnits}
+        orient={orient}
+        refX="0"
+        refY="0"
+      >
+        <Symbol color={color} strokeWidth={strokeWidth} />
+      </marker>
+    );
+  };
 
-  }
+  return MarkerWrapper;
+};
 
-  return MarkerWrapper
-}
-
-export default wrapAnchor
+export default wrapAnchor;

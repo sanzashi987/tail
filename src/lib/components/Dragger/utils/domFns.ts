@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-types */
 // @flow
-import { findInArray } from '../../../utils';
 import type { coordinates, MouseTouchEvent } from '@types';
+import { findInArray } from '../../../utils';
 
 export function addEvent(el: any, event: string, handler: Function, inputOptions?: Object): void {
   if (!el) return;
@@ -39,7 +40,7 @@ export function offsetXYFromParent(
   offsetParent: HTMLElement,
   scaleRaw: () => number,
 ): coordinates {
-  let scale = scaleRaw();
+  const scale = scaleRaw();
 
   const isBody = offsetParent === offsetParent.ownerDocument!.body;
   const offsetParentRect = isBody ? { left: 0, top: 0 } : offsetParent.getBoundingClientRect();

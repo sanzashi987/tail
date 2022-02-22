@@ -21,10 +21,12 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   const [{ node, selected, selectedHandles }, setNodeInternal] = useRecoilState(atom);
   const ref = useRef<HTMLDivElement>(null);
   const rootInterface = useContext(InstanceInterface)!;
-  const [{ x, y }, setCoordinate] = useState({ x: node.left, y: node.top });
-  if (node.left !== x || node.top !== y) {
-    setCoordinate({ x: node.left, y: node.top });
-  }
+  // const [{ x, y }, setCoordinate] = useState({ x: node.left, y: node.top });
+  // if (node.left !== x || node.top !== y) {
+  //   setCoordinate({ x: node.left, y: node.top });
+  // }
+  const { left: x, top: y } = node;
+
   const style = useMemo(() => {
     return {
       transform: `translate(${x}px,${y}px)`,
@@ -40,14 +42,14 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   );
   const drag = useCallback(
     (e: MouseEvent, c: coordinates) => {
-      setCoordinate(c);
+      // setCoordinate(c);
       return rootInterface.node.onDrag(e, node, c);
     },
     [node],
   );
   const dragEnd = useCallback(
     (e: MouseEvent, c: coordinates) => {
-      setCoordinate(c);
+      // setCoordinate(c);
       return rootInterface.node.onDragEnd(e, node, c);
     },
     [node],

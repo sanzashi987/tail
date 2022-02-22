@@ -1,20 +1,19 @@
-import type { AnchorProps } from "@app/types";
-import { FC } from "react";
-import { wrapAnchor } from ".";
-
+import React, { FC } from 'react';
+import type { AnchorProps } from '@app/types';
+import { wrapAnchor } from '.';
 
 const BasicAnchor: FC<AnchorProps> = ({ color = 'none', strokeWidth = 1 }) => {
-
-  return <polyline
-    stroke={color}
-    strokeWidth={strokeWidth}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    fill="none"
-    points="-5,-4 0,0 -5,4"
-  ></polyline>
-}
-
+  return (
+    <polyline
+      stroke={color}
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      points="-5,-4 0,0 -5,4"
+    ></polyline>
+  );
+};
 
 const BasicClosedAnchor: FC<AnchorProps> = ({ color = 'none', strokeWidth = 1 }) => {
   return (
@@ -29,11 +28,6 @@ const BasicClosedAnchor: FC<AnchorProps> = ({ color = 'none', strokeWidth = 1 })
   );
 };
 
-const BasicMarker = wrapAnchor(BasicAnchor)
-const BasicClosedMarker = wrapAnchor(BasicClosedAnchor)
-export {
-  BasicAnchor,
-  BasicClosedAnchor,
-  BasicMarker,
-  BasicClosedMarker
-}
+const BasicMarker = wrapAnchor(BasicAnchor);
+const BasicClosedMarker = wrapAnchor(BasicClosedAnchor);
+export { BasicAnchor, BasicClosedAnchor, BasicMarker, BasicClosedMarker };
