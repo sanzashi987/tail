@@ -33,15 +33,25 @@ export function activateEgdeInProgress(
   y: number,
   source: string,
   sourceNode: string,
+  reconnect: boolean,
 ): EdgeInProgressAtomType {
   return {
     active: true,
     source,
     sourceNode,
+    reconnect,
     sourceX: x,
     targetX: x,
     sourceY: y,
     targetY: y,
+  };
+}
+
+export function createEdgeInProgressUpdater(x: number, y: number) {
+  return function (prev: EdgeInProgressAtomType) {
+    const next = { ...prev };
+    [next.targetX, next.targetY] = [x, y];
+    return next;
   };
 }
 

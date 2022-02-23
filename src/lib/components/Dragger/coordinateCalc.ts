@@ -9,7 +9,7 @@ const defaultState = {
 };
 
 class CoordinateCalc {
-  state = defaultState;
+  private state = defaultState;
 
   start = (e: MouseEventCollection, x: number, y: number, parent: Element, scale: number) => {
     const cor = getCoordinatesFromParent(e, parent, scale);
