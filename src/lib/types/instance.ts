@@ -9,9 +9,11 @@ import type {
   EdgeTemplatesType,
   NodeTemplatesType,
   MarkerTemplatesType,
+  EdgeAtom,
+  NodeAtom,
 } from '.';
 
-export type TailRendererOptionalProps = {
+export type TailCoreOptionalProps = {
   nodeTemplates: NodeTemplatesType;
   edgeTemplates: EdgeTemplatesType;
   markerTemplates: MarkerTemplatesType;
@@ -20,12 +22,12 @@ export type TailRendererOptionalProps = {
   NodeMouseInterface &
   EdgeMouseInterface;
 
-export type TailRendererProps = {
+export type TailCoreProps = {
   nodes: IObject<Node>;
   edges: IObject<Edge>;
 } & NodeMouseInterface &
   EdgeMouseInterface &
-  TailRendererOptionalProps;
+  TailCoreOptionalProps;
 
 export interface NodeMutation {
   onNodeCreate(): void;
@@ -88,3 +90,9 @@ export interface RecoilNexusInterface {
 export type AtomForceRender = {
   forceRender: number;
 };
+
+export type PoolType<T> = T extends 'edge'
+  ? RecoilState<EdgeAtom>
+  : T extends 'node'
+  ? RecoilState<NodeAtom>
+  : never;

@@ -6,39 +6,33 @@ import type {
   SelectedItemCollection,
   InterfaceValue,
   ConnectMethodType,
-  TailRendererProps,
+  TailCoreProps,
   SelectedItemType,
   RecoilNexusInterface,
-  EdgeAtom,
   NodeAtom,
+  PoolType,
 } from '@types';
 import { edgeInProgressAtom } from '@app/atoms/edges';
-import {
-  getAtom,
-  immutableSelectedHandles,
-  activateHandle,
-  deactivateHandle,
-  activateEgdeInProgress,
-} from './mutation';
+import { CoordinateCalc } from '@app/components/Dragger';
+import { getAtom, activateEgdeInProgress, switchActive } from './mutation';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
 import InfiniteViewer from '../InfiniteViewer';
 import MarkerDefs from '../MarkerDefs';
 
-class TailRenderer extends Component<TailRendererProps> {
+class TailCore extends Component<TailCoreProps> {
   activeItems: SelectedItemCollection = {};
 
   viewer = createRef<InfiniteViewer>();
   edgeRef = createRef<EdgeRenderer>();
   nodeRef = createRef<NodeRenderer>();
   nexus = createRef<RecoilNexusInterface>();
+  dragger = new CoordinateCalc();
 
-  state = {
-    nodesReady: false,
-  };
+  state = { nodesReady: false };
 
   contextInterface: InterfaceValue;
-  constructor(props: TailRendererProps) {
+  constructor(props: TailCoreProps) {
     super(props);
     const { onEdgeClick, onDragEnd, onDragStart, onDrag, onNodeClick } = props;
     this.contextInterface = {
@@ -47,112 +41,69 @@ class TailRenderer extends Component<TailRendererProps> {
       startConnecting: this.startConnecting,
       onConnected: this.onConnected,
       startReconnecting: this.startReconnecting,
-      activateItem: this.activateItem,
+      activateItem: this.activateNext,
       getScale: this.getScale,
     };
   }
 
-  activateItem = (e: React.MouseEvent, type: SelectedItemType, id: string) => {
+  activateNext = (e: React.MouseEvent, type: SelectedItemType, id: string) => {
     const append = isModifierExact(e) && CtrlOrCmd(e);
     if (!append) this.deactivateLast();
-    this.activateNext(type, id);
-  };
-
-  activateNext(type: SelectedItemType, id: string) {
     this.activeItems[id] = { id, type };
-    const atom = this.setSelectedAtom(type, id, true);
-    if (type === 'edge') {
-      const {
-        edge: { sourceNode, target, targetNode, source },
-      } = this.recoilGet(atom as RecoilState<EdgeAtom>)!;
-      this.setSelectedHandle(sourceNode, source, activateHandle);
-      this.setSelectedHandle(targetNode, target, activateHandle);
-    }
-  }
+    switchActive(this, type, id, true);
+  };
 
   deactivateLast() {
     Object.keys(this.activeItems).forEach((key) => {
       const { id, type } = this.activeItems[key];
-      this.deactivateAtom(type, id);
+      switchActive(this, type, id, false);
     });
     this.activeItems = {};
   }
 
-  deactivateAtom(type: SelectedItemType, id: string) {
-    const atom = this.setSelectedAtom(type, id, false);
+  getAtom<T extends SelectedItemType>(type: T, id: string): PoolType<T> {
     if (type === 'edge') {
-      const {
-        edge: { sourceNode, target, targetNode, source },
-      } = this.recoilGet(atom as RecoilState<EdgeAtom>)!;
-      this.setSelectedHandle(sourceNode, source, deactivateHandle);
-      this.setSelectedHandle(targetNode, target, deactivateHandle);
+      return getAtom(id, this.edgeRef.current?.edgeAtoms) as PoolType<T>;
+    } else {
+      return getAtom(id, this.nodeRef.current?.nodeAtoms) as PoolType<T>;
     }
   }
-
-  setSelectedHandle(
-    nodeId: string,
-    handleId: string,
-    cb: (next: NodeAtom, handleId: string) => void,
-  ) {
-    const atom = getAtom(nodeId, this.nodeRef.current?.nodeAtoms);
-    this.reocoilSet(atom as RecoilState<NodeAtom>, (prev) => {
-      const next = immutableSelectedHandles(prev);
-      cb(next, handleId);
-      return next;
-    });
-  }
-
-  setSelectedAtom(type: SelectedItemType, id: string, bol: boolean) {
-    const atom = this.getAtom(type, id);
-    this.reocoilSet(atom, (prev) => {
-      const next = { ...prev };
-      next.selected = bol;
-      return next;
-    });
-    return atom;
-  }
-
-  getAtom(type: SelectedItemType, id: string) {
-    const atomPool =
-      type === 'edge' ? this.edgeRef.current?.edgeAtoms : this.nodeRef.current?.nodeAtoms;
-    return getAtom(id, atomPool);
-  }
-
-  reocoilSet<T>(atom: RecoilState<T>, updater: T | ((cur: T) => T)) {
+  Set<T>(atom: RecoilState<T>, updater: T | ((cur: T) => T)) {
     return this.nexus.current?.setRecoil<T>(atom, updater);
   }
-
-  recoilGet<T>(atom: RecoilValue<T>) {
+  Get<T>(atom: RecoilValue<T>) {
     return this.nexus.current?.getRecoil<T>(atom);
   }
-
-  recoilReset(atom: RecoilState<any>) {
+  Reset(atom: RecoilState<any>) {
     return this.nexus.current?.resetRecoil(atom);
   }
 
   startConnecting = (e: React.MouseEvent, nodeId: string, handleId: string) => {
-    const handles = this.recoilGet(this.getAtom('node', nodeId) as RecoilState<NodeAtom>)?.handles;
+    const handles = this.Get(this.getAtom('node', nodeId) as RecoilState<NodeAtom>)?.handles;
     if (!handles || !handles.source[handleId]) {
       throw new Error('fail to fetch start handle info');
     }
     const { x, y } = handles.source[handleId];
-    this.reocoilSet(edgeInProgressAtom, activateEgdeInProgress(x, y, nodeId, handleId));
+    this.Set(edgeInProgressAtom, activateEgdeInProgress(x, y, nodeId, handleId));
     document.addEventListener('mousemove', this.onConnecting);
-    document.addEventListener('mouseup', this.onConnectEnd);
+    document.addEventListener('mouseup', this.tryConnect);
   };
 
   onConnecting = (e: MouseEvent) => {
     return;
   };
 
-  onConnectEnd = (e: MouseEvent) => {
-    this.recoilReset(edgeInProgressAtom);
+  tryConnect = (e: MouseEvent) => {};
+
+  resetConnect = () => {
+    this.Reset(edgeInProgressAtom);
     document.removeEventListener('mousemove', this.onConnecting);
-    document.removeEventListener('mouseup', this.onConnectEnd);
+    document.removeEventListener('mouseup', this.tryConnect);
   };
 
   onConnected: ConnectMethodType = (e, nodeId, handleId) => {
-    const { active, sourceNode, source } = this.recoilGet(edgeInProgressAtom)!;
+    e.stopPropagation();
+    const { active, sourceNode, source } = this.Get(edgeInProgressAtom)!;
     if (active) {
       this.props.onEdgeCreate({
         source,
@@ -161,7 +112,7 @@ class TailRenderer extends Component<TailRendererProps> {
         targetNode: nodeId,
       });
     }
-    this.recoilReset(edgeInProgressAtom);
+    this.resetConnect();
   };
 
   startReconnecting: ConnectMethodType = (e, nodeId, handleId) => {
@@ -204,4 +155,4 @@ class TailRenderer extends Component<TailRendererProps> {
   }
 }
 
-export default TailRenderer;
+export default TailCore;
