@@ -52,13 +52,13 @@ class TailCore extends Component<TailCoreProps> {
     switchActive(this, type, id, true);
   };
 
-  deactivateLast() {
+  deactivateLast = () => {
     Object.keys(this.activeItems).forEach((key) => {
       const { id, type } = this.activeItems[key];
       switchActive(this, type, id, false);
     });
     this.activeItems = {};
-  }
+  };
 
   startConnecting = (e: React.MouseEvent, nodeId: string, handleId: string) => {
     this.startConnectingInner(e, nodeId, handleId, false);
