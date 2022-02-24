@@ -92,14 +92,14 @@ class TailCore extends Component<TailCoreProps> {
     e.stopPropagation();
     const { x, y } = this.dragger.end(e, document.body, this.getScale());
     const { reconnect, prevEdgeId } = this.Get(edgeInProgressAtom);
-    if (reconnect) {
-      const { target, targetNode } = this.Get(this.getAtom('edge', prevEdgeId!)).edge;
+    if (reconnect && prevEdgeId) {
+      const { target, targetNode } = this.Get(this.getAtom('edge', prevEdgeId)).edge;
       const { x: X, y: Y } = this.Get(this.getAtom('node', targetNode)).handles.target[target];
       const threshold = this.props.dropThreshold;
       if (Math.abs(x - X) < threshold && Math.abs(y - Y) < threshold) {
-        this.Set(this.getAtom('edge', prevEdgeId!), (prev) => ({ ...prev, reconnect: false }));
+        this.Set(this.getAtom('edge', prevEdgeId), (prev) => ({ ...prev, reconnect: false }));
       } else {
-        this.deleteItem([{ type: 'edge', id: prevEdgeId! }]);
+        this.deleteItem([{ type: 'edge', id: prevEdgeId }]);
       }
     }
     this.resetConnect();
