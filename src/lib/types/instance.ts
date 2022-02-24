@@ -17,6 +17,8 @@ export type TailCoreOptionalProps = {
   nodeTemplates: NodeTemplatesType;
   edgeTemplates: EdgeTemplatesType;
   markerTemplates: MarkerTemplatesType;
+  dropThreshold: number;
+  onDelete(nodes: string[], edges: string[]): void; //come with id array 
 } & NodeMutation &
   EdgeMutation &
   NodeMouseInterface &
@@ -32,13 +34,13 @@ export type TailCoreProps = {
 export interface NodeMutation {
   onNodeCreate(): void;
   // onNodeUpdate(): void;
-  onNodeDelete(): void;
+  // onNodeDelete(): void;
 }
 
 export interface EdgeMutation {
   onEdgeCreate(edgeBasic: EdgeBasic): void;
   onEdgeUpdate(): void;
-  onEdgeDelete(): void;
+  // onEdgeDelete(): void;
 }
 
 export type SelectedItemType = 'node' | 'edge';
@@ -96,3 +98,10 @@ export type PoolType<T> = T extends 'edge'
   : T extends 'node'
   ? RecoilState<NodeAtom>
   : never;
+
+export type DeleteItem = {
+  type: SelectedItemType;
+  id: string;
+};
+
+export type DeletePayload = DeleteItem[];

@@ -113,9 +113,8 @@ export type EdgeInProgressAtomType = {
   sourceNode: string;
   source: string;
   active: boolean;
-  reconnect: boolean;
-  prevTargetX?: number;
-  prevTargetY?: number;
+  reconnect?: boolean;
+  prevEdgeId?: string;
 } & EdgeBasicProps;
 
 export type EdgeInProgressProps = {

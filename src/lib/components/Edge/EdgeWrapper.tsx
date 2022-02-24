@@ -3,6 +3,7 @@ import type { EdgeWrapperProps } from '@app/types';
 import { useRecoilValue } from 'recoil';
 import { computedEdgeSelector } from '@app/atoms/edges';
 import { InstanceInterface } from '@app/contexts/instance';
+import { isNum } from '@app/utils';
 
 const getMarkerId = (markerId?: string) => {
   if (typeof markerId === 'string') return `url(#${markerId})`;
@@ -15,7 +16,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, template: EdgeComp
   );
   if (
     [sourceX, sourceY, targetX, targetY].reduce(
-      (last, val) => (typeof val === 'number' && !isNaN(val) ? last || false : true),
+      (last, val) => (isNum(val) ? last || false : true),
       false,
     ) ||
     reconnect
