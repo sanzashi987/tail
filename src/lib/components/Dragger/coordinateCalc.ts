@@ -25,9 +25,13 @@ class CoordinateCalc {
 
   end = (e: MouseEventCollection, parent: Element, scale: number) => {
     const a = this.iter(e, parent, scale);
-    this.state = defaultState;
+    this.reset();
     return a;
   };
+
+  reset() {
+    this.state = defaultState;
+  }
 }
 
 export default CoordinateCalc;

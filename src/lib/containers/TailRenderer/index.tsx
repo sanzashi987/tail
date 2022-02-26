@@ -15,12 +15,19 @@ import type {
 } from '@types';
 import { edgeInProgressAtom } from '@app/atoms/edges';
 import { CoordinateCalc } from '@app/components/Dragger';
-import { getAtom, createEdgeInProgressUpdater } from './mutation';
-import { activateEgdeInProgress, switchActive } from './activateHandlers';
+import { getAtom } from './mutation';
+import { switchActive } from './activateHandlers';
+import {
+  activateEgdeInProgress,
+  disableEdgeReconnect,
+  enableEdgeReconnect,
+  createEdgeInProgressUpdater,
+} from './connectHandlers';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
 import InfiniteViewer from '../InfiniteViewer';
 import MarkerDefs from '../MarkerDefs';
+
 class TailCore extends Component<TailCoreProps> {
   activeItems: SelectedItemCollection = {};
   viewer = createRef<InfiniteViewer>();
@@ -37,14 +44,16 @@ class TailCore extends Component<TailCoreProps> {
     this.contextInterface = {
       edge: { onEdgeClick },
       node: { onDrag, onDragStart, onDragEnd, onNodeClick },
-      startConnecting: this.startConnecting,
-      onConnected: this.onConnected,
-      startReconnecting: this.startReconnecting,
+      handle: {
+        onMouseDown: this.onHandleMouseDown,
+        onMouseUp: this.onHandleMouseUp,
+      },
       activateItem: this.activateNext,
       getScale: this.getScale,
     };
   }
 
+  /* Activate & Deactivate */
   activateNext = (e: React.MouseEvent, type: SelectedItemType, id: string) => {
     const append = isModifierExact(e) && CtrlOrCmd(e);
     if (!append) this.deactivateLast();
@@ -60,32 +69,34 @@ class TailCore extends Component<TailCoreProps> {
     this.activeItems = {};
   };
 
-  startConnecting = (e: React.MouseEvent, nodeId: string, handleId: string) => {
-    this.startConnectingInner(e, nodeId, handleId, false);
-  };
-
-  startConnectingInner = (
-    e: React.MouseEvent,
-    nodeId: string,
-    handleId: string,
-    reconnect: boolean,
-  ) => {
+  /* Connect and reconnect */
+  onHandleMouseDown: ConnectMethodType = (e, type, nodeId, handleId) => {
     const handles = this.Get(this.getAtom('node', nodeId) as RecoilState<NodeAtom>).handles;
     if (!handles || !handles.source[handleId]) {
-      throw new Error('fail to fetch start handle info');
+      console.log('fail to fetch start handle info');
+      return;
+      // throw new Error('fail to fetch start handle info');
     }
     const { x, y } = handles.source[handleId];
-    this.Set(edgeInProgressAtom, activateEgdeInProgress(x, y, nodeId, handleId, reconnect));
+    this.Set(edgeInProgressAtom, activateEgdeInProgress(x, y, nodeId, handleId));
     this.dragger.start(e, x, y, document.body, this.getScale());
     document.addEventListener('mousemove', this.onConnecting);
     document.addEventListener('mouseup', this.tryConnect);
+  };
+
+  onHandleMouseUp: ConnectMethodType = (e, type, nodeId, handleId) => {
+    e.stopPropagation();
+    const { active, sourceNode, source } = this.Get(edgeInProgressAtom);
+    if (active) {
+      this.props.onEdgeCreate({ source, sourceNode, target, targetNode });
+    }
+    this.resetConnect();
   };
 
   onConnecting = (e: MouseEvent) => {
     e.stopPropagation();
     const { x, y } = this.dragger.iter(e, document.body, this.getScale());
     this.Set(edgeInProgressAtom, createEdgeInProgressUpdater(x, y));
-    return;
   };
 
   tryConnect = (e: MouseEvent) => {
@@ -97,7 +108,7 @@ class TailCore extends Component<TailCoreProps> {
       const { x: X, y: Y } = this.Get(this.getAtom('node', targetNode)).handles.target[target];
       const threshold = this.props.dropThreshold;
       if (Math.abs(x - X) < threshold && Math.abs(y - Y) < threshold) {
-        this.Set(this.getAtom('edge', prevEdgeId), (prev) => ({ ...prev, reconnect: false }));
+        this.Set(this.getAtom('edge', prevEdgeId), disableEdgeReconnect);
       } else {
         this.deleteItem([{ type: 'edge', id: prevEdgeId }]);
       }
@@ -105,50 +116,27 @@ class TailCore extends Component<TailCoreProps> {
     this.resetConnect();
   };
 
-  deleteItem(payload: DeletePayload) {
-    const edges: string[] = [],
-      nodes: string[] = [];
-    payload.forEach((val) => {
-      const { type, id } = val;
-      if (type === 'node') {
-        nodes.push(id);
-        const keys = this.edgeRef.current?.edgeTree.get(id)?.keys() ?? [];
-        edges.push(...keys);
-      } else if (type === 'edge') {
-        edges.push(id);
-      }
-    });
-    this.props.onDelete(nodes, edges);
-  }
-
-  onConnected: ConnectMethodType = (e, targetNode, target) => {
-    e.stopPropagation();
-    const { active, sourceNode, source } = this.Get(edgeInProgressAtom);
-    if (active) {
-      this.props.onEdgeCreate({ source, sourceNode, target, targetNode });
-    }
-    this.resetConnect();
-  };
-
-  startReconnecting: ConnectMethodType = (e, nodeId, handleId) => {
-    const connectedEdge = this.edgeRef.current?.edgeTree.get(nodeId)?.get(handleId)?.keys();
+  startReconnecting = (e, targetNodeId, targetHandleId) => {
+    const connectedEdge = this.edgeRef.current?.edgeTree
+      .get(targetNodeId)
+      ?.get(targetHandleId)
+      ?.keys();
     if (!connectedEdge) return;
-    for (const edge of connectedEdge) {
-      if (this.activeItems[edge] && this.activeItems[edge].type === 'edge') {
-        const atom = this.getAtom('edge', edge);
-        this.Set(atom, (prev) => {
-          const next = { ...prev };
-          next.reconnect = true;
-          return next;
-        });
+    const arr = [...connectedEdge];
+    if (arr.length === 0) return;
+    let chosen = arr[0];
+    for (const edge of arr) {
+      if (this.activeItems[edge]?.type === 'edge') {
+        chosen = edge;
         break;
       }
     }
-    return;
+    this.Set(this.getAtom('edge', chosen), enableEdgeReconnect);
   };
 
   resetConnect = () => {
     this.Reset(edgeInProgressAtom);
+    this.dragger.reset();
     document.removeEventListener('mousemove', this.onConnecting);
     document.removeEventListener('mouseup', this.tryConnect);
   };
@@ -176,6 +164,21 @@ class TailCore extends Component<TailCoreProps> {
     );
   }
 
+  deleteItem(payload: DeletePayload) {
+    const edges: string[] = [],
+      nodes: string[] = [];
+    payload.forEach((val) => {
+      const { type, id } = val;
+      if (type === 'node') {
+        nodes.push(id);
+        const keys = this.edgeRef.current?.edgeTree.get(id)?.keys() ?? [];
+        edges.push(...keys);
+      } else if (type === 'edge') {
+        edges.push(id);
+      }
+    });
+    this.props.onDelete(nodes, edges);
+  }
   getAtom<T extends SelectedItemType>(type: T, id: string): PoolType<T> {
     if (type === 'edge') {
       return getAtom(id, this.edgeRef.current?.edgeAtoms) as PoolType<T>;

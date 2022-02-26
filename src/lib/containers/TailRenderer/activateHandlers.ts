@@ -1,4 +1,4 @@
-import type { SelectedItemType, EdgeAtom, NodeAtom, EdgeInProgressAtomType } from '@app/types';
+import type { SelectedItemType, EdgeAtom, NodeAtom,  } from '@app/types';
 import type TailCore from '.';
 import type { RecoilState } from 'recoil';
 import { getAtom } from './mutation';
@@ -55,25 +55,3 @@ export function switchActive(_this: TailCore, type: SelectedItemType, id: string
   setSelectedHandle(targetNode, target, pool, cb, _this.Set);
 }
 
-export function activateEgdeInProgress(
-  x: number,
-  y: number,
-  source: string,
-  sourceNode: string,
-  reconnect?: boolean,
-  prevEdgeId?: string,
-): EdgeInProgressAtomType {
-  const basic = {
-    active: true,
-    source,
-    sourceNode,
-    sourceX: x,
-    targetX: x,
-    sourceY: y,
-    targetY: y,
-  };
-  if (reconnect && prevEdgeId) {
-    return { ...basic, reconnect, prevEdgeId };
-  }
-  return basic;
-}

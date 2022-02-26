@@ -15,20 +15,14 @@ class Handle extends Component<HandlePropsInner> {
 
   onMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const { startConnecting, startReconnecting } = this.context as InterfaceValue;
     const { type, handleId, nodeId } = this.props;
-    if (type === 'source') {
-      startConnecting(e, nodeId, handleId);
-    } else if (type === 'target') {
-      startReconnecting(e, nodeId, handleId);
-    }
+    (this.context as InterfaceValue).handle.onMouseDown(e, type, nodeId, handleId);
   };
 
   onMouseUp = (e: React.MouseEvent) => {
     const { type, handleId, nodeId } = this.props;
-    if (type === 'source') return;
     e.stopPropagation();
-    (this.context as InterfaceValue).onConnected(e, nodeId, handleId);
+    (this.context as InterfaceValue).handle.onMouseDown(e, type, nodeId, handleId);
   };
 
   applyMouseActions = () => {

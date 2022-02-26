@@ -11,6 +11,7 @@ import type {
   MarkerTemplatesType,
   EdgeAtom,
   NodeAtom,
+  HandleType,
 } from '.';
 
 export type TailCoreOptionalProps = {
@@ -18,7 +19,7 @@ export type TailCoreOptionalProps = {
   edgeTemplates: EdgeTemplatesType;
   markerTemplates: MarkerTemplatesType;
   dropThreshold: number;
-  onDelete(nodes: string[], edges: string[]): void; //come with id array 
+  onDelete(nodes: string[], edges: string[]): void; //come with id array
 } & NodeMutation &
   EdgeMutation &
   NodeMouseInterface &
@@ -65,19 +66,24 @@ export type NodeInternalInfo = {
   handles: HandlesInfo;
 };
 export type NodeInternals = Map<string, NodeInternalInfo>;
-export interface GeneralMethods extends ConnectInterface {
+export interface GeneralMethods {
   activateItem(e: React.MouseEvent, type: SelectedItemType, id: string): void;
   getScale(): number;
 }
-export type ConnectMethodType = (e: React.MouseEvent, nodeId: string, handleId: string) => void;
+export type ConnectMethodType = (
+  e: React.MouseEvent,
+  type: HandleType,
+  nodeId: string,
+  handleId: string,
+) => void;
 export interface InterfaceValue extends GeneralMethods {
   edge: EdgeMouseInterface;
   node: NodeMouseInterface;
+  handle: HandleInterface;
 }
-export interface ConnectInterface {
-  startConnecting: ConnectMethodType;
-  onConnected: ConnectMethodType;
-  startReconnecting: ConnectMethodType;
+export interface HandleInterface {
+  onMouseDown: ConnectMethodType;
+  onMouseUp: ConnectMethodType;
 }
 
 type MouseEventCollection = React.MouseEvent | MouseEvent;
