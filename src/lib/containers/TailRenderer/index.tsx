@@ -21,7 +21,7 @@ import {
   activateEgdeInProgress,
   disableEdgeReconnect,
   enableEdgeReconnect,
-  createEdgeInProgressUpdater,
+  setTarget,
 } from './connectHandlers';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
@@ -71,37 +71,43 @@ class TailCore extends Component<TailCoreProps> {
 
   /* Connect and reconnect */
   onHandleMouseDown: ConnectMethodType = (e, type, nodeId, handleId) => {
-    const handles = this.Get(this.getAtom('node', nodeId) as RecoilState<NodeAtom>).handles;
+    //only edge active will try reconnect
+  };
+
+  sourceStart(sourceNodeId: string, handleId: string) {
+    const handles = this.Get(this.getAtom('node', sourceNodeId) as RecoilState<NodeAtom>).handles;
     if (!handles || !handles.source[handleId]) {
       console.log('fail to fetch start handle info');
       return;
       // throw new Error('fail to fetch start handle info');
     }
     const { x, y } = handles.source[handleId];
-    this.Set(edgeInProgressAtom, activateEgdeInProgress(x, y, nodeId, handleId));
-    this.dragger.start(e, x, y, document.body, this.getScale());
-    document.addEventListener('mousemove', this.onConnecting);
-    document.addEventListener('mouseup', this.tryConnect);
-  };
+  }
 
-  onHandleMouseUp: ConnectMethodType = (e, type, nodeId, handleId) => {
-    e.stopPropagation();
+  sourceEnd() {}
+
+  targetEnd(target: string, targetNode: string) {
     const { active, sourceNode, source } = this.Get(edgeInProgressAtom);
     if (active) {
       this.props.onEdgeCreate({ source, sourceNode, target, targetNode });
     }
-    this.resetConnect();
+  }
+
+  getHandleXY: ConnectMethodType = (e, type, nodeId, handleId) => {
+    const handles = this.Get(this.getAtom('node', nodeId) as RecoilState<NodeAtom>).handles;
+    if (!handles || !handles[type][handleId]) return console.log('fail to fetch start handle info');
+    return handles[type][handleId];
   };
 
-  onConnecting = (e: MouseEvent) => {
-    e.stopPropagation();
-    const { x, y } = this.dragger.iter(e, document.body, this.getScale());
-    this.Set(edgeInProgressAtom, createEdgeInProgressUpdater(x, y));
+  createConnect: ConnectMethodType = (e, type, nodeId, handleId) => {};
+
+  onHandleMouseUp: ConnectMethodType = (e, type, nodeId, handleId) => {};
+
+  sourceMove = (x: number, y: number) => {
+    this.Set(edgeInProgressAtom, setTarget(x, y));
   };
 
-  tryConnect = (e: MouseEvent) => {
-    e.stopPropagation();
-    const { x, y } = this.dragger.end(e, document.body, this.getScale());
+  tryConnect = (x: number, y: number) => {
     const { reconnect, prevEdgeId } = this.Get(edgeInProgressAtom);
     if (reconnect && prevEdgeId) {
       const { target, targetNode } = this.Get(this.getAtom('edge', prevEdgeId)).edge;
@@ -114,31 +120,6 @@ class TailCore extends Component<TailCoreProps> {
       }
     }
     this.resetConnect();
-  };
-
-  startReconnecting = (e, targetNodeId, targetHandleId) => {
-    const connectedEdge = this.edgeRef.current?.edgeTree
-      .get(targetNodeId)
-      ?.get(targetHandleId)
-      ?.keys();
-    if (!connectedEdge) return;
-    const arr = [...connectedEdge];
-    if (arr.length === 0) return;
-    let chosen = arr[0];
-    for (const edge of arr) {
-      if (this.activeItems[edge]?.type === 'edge') {
-        chosen = edge;
-        break;
-      }
-    }
-    this.Set(this.getAtom('edge', chosen), enableEdgeReconnect);
-  };
-
-  resetConnect = () => {
-    this.Reset(edgeInProgressAtom);
-    this.dragger.reset();
-    document.removeEventListener('mousemove', this.onConnecting);
-    document.removeEventListener('mouseup', this.tryConnect);
   };
 
   render() {

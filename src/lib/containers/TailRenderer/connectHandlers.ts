@@ -1,4 +1,11 @@
-import type { EdgeAtom, EdgeInProgressAtomType } from '@types';
+import type {
+  ConnectMethodType,
+  EdgeAtom,
+  EdgeInProgressAtomType,
+  EdgeTree,
+  RecoilNexusInterface,
+  SelectedItemCollection,
+} from '@types';
 import { CoordinateCalc } from '@app/components/Dragger';
 
 export function activateEgdeInProgress(
@@ -53,10 +60,18 @@ export function disableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
   };
 }
 
-export function createEdgeInProgressUpdater(x: number, y: number) {
+export function setTarget(x: number, y: number) {
   return function (prev: EdgeInProgressAtomType) {
     const next = { ...prev };
     [next.targetX, next.targetY] = [x, y];
+    return next;
+  };
+}
+
+export function setSource(x: number, y: number) {
+  return function (prev: EdgeInProgressAtomType) {
+    const next = { ...prev };
+    [next.sourceX, next.sourceY] = [x, y];
     return next;
   };
 }
@@ -66,8 +81,17 @@ enum OppositeHandleType {
   'target' = 'source',
 }
 
-class ConnectProcessor {
-  dragger = new CoordinateCalc();
-
-  
+export function hasConnectedEdgeActive(
+  edgeTree: EdgeTree,
+  activePool: SelectedItemCollection,
+  nodeId: string,
+  handleId: string,
+) {
+  const arr = [...edgeTree.get(nodeId)?.get(handleId)?.keys() ?? []];
+  for (const edge of arr) {
+    if (activePool[edge].type === 'edge') {
+      return edge;
+    }
+  }
+  return false;
 }
