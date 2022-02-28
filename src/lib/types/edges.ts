@@ -118,6 +118,10 @@ export type EdgeInProgressAtomType = {
   prevEdgeId?: string;
 } & EdgeBasicProps;
 
+export type EdgeInProgressAtomUpdater = (
+  updater: EdgeInProgressAtomType | ((s: EdgeInProgressAtomType) => EdgeInProgressAtomType)
+) => void;
+
 export type EdgeInProgressProps = {
   template: ComponentType<EdgeBasicProps>;
 };

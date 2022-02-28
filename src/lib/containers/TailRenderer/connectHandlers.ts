@@ -7,6 +7,7 @@ import type {
   RecoilNexusInterface,
   SelectedItemCollection,
   EdgeBasic,
+  EdgeInProgressAtomUpdater,
 } from '@types';
 import { CoordinateCalc } from '@app/components/Dragger';
 
@@ -61,7 +62,6 @@ export function disableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
     reconnect: false,
   };
 }
-
 
 export function hasConnectedEdgeActive(
   edgeTree: EdgeTree,
@@ -130,12 +130,28 @@ export function setSource(x: number, y: number) {
   };
 }
 
+export function createBasicConnect(
+  to: HandleType,
+  x: number,
+  y: number,
+  nodeId: string,
+  handleId: string,
+): EdgeInProgressAtomType {
+  return {
+    active: true,
+    to,
+    nodeId,
+    handleId,
+    sourceX: x,
+    sourceY: y,
+    targetX: x,
+    targetY: y,
+  };
+}
 
-export function createMove(to: HandleType, x: number, y: number) {
-  return function (prev: EdgeInProgressAtomType) {
-    const next = { ...prev };
-    const [X, Y] = handleToCoor[to];
-    [next[X], next[Y]] = [x, y];
-    return prev;
+export function createMoveCallback(setter: EdgeInProgressAtomUpdater, type: HandleType) {
+  const moveUpdater = type === 'source' ? setSource : setTarget;
+  return (x: number, y: number) => {
+    setter(moveUpdater(x, y));
   };
 }

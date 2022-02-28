@@ -13,6 +13,7 @@ import type {
   PoolType,
   DeletePayload,
   HandleType,
+  EdgeInProgressAtomUpdater,
 } from '@types';
 import { edgeInProgressAtom } from '@app/atoms/edges';
 import { CoordinateCalc } from '@app/components/Dragger';
@@ -26,6 +27,8 @@ import {
   hasConnectedEdgeActive,
   oppositeHandleType,
   setTarget,
+  createBasicConnect,
+  createMoveCallback,
 } from './connectHandlers';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
@@ -76,16 +79,27 @@ class TailCore extends Component<TailCoreProps> {
   /* Connect and reconnect */
   onHandleMouseDown: ConnectMethodType = (e, type, nodeId, handleId) => {
     //only edge active will try reconnect
-    const { edgeTree } = this.edgeRef.current!;
+    const { edgeTree, edgeAtoms } = this.edgeRef.current!;
     const possibleEdge = hasConnectedEdgeActive(edgeTree, this.activeItems, nodeId, handleId);
     const to = oppositeHandleType[type];
-    if (possibleEdge === false) {
-      // create
-    } else {
+    const { x, y } = this.getHandleXY(type, nodeId, handleId);
+    const basicState = createBasicConnect(to, x, y, nodeId, handleId);
+    if (possibleEdge !== false) {
+      // reconnect
+      this.Set(edgeAtoms[possibleEdge], enableEdgeReconnect);
+      basicState.reconnect = true;
+      basicState.prevEdgeId = possibleEdge;
     }
+    this.edgeInProgressUpdater(basicState);
+    this.dragger.start(e, {
+      x,
+      y,
+      parent: document.body,
+      getScale: this.getScale,
+      movecb: createMoveCallback(this.edgeInProgressUpdater, type),
+      endcb:
+    });
   };
-
-  sourceStart(sourceNodeId: string, handleId: string) {}
 
   createEnd(type: HandleType, node: string, handle: string) {
     const { to, active, nodeId, handleId } = this.Get(edgeInProgressAtom)!;
@@ -93,11 +107,11 @@ class TailCore extends Component<TailCoreProps> {
     this.props.onEdgeCreate(createEdgePayload(to, node, handle, nodeId, handleId));
   }
 
-  getHandleXY: ConnectMethodType = (e, type, nodeId, handleId) => {
+  getHandleXY(type: HandleType, nodeId: string, handleId: string) {
     const handles = this.Get(this.getAtom('node', nodeId) as RecoilState<NodeAtom>).handles;
-    if (!handles || !handles[type][handleId]) return console.log('fail to fetch start handle info');
+    if (!handles || !handles[type][handleId]) throw console.log('fail to fetch start handle info');
     return handles[type][handleId];
-  };
+  }
 
   createConnect: ConnectMethodType = (e, type, nodeId, handleId) => {};
 
@@ -180,6 +194,9 @@ class TailCore extends Component<TailCoreProps> {
   };
   getScale = () => {
     return this.viewer.current?.getScale() || 1;
+  };
+  edgeInProgressUpdater: EdgeInProgressAtomUpdater = (updater) => {
+    this.Set(edgeInProgressAtom, updater);
   };
 }
 
