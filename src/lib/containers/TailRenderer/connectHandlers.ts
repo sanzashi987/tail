@@ -3,8 +3,10 @@ import type {
   EdgeAtom,
   EdgeInProgressAtomType,
   EdgeTree,
+  HandleType,
   RecoilNexusInterface,
   SelectedItemCollection,
+  EdgeBasic,
 } from '@types';
 import { CoordinateCalc } from '@app/components/Dragger';
 
@@ -60,6 +62,58 @@ export function disableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
   };
 }
 
+
+export function hasConnectedEdgeActive(
+  edgeTree: EdgeTree,
+  activePool: SelectedItemCollection,
+  nodeId: string,
+  handleId: string,
+) {
+  const arr = [...(edgeTree.get(nodeId)?.get(handleId)?.keys() ?? [])];
+  for (const edge of arr) {
+    if (activePool[edge].type === 'edge') {
+      return edge;
+    }
+  }
+  return false;
+}
+
+export const oppositeHandleType = {
+  source: 'target',
+  target: 'source',
+} as const;
+const oppositeNodeType = {
+  source: 'targetNode',
+  target: 'sourceNode',
+} as const;
+const handleTypeToNode = {
+  source: 'sourceNode',
+  target: 'targetNode',
+} as const;
+
+const handleToCoor = {
+  source: ['sourceX', 'sourceY'],
+  target: ['targetX', 'targetY'],
+} as const;
+
+export function createEdgePayload(
+  to: HandleType,
+  nodeId: string,
+  handleId: string,
+  nodeIdStored: string,
+  handleIdStored: string,
+) {
+  const storedHandle = oppositeHandleType[to];
+  const storedNode = oppositeNodeType[to];
+  const toNode = handleTypeToNode[to];
+  return {
+    [storedNode]: nodeIdStored,
+    [storedHandle]: handleIdStored,
+    [to]: handleId,
+    [toNode]: nodeId,
+  } as EdgeBasic;
+}
+
 export function setTarget(x: number, y: number) {
   return function (prev: EdgeInProgressAtomType) {
     const next = { ...prev };
@@ -76,22 +130,12 @@ export function setSource(x: number, y: number) {
   };
 }
 
-enum OppositeHandleType {
-  'source' = 'target',
-  'target' = 'source',
-}
 
-export function hasConnectedEdgeActive(
-  edgeTree: EdgeTree,
-  activePool: SelectedItemCollection,
-  nodeId: string,
-  handleId: string,
-) {
-  const arr = [...edgeTree.get(nodeId)?.get(handleId)?.keys() ?? []];
-  for (const edge of arr) {
-    if (activePool[edge].type === 'edge') {
-      return edge;
-    }
-  }
-  return false;
+export function createMove(to: HandleType, x: number, y: number) {
+  return function (prev: EdgeInProgressAtomType) {
+    const next = { ...prev };
+    const [X, Y] = handleToCoor[to];
+    [next[X], next[Y]] = [x, y];
+    return prev;
+  };
 }

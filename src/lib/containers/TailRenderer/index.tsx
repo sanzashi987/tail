@@ -12,6 +12,7 @@ import type {
   NodeAtom,
   PoolType,
   DeletePayload,
+  HandleType,
 } from '@types';
 import { edgeInProgressAtom } from '@app/atoms/edges';
 import { CoordinateCalc } from '@app/components/Dragger';
@@ -19,8 +20,11 @@ import { getAtom } from './mutation';
 import { switchActive } from './activateHandlers';
 import {
   activateEgdeInProgress,
+  createEdgePayload,
   disableEdgeReconnect,
   enableEdgeReconnect,
+  hasConnectedEdgeActive,
+  oppositeHandleType,
   setTarget,
 } from './connectHandlers';
 import NodeRenderer from '../NodeRenderer';
@@ -72,25 +76,21 @@ class TailCore extends Component<TailCoreProps> {
   /* Connect and reconnect */
   onHandleMouseDown: ConnectMethodType = (e, type, nodeId, handleId) => {
     //only edge active will try reconnect
+    const { edgeTree } = this.edgeRef.current!;
+    const possibleEdge = hasConnectedEdgeActive(edgeTree, this.activeItems, nodeId, handleId);
+    const to = oppositeHandleType[type];
+    if (possibleEdge === false) {
+      // create
+    } else {
+    }
   };
 
-  sourceStart(sourceNodeId: string, handleId: string) {
-    const handles = this.Get(this.getAtom('node', sourceNodeId) as RecoilState<NodeAtom>).handles;
-    if (!handles || !handles.source[handleId]) {
-      console.log('fail to fetch start handle info');
-      return;
-      // throw new Error('fail to fetch start handle info');
-    }
-    const { x, y } = handles.source[handleId];
-  }
+  sourceStart(sourceNodeId: string, handleId: string) {}
 
-  sourceEnd() {}
-
-  targetEnd(target: string, targetNode: string) {
-    const { active, sourceNode, source } = this.Get(edgeInProgressAtom);
-    if (active) {
-      this.props.onEdgeCreate({ source, sourceNode, target, targetNode });
-    }
+  createEnd(type: HandleType, node: string, handle: string) {
+    const { to, active, nodeId, handleId } = this.Get(edgeInProgressAtom)!;
+    if (!active || to !== type) return;
+    this.props.onEdgeCreate(createEdgePayload(to, node, handle, nodeId, handleId));
   }
 
   getHandleXY: ConnectMethodType = (e, type, nodeId, handleId) => {
@@ -119,7 +119,6 @@ class TailCore extends Component<TailCoreProps> {
         this.deleteItem([{ type: 'edge', id: prevEdgeId }]);
       }
     }
-    this.resetConnect();
   };
 
   render() {

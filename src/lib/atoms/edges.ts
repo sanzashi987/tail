@@ -70,6 +70,8 @@ export const edgeInProgressAtom = atom<EdgeInProgressAtomType>({
     active: false,
     source: '',
     sourceNode: '',
+    target: '',
+    targetNode: '',
     ...emptySourceTarget,
   },
 });

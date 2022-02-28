@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import React, { ComponentType } from 'react';
 import type { RecoilState } from 'recoil';
-import { AtomForceRender, NodeAtomsType } from '.';
+import { AtomForceRender, HandleType, NodeAtomsType } from '.';
 
 export type EdgeBasic = {
   source: string;
@@ -110,8 +110,9 @@ type EdgeId = string;
 export type EdgeTree = Map<NodeId, Map<HandleId, Map<EdgeId, EdgeId>>>;
 
 export type EdgeInProgressAtomType = {
-  sourceNode: string;
-  source: string;
+  nodeId: string;
+  handleId: string;
+  to: HandleType;
   active: boolean;
   reconnect?: boolean;
   prevEdgeId?: string;
