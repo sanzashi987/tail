@@ -155,3 +155,7 @@ export function createMoveCallback(setter: EdgeInProgressAtomUpdater, type: Hand
     setter(moveUpdater(x, y));
   };
 }
+
+export function createEndCallback() {
+  return (x: number, y: number) => {};
+}

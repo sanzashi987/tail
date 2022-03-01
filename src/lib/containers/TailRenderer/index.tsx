@@ -17,7 +17,7 @@ import type {
 } from '@types';
 import { edgeInProgressAtom } from '@app/atoms/edges';
 import { CoordinateCalc } from '@app/components/Dragger';
-import { getAtom } from './mutation';
+import { findDeletedItem, getAtom } from './mutation';
 import { switchActive } from './activateHandlers';
 import {
   activateEgdeInProgress,
@@ -29,6 +29,7 @@ import {
   setTarget,
   createBasicConnect,
   createMoveCallback,
+  createEndCallback,
 } from './connectHandlers';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
@@ -97,7 +98,7 @@ class TailCore extends Component<TailCoreProps> {
       parent: document.body,
       getScale: this.getScale,
       movecb: createMoveCallback(this.edgeInProgressUpdater, type),
-      endcb:
+      endcb: createEndCallback(),
     });
   };
 
@@ -142,11 +143,7 @@ class TailCore extends Component<TailCoreProps> {
         <RecoilRoot>
           <RecoilNexus ref={this.nexus} />
           <InterfaceProvider value={this.contextInterface}>
-            <NodeRenderer
-              nodes={nodes}
-              ref={this.nodeRef}
-              mounted={() => this.setState({ nodesReady: true })}
-            />
+            <NodeRenderer nodes={nodes} ref={this.nodeRef} mounted={this.nodesReady} />
             {this.state.nodesReady && (
               <EdgeRenderer edges={edges} ref={this.edgeRef} getNodeAtoms={this.getNodeAtoms}>
                 <MarkerDefs />
@@ -159,18 +156,7 @@ class TailCore extends Component<TailCoreProps> {
   }
 
   deleteItem(payload: DeletePayload) {
-    const edges: string[] = [],
-      nodes: string[] = [];
-    payload.forEach((val) => {
-      const { type, id } = val;
-      if (type === 'node') {
-        nodes.push(id);
-        const keys = this.edgeRef.current?.edgeTree.get(id)?.keys() ?? [];
-        edges.push(...keys);
-      } else if (type === 'edge') {
-        edges.push(id);
-      }
-    });
+    const { nodes, edges } = findDeletedItem(this.edgeRef.current!.edgeTree, payload);
     this.props.onDelete(nodes, edges);
   }
   getAtom<T extends SelectedItemType>(type: T, id: string): PoolType<T> {
@@ -198,6 +184,9 @@ class TailCore extends Component<TailCoreProps> {
   edgeInProgressUpdater: EdgeInProgressAtomUpdater = (updater) => {
     this.Set(edgeInProgressAtom, updater);
   };
+  nodesReady() {
+    this.setState({ nodesReady: true });
+  }
 }
 
 export default TailCore;
