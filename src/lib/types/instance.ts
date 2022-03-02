@@ -99,11 +99,11 @@ export type AtomForceRender = {
   forceRender: number;
 };
 
-export type PoolType<T> = T extends 'edge'
-  ? RecoilState<EdgeAtom>
-  : T extends 'node'
-  ? RecoilState<NodeAtom>
-  : never;
+// export type PoolType<T> = T extends 'edge'
+//   ? RecoilState<EdgeAtom>
+//   : T extends 'node'
+//   ? RecoilState<NodeAtom>
+//   : never;
 
 export type DeleteItem = {
   type: SelectedItemType;
@@ -111,3 +111,10 @@ export type DeleteItem = {
 };
 
 export type DeletePayload = DeleteItem[];
+
+export type AtomStateGetterType = <T>(type: SelectedItemType, id: string) => T;
+export type AtomStateSetterType = <T>(
+  type: SelectedItemType,
+  id: string,
+  updater: T | ((c: T) => T),
+) => T;

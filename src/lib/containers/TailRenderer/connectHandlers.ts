@@ -7,9 +7,9 @@ import type {
   SelectedItemCollection,
   EdgeBasic,
   EdgeInProgressAtomUpdater,
-  PoolType,
   SelectedItemType,
   NodeAtom,
+  AtomStateGetterType,
 } from '@types';
 import { RecoilState } from 'recoil';
 
@@ -50,7 +50,7 @@ const oppositeNodeType = {
   source: 'targetNode',
   target: 'sourceNode',
 } as const;
-const handleTypeToNode = {
+export const handleTypeToNode = {
   source: 'sourceNode',
   target: 'targetNode',
 } as const;
@@ -117,19 +117,25 @@ export function addReconnectToState(
   state: EdgeInProgressAtomType,
   type: HandleType,
   prevEdgeId: string,
-  atomGetter: (type: SelectedItemType, id: string) => PoolType<SelectedItemType>,
-  stateGetter: RecoilNexusInterface['getRecoil'],
+  atomStateGetter: AtomStateGetterType,
 ) {
   const next = { ...state };
   const [X, Y] = handleToCoor[type];
   const toNode = handleTypeToNode[type];
-  const { [toNode]: nodeId, [type]: handleId } = stateGetter(
-    atomGetter('edge', prevEdgeId) as RecoilState<EdgeAtom>,
-  ).edge;
+  const opposite = oppositeHandleType[type];
+  const oppositeNode = handleTypeToNode[opposite];
+  const {
+    [toNode]: nodeId,
+    [type]: handleId,
+    [opposite]: storedHandle,
+    [oppositeNode]: storedNode,
+  } = atomStateGetter<EdgeAtom>('edge', prevEdgeId).edge;
   const {
     [handleId]: { x, y },
-  } = stateGetter(atomGetter('node', nodeId) as RecoilState<NodeAtom>).handles[type];
+  } = atomStateGetter<NodeAtom>('node', nodeId).handles[type];
   [next[X], next[Y]] = [x, y];
+  next.nodeId = storedNode;
+  next.handleId = storedHandle;
   next.to = type;
   next.reconnect = true;
   next.prevEdgeId = prevEdgeId;
@@ -141,8 +147,4 @@ export function createMoveCallback(setter: EdgeInProgressAtomUpdater, type: Hand
   return (x: number, y: number) => {
     setter(moveUpdater(x, y));
   };
-}
-
-export function createEndCallback() {
-  return (x: number, y: number) => {};
 }
