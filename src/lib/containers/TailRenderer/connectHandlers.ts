@@ -120,6 +120,7 @@ export function addReconnectToState(
   atomGetter: (type: SelectedItemType, id: string) => PoolType<SelectedItemType>,
   stateGetter: RecoilNexusInterface['getRecoil'],
 ) {
+  const next = { ...state };
   const [X, Y] = handleToCoor[type];
   const toNode = handleTypeToNode[type];
   const { [toNode]: nodeId, [type]: handleId } = stateGetter(
@@ -128,10 +129,11 @@ export function addReconnectToState(
   const {
     [handleId]: { x, y },
   } = stateGetter(atomGetter('node', nodeId) as RecoilState<NodeAtom>).handles[type];
-  [state[X], state[Y]] = [x, y];
-  state.to = type;
-  state.reconnect = true;
-  state.prevEdgeId = prevEdgeId;
+  [next[X], next[Y]] = [x, y];
+  next.to = type;
+  next.reconnect = true;
+  next.prevEdgeId = prevEdgeId;
+  return next;
 }
 
 export function createMoveCallback(setter: EdgeInProgressAtomUpdater, type: HandleType) {

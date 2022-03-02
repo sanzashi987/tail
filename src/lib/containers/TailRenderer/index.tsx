@@ -81,11 +81,11 @@ class TailCore extends Component<TailCoreProps> {
     const { edgeTree, edgeAtoms } = this.edgeRef.current!;
     const possibleEdge = hasConnectedEdgeActive(edgeTree, this.activeItems, nodeId, handleId);
     const { x, y } = this.getHandleXY(type, nodeId, handleId);
-    const basicState = createBasicConnect(type, x, y, nodeId, handleId);
+    let basicState = createBasicConnect(type, x, y, nodeId, handleId);
     if (possibleEdge !== false) {
       // reconnect
       const { getAtom, Get } = this;
-      addReconnectToState(basicState, type, possibleEdge, getAtom, Get);
+      basicState = addReconnectToState(basicState, type, possibleEdge, getAtom, Get);
       this.Set(edgeAtoms[possibleEdge], enableEdgeReconnect);
     }
     this.edgeInProgressUpdater(basicState);
