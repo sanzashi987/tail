@@ -1,5 +1,4 @@
 import type {
-  ConnectMethodType,
   EdgeAtom,
   EdgeInProgressAtomType,
   EdgeTree,
@@ -8,46 +7,11 @@ import type {
   SelectedItemCollection,
   EdgeBasic,
   EdgeInProgressAtomUpdater,
+  PoolType,
+  SelectedItemType,
+  NodeAtom,
 } from '@types';
-import { CoordinateCalc } from '@app/components/Dragger';
-
-export function activateEgdeInProgress(
-  x: number,
-  y: number,
-  source: string,
-  sourceNode: string,
-): EdgeInProgressAtomType {
-  return {
-    active: true,
-    source,
-    sourceNode,
-    sourceX: x,
-    targetX: x,
-    sourceY: y,
-    targetY: y,
-  };
-}
-
-export function activateEgdeInProgressReconnect(
-  sourceX: number,
-  sourceY: number,
-  targetX: number,
-  targetY: number,
-  source: string,
-  sourceNode: string,
-  prevEdgeId: string,
-) {
-  return {
-    active: true,
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-    source,
-    sourceNode,
-    prevEdgeId,
-  };
-}
+import { RecoilState } from 'recoil';
 
 export function enableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
   return {
@@ -139,7 +103,7 @@ export function createBasicConnect(
 ): EdgeInProgressAtomType {
   return {
     active: true,
-    to,
+    to: oppositeHandleType[to],
     nodeId,
     handleId,
     sourceX: x,
@@ -147,6 +111,27 @@ export function createBasicConnect(
     targetX: x,
     targetY: y,
   };
+}
+
+export function addReconnectToState(
+  state: EdgeInProgressAtomType,
+  type: HandleType,
+  prevEdgeId: string,
+  atomGetter: (type: SelectedItemType, id: string) => PoolType<SelectedItemType>,
+  stateGetter: RecoilNexusInterface['getRecoil'],
+) {
+  const [X, Y] = handleToCoor[type];
+  const toNode = handleTypeToNode[type];
+  const { [toNode]: nodeId, [type]: handleId } = stateGetter(
+    atomGetter('edge', prevEdgeId) as RecoilState<EdgeAtom>,
+  ).edge;
+  const {
+    [handleId]: { x, y },
+  } = stateGetter(atomGetter('node', nodeId) as RecoilState<NodeAtom>).handles[type];
+  [state[X], state[Y]] = [x, y];
+  state.to = type;
+  state.reconnect = true;
+  state.prevEdgeId = prevEdgeId;
 }
 
 export function createMoveCallback(setter: EdgeInProgressAtomUpdater, type: HandleType) {

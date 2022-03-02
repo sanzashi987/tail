@@ -20,16 +20,14 @@ import { CoordinateCalc } from '@app/components/Dragger';
 import { findDeletedItem, getAtom } from './mutation';
 import { switchActive } from './activateHandlers';
 import {
-  activateEgdeInProgress,
   createEdgePayload,
   disableEdgeReconnect,
   enableEdgeReconnect,
   hasConnectedEdgeActive,
-  oppositeHandleType,
-  setTarget,
   createBasicConnect,
   createMoveCallback,
   createEndCallback,
+  addReconnectToState,
 } from './connectHandlers';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
@@ -82,14 +80,13 @@ class TailCore extends Component<TailCoreProps> {
     //only edge active will try reconnect
     const { edgeTree, edgeAtoms } = this.edgeRef.current!;
     const possibleEdge = hasConnectedEdgeActive(edgeTree, this.activeItems, nodeId, handleId);
-    const to = oppositeHandleType[type];
     const { x, y } = this.getHandleXY(type, nodeId, handleId);
-    const basicState = createBasicConnect(to, x, y, nodeId, handleId);
+    const basicState = createBasicConnect(type, x, y, nodeId, handleId);
     if (possibleEdge !== false) {
       // reconnect
+      const { getAtom, Get } = this;
+      addReconnectToState(basicState, type, possibleEdge, getAtom, Get);
       this.Set(edgeAtoms[possibleEdge], enableEdgeReconnect);
-      basicState.reconnect = true;
-      basicState.prevEdgeId = possibleEdge;
     }
     this.edgeInProgressUpdater(basicState);
     this.dragger.start(e, {
@@ -103,7 +100,7 @@ class TailCore extends Component<TailCoreProps> {
   };
 
   createEnd(type: HandleType, node: string, handle: string) {
-    const { to, active, nodeId, handleId } = this.Get(edgeInProgressAtom)!;
+    const { to, active, nodeId, handleId, reconnect, prevEdgeId } = this.Get(edgeInProgressAtom)!;
     if (!active || to !== type) return;
     this.props.onEdgeCreate(createEdgePayload(to, node, handle, nodeId, handleId));
   }
@@ -114,12 +111,8 @@ class TailCore extends Component<TailCoreProps> {
     return handles[type][handleId];
   }
 
-  createConnect: ConnectMethodType = (e, type, nodeId, handleId) => {};
-
-  onHandleMouseUp: ConnectMethodType = (e, type, nodeId, handleId) => {};
-
-  sourceMove = (x: number, y: number) => {
-    this.Set(edgeInProgressAtom, setTarget(x, y));
+  onHandleMouseUp: ConnectMethodType = (e, type, nodeId, handleId) => {
+    this.dragger.reset();
   };
 
   tryConnect = (x: number, y: number) => {
@@ -159,34 +152,22 @@ class TailCore extends Component<TailCoreProps> {
     const { nodes, edges } = findDeletedItem(this.edgeRef.current!.edgeTree, payload);
     this.props.onDelete(nodes, edges);
   }
-  getAtom<T extends SelectedItemType>(type: T, id: string): PoolType<T> {
+  getAtom = <T extends SelectedItemType>(type: T, id: string): PoolType<T> => {
     if (type === 'edge') {
       return getAtom(id, this.edgeRef.current?.edgeAtoms) as PoolType<T>;
     } else {
       return getAtom(id, this.nodeRef.current?.nodeAtoms) as PoolType<T>;
     }
-  }
-  Set<T>(atom: RecoilState<T>, updater: T | ((cur: T) => T)) {
-    return this.nexus.current!.setRecoil<T>(atom, updater); // ! shall be ok
-  }
-  Get<T>(atom: RecoilValue<T>) {
-    return this.nexus.current!.getRecoil<T>(atom);
-  }
-  Reset(atom: RecoilState<any>) {
-    return this.nexus.current!.resetRecoil(atom);
-  }
-  getNodeAtoms = () => {
-    return this.nodeRef.current?.nodeAtoms ?? {};
   };
-  getScale = () => {
-    return this.viewer.current?.getScale() || 1;
-  };
-  edgeInProgressUpdater: EdgeInProgressAtomUpdater = (updater) => {
+  Set = <T,>(atom: RecoilState<T>, updater: T | ((cur: T) => T)) =>
+    this.nexus.current!.setRecoil<T>(atom, updater); // ! shall be ok
+  Get = <T,>(atom: RecoilValue<T>) => this.nexus.current!.getRecoil<T>(atom);
+  Reset = (atom: RecoilState<any>) => this.nexus.current!.resetRecoil(atom);
+  getNodeAtoms = () => this.nodeRef.current?.nodeAtoms ?? {};
+  getScale = () => this.viewer.current?.getScale() || 1;
+  edgeInProgressUpdater: EdgeInProgressAtomUpdater = (updater) =>
     this.Set(edgeInProgressAtom, updater);
-  };
-  nodesReady() {
-    this.setState({ nodesReady: true });
-  }
+  nodesReady = () => this.setState({ nodesReady: true });
 }
 
 export default TailCore;

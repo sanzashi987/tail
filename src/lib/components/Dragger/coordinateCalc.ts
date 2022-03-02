@@ -21,10 +21,10 @@ type StartPayload = {
 };
 class CoordinateCalc {
   private state = defaultState;
-  domParent: Element | null = null;
-  movecb: cb = noop;
-  endcb: cb = noop;
-  getScale = () => 1;
+  private domParent: Element | null = null;
+  private movecb: cb = noop;
+  private endcb: cb = noop;
+  private getScale = () => 1;
   start = (e: MouseEventCollection, { x, y, parent, movecb, endcb, getScale }: StartPayload) => {
     e.stopPropagation();
     const cor = getCoordinatesFromParent(e, parent, getScale());
@@ -42,7 +42,7 @@ class CoordinateCalc {
     this.movecb(this.state.x, this.state.y);
   };
 
-  iter(e: MouseEventCollection) {
+  private iter(e: MouseEventCollection) {
     e.stopPropagation();
     const cor = getCoordinatesFromParent(e, this.domParent!, this.getScale());
     const { x, y, lastY, lastX } = this.state;
