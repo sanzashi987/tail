@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Tail } from '@app/index';
-import { coordinates, Edge, Node } from '@app/types';
+import { coordinates, Edge, EdgeBasic, Node } from '@app/types';
 
 const nodes: IObject<Node> = {
   id1: {
@@ -43,9 +43,14 @@ function Overview() {
       };
     });
   }, []);
-  // const onNodeDelete = useCallback(() => {
 
-  // })
+  const onEdgeCreate = useCallback((edgeState: EdgeBasic) => {
+    const id = `edgeid${Math.round(Math.random() * 100)}`;
+    setEdgeState((pre) => ({
+      ...pre,
+      [id]: { id, ...edgeState },
+    }));
+  }, []);
   return (
     <Tail
       nodes={nodeState}
@@ -53,16 +58,16 @@ function Overview() {
       onEdgeClick={noop}
       onNodeClick={noop}
       onNodeCreate={noop}
-      onNodeDelete={noop}
-      onEdgeCreate={noop}
+      onEdgeCreate={onEdgeCreate}
       onEdgeUpdate={noop}
-      onEdgeDelete={noop}
+      onDelete={noop}
       onDragStart={noop}
       onDrag={onDrag}
       onDragEnd={onDrag}
       nodeTemplates={{}}
       edgeTemplates={{}}
       markerTemplates={{}}
+      dropThreshold={40}
     />
   );
 }

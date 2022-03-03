@@ -6,6 +6,9 @@
   // align-items: center;
   position: relative;
   border: 1px solid black;
+  &:global(.selected) {
+    border-color: orange;
+  }
   :global {
     .target {
       position: absolute;

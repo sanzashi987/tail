@@ -12,7 +12,6 @@ import type {
   EdgeAtom,
   NodeAtom,
   DeletePayload,
-  HandleType,
   EdgeInProgressAtomUpdater,
 } from '@types';
 import { edgeInProgressAtom } from '@app/atoms/edges';
@@ -27,12 +26,13 @@ import {
   createBasicConnect,
   createMoveCallback,
   addReconnectToState,
-  handleTypeToNode,
+  addHandleNode,
 } from './connectHandlers';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
 import InfiniteViewer from '../InfiniteViewer';
 import MarkerDefs from '../MarkerDefs';
+import '@app/styles/index.scss';
 
 class TailCore extends Component<TailCoreProps> {
   activeItems: SelectedItemCollection = {};
@@ -60,11 +60,14 @@ class TailCore extends Component<TailCoreProps> {
   }
 
   /* Activate & Deactivate */
-  activateNext = (e: React.MouseEvent, type: SelectedItemType, id: string) => {
-    const append = isModifierExact(e) && CtrlOrCmd(e);
-    if (!append) this.deactivateLast();
-    this.activeItems[id] = { id, type };
-    switchActive(this, type, id, true);
+  activateNext = (e: React.MouseEvent, type: SelectedItemType, id: string, selected: boolean) => {
+    const hold = isModifierExact(e) && CtrlOrCmd(e);
+    if (!hold && selected) return;
+    if (!hold) {
+      this.deactivateLast();
+    }
+    selected ? delete this.activeItems[id] : (this.activeItems[id] = { id, type });
+    switchActive(this, type, id, !selected);
   };
 
   deactivateLast = () => {
@@ -80,8 +83,16 @@ class TailCore extends Component<TailCoreProps> {
     //only edge active will try reconnect
     const { edgeTree, edgeAtoms } = this.edgeRef.current!;
     const possibleEdge = hasConnectedEdgeActive(edgeTree, this.activeItems, nodeId, handleId);
-    const { x, y } = this.getHandleXY(type, nodeId, handleId);
-    let basicState = createBasicConnect(type, x, y, nodeId, handleId);
+    const {
+      handles: {
+        [type]: {
+          [handleId]: { x, y },
+        },
+      },
+      node: { left, top },
+    } = this.getAtomState<NodeAtom>('node', nodeId);
+    const [absX, absY] = [x + left, y + top];
+    let basicState = createBasicConnect(type, absX, absY, nodeId, handleId);
     if (possibleEdge !== false) {
       // reconnect
       basicState = addReconnectToState(basicState, type, possibleEdge, this.getAtomState);
@@ -89,41 +100,49 @@ class TailCore extends Component<TailCoreProps> {
     }
     this.edgeInProgressUpdater(basicState);
     this.dragger.start(e, {
-      x,
-      y,
+      x: absX,
+      y: absY,
       parent: document.body,
       getScale: this.getScale,
       movecb: createMoveCallback(this.edgeInProgressUpdater, type),
-      endcb: (x: number, y: number) => this.tryConnect(type, x, y),
+      endcb: this.tryConnect,
     });
   };
 
-  getHandleXY(type: HandleType, nodeId: string, handleId: string) {
-    const { handles } = this.getAtomState<NodeAtom>('node', nodeId);
-    if (!handles || !handles[type][handleId]) throw console.log('fail to fetch start handle info');
-    return handles[type][handleId];
-  }
-
-  onHandleMouseUp: ConnectMethodType = (e, type, node, handle) => {
+  onHandleMouseUp: ConnectMethodType = (e, type, nodeId, handleId) => {
     e.stopPropagation();
-    const { active, reconnect, prevEdgeId, to, nodeId, handleId } = this.Get(edgeInProgressAtom);
+    const {
+      active,
+      reconnect,
+      prevEdgeId,
+      to,
+      nodeId: storedNode,
+      handleId: storedHandle,
+    } = this.Get(edgeInProgressAtom);
     if (to === type && active) {
+      const newPayload = createEdgePayload(to, nodeId, handleId, storedNode, storedHandle);
       if (reconnect && prevEdgeId) {
-
-
-        this.props.onEdgeUpdate()
+        const toNode = addHandleNode[type];
+        const { [type]: prevHandleId, [toNode]: prevNodeId } = this.getAtomState<EdgeAtom>(
+          'edge',
+          prevEdgeId,
+        ).edge;
+        if (prevHandleId !== handleId || prevNodeId !== nodeId) {
+          this.props.onEdgeUpdate(prevEdgeId, newPayload);
+          this.setAtomState('edge', prevEdgeId, disableEdgeReconnect);
+        }
       } else {
-        this.props.onEdgeCreate(createEdgePayload(to, node, handle, nodeId, handleId));
+        this.props.onEdgeCreate(newPayload);
       }
     }
     this.connectReset();
   };
 
-  tryConnect = (type: HandleType, x: number, y: number) => {
-    const { reconnect, prevEdgeId } = this.Get(edgeInProgressAtom);
+  tryConnect = (x: number, y: number) => {
+    const { reconnect, prevEdgeId, to: type } = this.Get(edgeInProgressAtom);
     if (reconnect && prevEdgeId) {
       const { getAtomState: GET, setAtomState: SET } = this;
-      const typeNode = handleTypeToNode[type];
+      const typeNode = addHandleNode[type];
       const {
         edge: { [typeNode]: originNode, [type]: originHandle },
       } = GET<EdgeAtom>('edge', prevEdgeId);
@@ -169,12 +188,12 @@ class TailCore extends Component<TailCoreProps> {
   getAtom = <T extends EdgeAtom | NodeAtom>(type: SelectedItemType, id: string) => {
     const pool =
       type === 'edge' ? this.edgeRef.current!.edgeAtoms : this.nodeRef.current!.nodeAtoms;
-    return getAtom(id, (pool as unknown) as IObject<RecoilState<T>>);
+    return getAtom(id, pool as unknown as IObject<RecoilState<T>>);
   };
   getAtomState = <T,>(type: SelectedItemType, id: string) =>
-    this.Get((this.getAtom(type, id) as unknown) as RecoilState<T>);
+    this.Get(this.getAtom(type, id) as unknown as RecoilState<T>);
   setAtomState = <T,>(type: SelectedItemType, id: string, updater: T | ((cur: T) => T)) =>
-    this.Set((this.getAtom(type, id) as unknown) as RecoilState<T>, updater);
+    this.Set(this.getAtom(type, id) as unknown as RecoilState<T>, updater);
   Set = <T,>(atom: RecoilState<T>, updater: T | ((cur: T) => T)) =>
     this.nexus.current!.setRecoil<T>(atom, updater); // ! shall be ok
   Get = <T,>(atom: RecoilValue<T>) => this.nexus.current!.getRecoil<T>(atom);

@@ -35,22 +35,22 @@ export function hasConnectedEdgeActive(
 ) {
   const arr = [...(edgeTree.get(nodeId)?.get(handleId)?.keys() ?? [])];
   for (const edge of arr) {
-    if (activePool[edge].type === 'edge') {
+    if (activePool[edge]?.type === 'edge') {
       return edge;
     }
   }
   return false;
 }
 
-export const oppositeHandleType = {
+export const flipHandle = {
   source: 'target',
   target: 'source',
 } as const;
-const oppositeNodeType = {
+const flipHandleNode = {
   source: 'targetNode',
   target: 'sourceNode',
 } as const;
-export const handleTypeToNode = {
+export const addHandleNode = {
   source: 'sourceNode',
   target: 'targetNode',
 } as const;
@@ -67,9 +67,9 @@ export function createEdgePayload(
   nodeIdStored: string,
   handleIdStored: string,
 ) {
-  const storedHandle = oppositeHandleType[to];
-  const storedNode = oppositeNodeType[to];
-  const toNode = handleTypeToNode[to];
+  const storedHandle = flipHandle[to];
+  const storedNode = flipHandleNode[to];
+  const toNode = addHandleNode[to];
   return {
     [storedNode]: nodeIdStored,
     [storedHandle]: handleIdStored,
@@ -103,7 +103,7 @@ export function createBasicConnect(
 ): EdgeInProgressAtomType {
   return {
     active: true,
-    to: oppositeHandleType[to],
+    to: flipHandle[to],
     nodeId,
     handleId,
     sourceX: x,
@@ -121,9 +121,9 @@ export function addReconnectToState(
 ) {
   const next = { ...state };
   const [X, Y] = handleToCoor[type];
-  const toNode = handleTypeToNode[type];
-  const opposite = oppositeHandleType[type];
-  const oppositeNode = handleTypeToNode[opposite];
+  const toNode = addHandleNode[type];
+  const opposite = flipHandle[type];
+  const oppositeNode = addHandleNode[opposite];
   const {
     [toNode]: nodeId,
     [type]: handleId,
@@ -143,7 +143,7 @@ export function addReconnectToState(
 }
 
 export function createMoveCallback(setter: EdgeInProgressAtomUpdater, type: HandleType) {
-  const moveUpdater = type === 'source' ? setSource : setTarget;
+  const moveUpdater = flipHandle[type] === 'source' ? setSource : setTarget;
   return (x: number, y: number) => {
     setter(moveUpdater(x, y));
   };

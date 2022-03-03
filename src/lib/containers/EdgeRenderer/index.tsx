@@ -112,7 +112,7 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
         <RecoilNexus ref={this.recoilInterface} />
         {this.props.children /*for marker definition */}
         {this.memoEdges}
-        {/* <EdgeInProgress /> */}
+        <EdgeInProgress template={BasicEdge as any} />
       </svg>
     );
   }

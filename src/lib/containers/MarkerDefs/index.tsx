@@ -1,28 +1,25 @@
-import React, { ReactNode, PureComponent } from "react";
-import { BasicClosedMarker, BasicMarker } from "@app/components/Anchor";
-import type { Marker, MarkerDefsProps, MarkerTemplatesType, MarkerTemplateType } from "@app/types";
-
+import React, { ReactNode, PureComponent } from 'react';
+import { BasicClosedMarker, BasicMarker } from '@app/components/Anchor';
+import type { Marker, MarkerDefsProps, MarkerTemplatesType, MarkerTemplateType } from '@app/types';
 
 const defaultTemplates: MarkerTemplatesType = {
-  'tailBasic': BasicMarker,
-  'tailBasicClosed': BasicClosedMarker
+  tailBasic: BasicMarker,
+  tailBasicClosed: BasicClosedMarker,
 };
 
 const defaultMarkers: Marker[] = [
   { id: 'tail-marker__basic', type: 'tailBasic' },
-  { id: 'tail-marker__basic-closed', type: 'tailBasicClosed' }
+  { id: 'tail-marker__basic-closed', type: 'tailBasicClosed' },
 ];
 
 function findTemplate(
   type: string,
-  passedTemplates?: MarkerTemplatesType
+  passedTemplates?: MarkerTemplatesType,
 ): MarkerTemplateType | null {
   return passedTemplates?.[type] ?? defaultTemplates[type] ?? null;
 }
 
-
 class MarkerDefs extends PureComponent<MarkerDefsProps> {
-
   // optional approach to load user-developed markers
   // but this runs as a singleton which will fail to render to tail instance
   // simultaneously in one app
@@ -33,11 +30,9 @@ class MarkerDefs extends PureComponent<MarkerDefsProps> {
     const { templates } = this.props;
     return markers.reduce<ReactNode[]>((lastRes, marker) => {
       const { type, ...MarkerWrapperProps } = marker;
-      const Marker = findTemplate(marker.type, templates);
+      const Marker = findTemplate(type, templates);
       if (Marker !== null) {
-        lastRes.push(
-          <Marker key={marker.id} {...MarkerWrapperProps} />
-        );
+        lastRes.push(<Marker key={marker.id} {...MarkerWrapperProps} />);
       }
       return lastRes;
     }, []);
@@ -45,10 +40,12 @@ class MarkerDefs extends PureComponent<MarkerDefsProps> {
 
   render() {
     const { markers = [] } = this.props;
-    return <defs>
-      {this.renderMarker(defaultMarkers)}
-      {this.renderMarker(markers)}
-    </defs>;
+    return (
+      <defs>
+        {this.renderMarker(defaultMarkers)}
+        {this.renderMarker(markers)}
+      </defs>
+    );
   }
 }
 

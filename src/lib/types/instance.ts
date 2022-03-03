@@ -40,7 +40,7 @@ export interface NodeMutation {
 
 export interface EdgeMutation {
   onEdgeCreate(edgeBasic: EdgeBasic): void;
-  onEdgeUpdate(): void;
+  onEdgeUpdate(id: string, edgeBasic: EdgeBasic): void;
   // onEdgeDelete(): void;
 }
 
@@ -67,7 +67,7 @@ export type NodeInternalInfo = {
 };
 export type NodeInternals = Map<string, NodeInternalInfo>;
 export interface GeneralMethods {
-  activateItem(e: React.MouseEvent, type: SelectedItemType, id: string): void;
+  activateItem(e: React.MouseEvent, type: SelectedItemType, id: string, selected: boolean): void;
   getScale(): number;
 }
 export type ConnectMethodType = (

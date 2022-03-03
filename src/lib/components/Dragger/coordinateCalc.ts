@@ -1,4 +1,4 @@
-import { coordinates, MouseEventCollection } from '@app/types';
+import type { MouseEventCollection } from '@app/types';
 import { getCoordinatesFromParent, getDraggerRelativeCoordinates } from './utils/calc';
 
 const defaultState = {
@@ -59,8 +59,8 @@ class CoordinateCalc {
     this.domParent = null;
     this.state = defaultState;
     this.movecb = this.endcb = noop;
-    document.addEventListener('mousemove', this.move);
-    document.addEventListener('mouseup', this.end);
+    document.removeEventListener('mousemove', this.move);
+    document.removeEventListener('mouseup', this.end);
   }
 }
 

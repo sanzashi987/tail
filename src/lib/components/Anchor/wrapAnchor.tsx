@@ -5,8 +5,8 @@ const wrapAnchor = (Symbol: ComponentType<AnchorProps>) => {
   const MarkerWrapper: FC<MarkerWrapperProps> = ({
     id,
     color,
-    width = 12.5,
-    height = 12.5,
+    width = 20,
+    height = 20,
     markerUnits = 'strokeWidth',
     strokeWidth,
     orient = 'auto',
@@ -17,7 +17,7 @@ const wrapAnchor = (Symbol: ComponentType<AnchorProps>) => {
         id={id}
         markerWidth={width}
         markerHeight={height}
-        viewBox="-10 -10 20 20"
+        viewBox="-20 -20 40 40"
         markerUnits={markerUnits}
         orient={orient}
         refX="0"

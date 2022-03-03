@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import type { AnchorProps } from '@app/types';
 import { wrapAnchor } from '.';
 
-const BasicAnchor: FC<AnchorProps> = ({ color = 'none', strokeWidth = 1 }) => {
+const BasicAnchor: FC<AnchorProps> = ({ color = 'black', strokeWidth = 2 }) => {
   return (
     <polyline
       stroke={color}
@@ -10,12 +10,13 @@ const BasicAnchor: FC<AnchorProps> = ({ color = 'none', strokeWidth = 1 }) => {
       strokeLinecap="round"
       strokeLinejoin="round"
       fill="none"
-      points="-5,-4 0,0 -5,4"
+      points="-20,-7 -10,0 -20,7"
+      orient=""
     ></polyline>
   );
 };
 
-const BasicClosedAnchor: FC<AnchorProps> = ({ color = 'none', strokeWidth = 1 }) => {
+const BasicClosedAnchor: FC<AnchorProps> = ({ color = 'black', strokeWidth = 1 }) => {
   return (
     <polyline
       stroke={color}
@@ -23,7 +24,7 @@ const BasicClosedAnchor: FC<AnchorProps> = ({ color = 'none', strokeWidth = 1 })
       strokeLinejoin="round"
       strokeWidth={strokeWidth}
       fill={color}
-      points="-5,-4 0,0 -5,4 -5,-4"
+      points="-20,-7 -10,0 -20,7 -20,-7"
     />
   );
 };

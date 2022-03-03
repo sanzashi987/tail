@@ -27,9 +27,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, template: EdgeComp
   const rootInterface = useContext(InstanceInterface)!;
   const onClick = useCallback(
     (e: React.MouseEvent) => {
-      if (!selected) {
-        rootInterface.activateItem(e, 'edge', edge.id);
-      }
+      rootInterface.activateItem(e, 'edge', edge.id, selected);
       rootInterface.edge.onEdgeClick(e, edge);
     },
     [selected, edge],

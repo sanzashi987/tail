@@ -56,12 +56,10 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   );
   const onNodeSelect = useCallback(
     (e: React.MouseEvent) => {
-      if (selected) {
-        rootInterface.activateItem(e, 'node', node.id);
-      }
+      rootInterface.activateItem(e, 'node', node.id, selected);
       rootInterface.node.onNodeClick(e, node);
     },
-    [node.id],
+    [selected, node],
   );
   const updateNodeHandles = useCallback(() => {
     const handles = getHandlesPosition(ref, node);

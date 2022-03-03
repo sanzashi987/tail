@@ -22,7 +22,7 @@ class Handle extends Component<HandlePropsInner> {
   onMouseUp = (e: React.MouseEvent) => {
     const { type, handleId, nodeId } = this.props;
     e.stopPropagation();
-    (this.context as InterfaceValue).handle.onMouseDown(e, type, nodeId, handleId);
+    (this.context as InterfaceValue).handle.onMouseUp(e, type, nodeId, handleId);
   };
 
   applyMouseActions = () => {

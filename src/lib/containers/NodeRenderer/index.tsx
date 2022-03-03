@@ -97,7 +97,7 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
 
   render() {
     return (
-      <div className="tail-node-container">
+      <div className="tail-node-container select-none">
         {this.memoNodes}
         <RecoilNexus ref={this.recoilInterface} />
       </div>
