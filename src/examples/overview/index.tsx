@@ -57,17 +57,15 @@ function Overview() {
       edges={edgeState}
       onEdgeClick={noop}
       onNodeClick={noop}
-      onNodeCreate={noop}
+      onNodeUpdate={noop}
       onEdgeCreate={onEdgeCreate}
       onEdgeUpdate={noop}
       onDelete={noop}
-      onDragStart={noop}
-      onDrag={onDrag}
-      onDragEnd={onDrag}
       nodeTemplates={{}}
       edgeTemplates={{}}
       markerTemplates={{}}
       dropThreshold={40}
+      quickNodeUpdate={true}
     />
   );
 }

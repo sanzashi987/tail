@@ -29,7 +29,7 @@ export type NodeRendererProps = {
   foldable?: boolean;
   templates?: IObject<TemplateNodeClass>;
   templatePicker?: (node: Node) => [string, string];
-  mounted():void
+  mounted(): void;
 };
 
 export type NodeWrapperProps<T extends IObject = {}> = {
@@ -55,13 +55,12 @@ export interface NodeMouseInterface extends WrapperDraggerInterface {
 export type WrapperDraggerInterface = DraggerCallbacksType;
 
 export type DraggerCallbacksType = {
-  [key in keyof DraggerInterface]: (
+  [key in keyof DraggerInterface]?: (
     e: MouseEventCollection,
     n: Node,
     c: coordinates,
   ) => boolean | void;
 };
-
 
 export type NodeAtomRaw<T extends IObject = {}> = Omit<NodeProps<T>, 'updateNodeHandles'> & {
   handles: HandlesInfo;

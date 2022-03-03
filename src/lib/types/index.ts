@@ -3,3 +3,4 @@ export * from './edges';
 export * from './handles';
 export * from './dragger';
 export * from './instance';
+export * from './viewer';

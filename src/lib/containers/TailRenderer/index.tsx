@@ -46,7 +46,7 @@ class TailCore extends Component<TailCoreProps> {
 
   constructor(props: TailCoreProps) {
     super(props);
-    const { onEdgeClick, onDragEnd, onDragStart, onDrag, onNodeClick } = props;
+    const { onEdgeClick, onDragEnd, onDragStart, onDrag, onNodeClick,quickNodeUpdate } = props;
     this.contextInterface = {
       edge: { onEdgeClick },
       node: { onDrag, onDragStart, onDragEnd, onNodeClick },
@@ -56,6 +56,7 @@ class TailCore extends Component<TailCoreProps> {
       },
       activateItem: this.activateNext,
       getScale: this.getScale,
+      quickNodeUpdate,
     };
   }
 

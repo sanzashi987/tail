@@ -19,6 +19,7 @@ export type TailCoreOptionalProps = {
   edgeTemplates: EdgeTemplatesType;
   markerTemplates: MarkerTemplatesType;
   dropThreshold: number;
+  quickNodeUpdate: boolean;
   onDelete(nodes: string[], edges: string[]): void; //come with id array
 } & NodeMutation &
   EdgeMutation &
@@ -33,8 +34,8 @@ export type TailCoreProps = {
   TailCoreOptionalProps;
 
 export interface NodeMutation {
-  onNodeCreate(): void;
-  // onNodeUpdate(): void;
+  // onNodeCreate(): void;
+  onNodeUpdate(id: string): void;
   // onNodeDelete(): void;
 }
 
@@ -60,15 +61,16 @@ export type HandlesInfo = {
   target: HandleMap;
 };
 
-export type NodeInternalInfo = {
-  //
-  folded: boolean;
-  handles: HandlesInfo;
-};
-export type NodeInternals = Map<string, NodeInternalInfo>;
+// export type NodeInternalInfo = {
+//   //
+//   folded: boolean;
+//   handles: HandlesInfo;
+// };
+// export type NodeInternals = Map<string, NodeInternalInfo>;
 export interface GeneralMethods {
   activateItem(e: React.MouseEvent, type: SelectedItemType, id: string, selected: boolean): void;
   getScale(): number;
+  quickNodeUpdate: boolean;
 }
 export type ConnectMethodType = (
   e: React.MouseEvent,
