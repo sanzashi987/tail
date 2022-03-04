@@ -9,7 +9,7 @@ import React, {
   useContext,
   memo,
 } from 'react';
-import type { NodeWrapperProps, coordinates, NodeCom } from '@types';
+import type { NodeWrapperProps, coordinates, NodeCom, DraggerData } from '@types';
 import { InstanceInterface } from '@app/contexts/instance';
 import { useRecoilState } from 'recoil';
 import Dragger from './Dragger';
@@ -35,28 +35,19 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
 
   //built-in event callbacks
   const dragStart = useCallback(
-    (e: React.MouseEvent, c: coordinates) => {
+    (e: React.MouseEvent, c: DraggerData) => {
       return rootInterface.node.onDragStart?.(e, node, c);
     },
     [node],
   );
   const drag = useCallback(
-    (e: MouseEvent, c: coordinates) => {
-      rootInterface.quickNodeUpdate &&
-        setNodeInternal((prev) => ({
-          ...prev,
-          node: {
-            ...prev.node,
-            left: c.x,
-            top: c.y,
-          },
-        }));
+    (e: MouseEvent, c: DraggerData) => {
       return rootInterface.node.onDrag?.(e, node, c);
     },
     [node],
   );
   const dragEnd = useCallback(
-    (e: MouseEvent, c: coordinates) => {
+    (e: MouseEvent, c: DraggerData) => {
       // setCoordinate(c);
       return rootInterface.node.onDragEnd?.(e, node, c);
     },

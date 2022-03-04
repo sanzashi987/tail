@@ -1,4 +1,4 @@
-import type { DeletePayload, EdgeTree } from '@app/types';
+import type { DeletePayload, EdgeTree, NodeAtom } from '@app/types';
 import type { RecoilState } from 'recoil';
 
 export function getAtom<T>(id: string, atomPool?: IObject<RecoilState<T>>) {
@@ -22,4 +22,17 @@ export function findDeletedItem(edgeTree: EdgeTree, payload: DeletePayload) {
   });
 
   return { nodes, edges };
+}
+
+export function createNodeDeltaMove(deltaX: number, deltaY: number) {
+  return function (prev: NodeAtom): NodeAtom {
+    return {
+      ...prev,
+      node: {
+        ...prev.node,
+        left: prev.node.left + deltaX,
+        top: prev.node.top + deltaY,
+      },
+    };
+  };
 }

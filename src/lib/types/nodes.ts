@@ -2,7 +2,7 @@
 import { Component, ComponentType } from 'react';
 import type { RecoilState } from 'recoil';
 import type { HandlesInfo } from './instance';
-import type { coordinates, AtomForceRender, DraggerInterface } from '.';
+import type { coordinates, AtomForceRender, DraggerInterface, DraggerData } from '.';
 
 export type Node<T extends IObject = {}> = {
   id: string;
@@ -57,7 +57,7 @@ export type WrapperDraggerInterface = DraggerCallbacksType;
 export type TailNodeDraggerCallback = (
   e: MouseEventCollection,
   n: Node,
-  c: coordinates,
+  c: DraggerData,
 ) => boolean | void;
 
 export type DraggerCallbacksType = {

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Tail } from '@app/index';
-import { coordinates, Edge, EdgeBasic, Node } from '@app/types';
+import { coordinates, DraggerData, Edge, EdgeBasic, Node } from '@app/types';
 
 const nodes: IObject<Node> = {
   id1: {
@@ -32,7 +32,7 @@ function noop() {
 function Overview() {
   const [nodeState, setNodeState] = useState(nodes);
   const [edgeState, setEdgeState] = useState(edges);
-  const onDrag = useCallback((e: any, n: Node, c: coordinates) => {
+  const onDrag = useCallback((e: any, n: Node, c: DraggerData) => {
     const { id } = n;
     setNodeState((pre) => {
       const val = { ...pre[id] };

@@ -35,7 +35,7 @@ export type TailCoreProps = {
 
 export interface NodeMutation {
   // onNodeCreate(): void;
-  onNodeUpdate(id: string): void;
+  onNodeUpdate(id: Node[]): void;
   // onNodeDelete(): void;
 }
 
@@ -70,7 +70,6 @@ export type HandlesInfo = {
 export interface GeneralMethods {
   activateItem(e: React.MouseEvent, type: SelectedItemType, id: string, selected: boolean): void;
   getScale(): number;
-  quickNodeUpdate: boolean;
 }
 export type ConnectMethodType = (
   e: React.MouseEvent,
@@ -87,8 +86,6 @@ export interface HandleInterface {
   onMouseDown: ConnectMethodType;
   onMouseUp: ConnectMethodType;
 }
-
-type MouseEventCollection = React.MouseEvent | MouseEvent;
 
 export interface RecoilNexusInterface {
   getRecoil: <T>(atom: RecoilValue<T>) => T;

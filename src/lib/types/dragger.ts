@@ -1,11 +1,11 @@
-import React from "react";
+import React from 'react';
 
 export type DraggerIterState = {
   // x: number,
   // y: number,
-  lastX: number,
-  lastY: number
-}
+  lastX: number;
+  lastY: number;
+};
 
 export type coordinates = {
   x: number;
@@ -13,9 +13,9 @@ export type coordinates = {
 };
 
 export type rect = {
-  width: number
-  height: number
-}
+  width: number;
+  height: number;
+};
 
 export type DraggerCoreBasic = {
   disable?: boolean;
@@ -30,13 +30,18 @@ export type DraggerCoreProps<T> = {
   children?: any;
 } & DraggerCoreBasic;
 
+export type DraggerData = {
+  deltaX: number;
+  deltaY: number;
+} & coordinates;
+
 export interface DraggerInterface {
-  onDragStart: (e: React.MouseEvent, c: coordinates) => boolean | void
-  onDrag: (e: MouseEvent, c: coordinates) => boolean | void
-  onDragEnd: (e: MouseEvent, c: coordinates) => boolean | void
+  onDragStart: (e: React.MouseEvent, c: DraggerData) => boolean | void;
+  onDrag: (e: MouseEvent, c: DraggerData) => boolean | void;
+  onDragEnd: (e: MouseEvent, c: DraggerData) => boolean | void;
 }
 
-export type DraggerProps = DraggerInterface & DraggerCoreBasic & coordinates
+export type DraggerProps = DraggerInterface & DraggerCoreBasic & coordinates;
 
 export type BasicPosture = {
   x: number;

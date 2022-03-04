@@ -3,6 +3,7 @@ import { InterfaceProvider } from '@app/contexts/instance';
 import { RecoilRoot, RecoilState, RecoilValue } from 'recoil';
 import { CtrlOrCmd, isModifierExact, RecoilNexus } from '@app/utils';
 import type {
+  Node,
   SelectedItemCollection,
   InterfaceValue,
   ConnectMethodType,
@@ -13,10 +14,13 @@ import type {
   NodeAtom,
   DeletePayload,
   EdgeInProgressAtomUpdater,
+  MouseEventCollection,
+  coordinates,
+  DraggerData,
 } from '@types';
 import { edgeInProgressAtom } from '@app/atoms/edges';
 import { CoordinateCalc } from '@app/components/Dragger';
-import { findDeletedItem, getAtom } from './mutation';
+import { createNodeDeltaMove, findDeletedItem, getAtom } from './mutation';
 import { switchActive } from './activateHandlers';
 import {
   createEdgePayload,
@@ -27,6 +31,7 @@ import {
   createMoveCallback,
   addReconnectToState,
   addHandleNode,
+  validateExistEdge,
 } from './connectHandlers';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
@@ -48,17 +53,21 @@ class TailCore extends Component<TailCoreProps> {
 
   constructor(props: TailCoreProps) {
     super(props);
-    const { onEdgeClick, onDragEnd, onDragStart, onDrag, onNodeClick, quickNodeUpdate } = props;
+    const { onEdgeClick, onDragStart, onNodeClick } = props;
     this.contextInterface = {
       edge: { onEdgeClick },
-      node: { onDrag, onDragStart, onDragEnd, onNodeClick },
+      node: {
+        onDrag: this.batchNodeDrag,
+        onDragEnd: this.batchNodeDragEnd,
+        onNodeClick,
+        onDragStart,
+      },
       handle: {
         onMouseDown: this.onHandleMouseDown,
         onMouseUp: this.onHandleMouseUp,
       },
       activateItem: this.activateNext,
       getScale: this.getScale,
-      quickNodeUpdate,
     };
   }
 
@@ -148,7 +157,7 @@ class TailCore extends Component<TailCoreProps> {
           this.props.onEdgeUpdate(prevEdgeId, newPayload);
           this.setAtomState('edge', prevEdgeId, disableEdgeReconnect);
         }
-      } else {
+      } else if (!validateExistEdge(newPayload, this.edgeRef.current!.edgeTree)) {
         this.props.onEdgeCreate(newPayload);
       }
     }
@@ -180,7 +189,31 @@ class TailCore extends Component<TailCoreProps> {
     this.Reset(edgeInProgressAtom);
   };
 
-  // batchUpdateNode = () => {};
+  batchNodeDrag = (e: MouseEventCollection, n: Node, d: DraggerData) => {
+    if (!this.props.quickNodeUpdate) {
+      this.batchEmitUpdate(e, n, d);
+    } else {
+      const updater = createNodeDeltaMove(d.deltaX, d.deltaY);
+      Object.keys(this.activeItems.node).forEach((e: string) => {
+        this.setAtomState('node', e, updater);
+      });
+    }
+    this.props.onDrag?.(e, n, d);
+  };
+
+  batchNodeDragEnd = (e: MouseEventCollection, n: Node, d: DraggerData) => {
+    this.batchEmitUpdate(e, n, d);
+    this.props.onDragEnd?.(e, n, d);
+  };
+
+  batchEmitUpdate = (e: MouseEventCollection, n: Node, d: DraggerData) => {
+    const updater = createNodeDeltaMove(d.deltaX, d.deltaY);
+    const updatePayload: Node[] = [];
+    Object.keys(this.activeItems.node).forEach((e: string) => {
+      updatePayload.push(updater(this.getAtomState<NodeAtom>('node', e)).node);
+    });
+    this.props.onNodeUpdate(updatePayload);
+  };
 
   render() {
     const { nodes, edges } = this.props;

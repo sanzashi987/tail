@@ -29,6 +29,8 @@ export const getDraggerRelativeCoordinates = (
     lastY: lastYNext,
     x: x + deltaX,
     y: y + deltaY,
+    deltaX,
+    deltaY,
   };
 };
 

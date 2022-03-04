@@ -147,3 +147,17 @@ export function createMoveCallback(setter: EdgeInProgressAtomUpdater, type: Hand
     setter(moveUpdater(x, y));
   };
 }
+
+export function validateExistEdge(edgeBasic: EdgeBasic, edgeTree: EdgeTree) {
+  const { source, sourceNode, target, targetNode } = edgeBasic;
+  const sourceEdges = [...(edgeTree.get(sourceNode)?.get(source)?.keys() ?? [])].reduce<
+    IObject<string>
+  >((prev, key) => {
+    prev[key] = key;
+    return prev;
+  }, {});
+  for (const edge of [...(edgeTree.get(targetNode)?.get(target)?.keys() ?? [])]) {
+    if (sourceEdges[edge]) return true;
+  }
+  return false;
+}
