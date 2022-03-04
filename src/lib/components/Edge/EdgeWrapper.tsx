@@ -14,16 +14,6 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, template: EdgeComp
   const { edge, selected, sourceX, sourceY, targetX, targetY, reconnect } = useRecoilValue(
     computedEdgeSelector({ edge: atom, nodeAtoms }),
   );
-  if (
-    [sourceX, sourceY, targetX, targetY].reduce(
-      (last, val) => (isNum(val) ? last || false : true),
-      false,
-    ) ||
-    reconnect
-  ) {
-    return null;
-  }
-
   const rootInterface = useContext(InstanceInterface)!;
   const onClick = useCallback(
     (e: React.MouseEvent) => {
@@ -36,6 +26,16 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, template: EdgeComp
   const { markerEnd, markerStart } = edge;
   const markerStartUrl = useMemo(() => getMarkerId(markerStart), [markerStart]);
   const markerEndUrl = useMemo(() => getMarkerId(markerEnd), [markerEnd]);
+
+  if (
+    [sourceX, sourceY, targetX, targetY].reduce(
+      (last, val) => (isNum(val) ? last || false : true),
+      false,
+    ) ||
+    reconnect
+  ) {
+    return null;
+  }
 
   return (
     <g className="tail-edge__wrapper" onClick={onClick}>

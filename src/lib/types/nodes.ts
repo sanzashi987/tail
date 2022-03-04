@@ -54,12 +54,14 @@ export interface NodeMouseInterface extends WrapperDraggerInterface {
 
 export type WrapperDraggerInterface = DraggerCallbacksType;
 
+export type TailNodeDraggerCallback = (
+  e: MouseEventCollection,
+  n: Node,
+  c: coordinates,
+) => boolean | void;
+
 export type DraggerCallbacksType = {
-  [key in keyof DraggerInterface]?: (
-    e: MouseEventCollection,
-    n: Node,
-    c: coordinates,
-  ) => boolean | void;
+  [key in keyof DraggerInterface]?: TailNodeDraggerCallback;
 };
 
 export type NodeAtomRaw<T extends IObject = {}> = Omit<NodeProps<T>, 'updateNodeHandles'> & {

@@ -34,8 +34,10 @@ import InfiniteViewer from '../InfiniteViewer';
 import MarkerDefs from '../MarkerDefs';
 import '@app/styles/index.scss';
 
+const emptyActives = { node: {}, edge: {} };
+
 class TailCore extends Component<TailCoreProps> {
-  activeItems: SelectedItemCollection = {};
+  activeItems: SelectedItemCollection = emptyActives;
   viewer = createRef<InfiniteViewer>();
   edgeRef = createRef<EdgeRenderer>();
   nodeRef = createRef<NodeRenderer>();
@@ -46,7 +48,7 @@ class TailCore extends Component<TailCoreProps> {
 
   constructor(props: TailCoreProps) {
     super(props);
-    const { onEdgeClick, onDragEnd, onDragStart, onDrag, onNodeClick,quickNodeUpdate } = props;
+    const { onEdgeClick, onDragEnd, onDragStart, onDrag, onNodeClick, quickNodeUpdate } = props;
     this.contextInterface = {
       edge: { onEdgeClick },
       node: { onDrag, onDragStart, onDragEnd, onNodeClick },
@@ -67,36 +69,50 @@ class TailCore extends Component<TailCoreProps> {
     if (!hold) {
       this.deactivateLast();
     }
-    selected ? delete this.activeItems[id] : (this.activeItems[id] = { id, type });
-    switchActive(this, type, id, !selected);
+    switchActive(this, type, id, !selected, this.activeItems[type]);
   };
 
   deactivateLast = () => {
-    Object.keys(this.activeItems).forEach((key) => {
-      const { id, type } = this.activeItems[key];
-      switchActive(this, type, id, false);
-    });
-    this.activeItems = {};
+    this.batchDeactivate('node');
+    this.batchDeactivate('edge');
   };
+
+  batchDeactivate(type: SelectedItemType) {
+    const pool = this.activeItems[type];
+    Object.keys(pool).forEach((key) => {
+      switchActive(this, 'node', key, false, pool);
+    });
+  }
 
   /* Connect and reconnect */
   onHandleMouseDown: ConnectMethodType = (e, type, nodeId, handleId) => {
     //only edge active will try reconnect
+    let newType = type;
     const { edgeTree, edgeAtoms } = this.edgeRef.current!;
-    const possibleEdge = hasConnectedEdgeActive(edgeTree, this.activeItems, nodeId, handleId);
+    const possibleEdge = hasConnectedEdgeActive(
+      edgeTree,
+      this.activeItems['edge'],
+      nodeId,
+      handleId,
+    );
     const {
       handles: {
-        [type]: {
+        [newType]: {
           [handleId]: { x, y },
         },
       },
       node: { left, top },
     } = this.getAtomState<NodeAtom>('node', nodeId);
     const [absX, absY] = [x + left, y + top];
-    let basicState = createBasicConnect(type, absX, absY, nodeId, handleId);
+    let basicState = createBasicConnect(newType, absX, absY, nodeId, handleId);
     if (possibleEdge !== false) {
       // reconnect
-      basicState = addReconnectToState(basicState, type, possibleEdge, this.getAtomState);
+      [newType, basicState] = addReconnectToState(
+        basicState,
+        newType,
+        possibleEdge,
+        this.getAtomState,
+      );
       this.Set(edgeAtoms[possibleEdge], enableEdgeReconnect);
     }
     this.edgeInProgressUpdater(basicState);
@@ -105,7 +121,7 @@ class TailCore extends Component<TailCoreProps> {
       y: absY,
       parent: document.body,
       getScale: this.getScale,
-      movecb: createMoveCallback(this.edgeInProgressUpdater, type),
+      movecb: createMoveCallback(this.edgeInProgressUpdater, newType),
       endcb: this.tryConnect,
     });
   };
@@ -153,6 +169,7 @@ class TailCore extends Component<TailCoreProps> {
         SET<EdgeAtom>('edge', prevEdgeId, disableEdgeReconnect);
       } else {
         this.deleteItem([{ type: 'edge', id: prevEdgeId }]);
+        switchActive(this, 'edge', prevEdgeId, false, this.activeItems['edge']);
       }
     }
     this.Reset(edgeInProgressAtom);
@@ -162,6 +179,8 @@ class TailCore extends Component<TailCoreProps> {
     this.dragger.reset();
     this.Reset(edgeInProgressAtom);
   };
+
+  // batchUpdateNode = () => {};
 
   render() {
     const { nodes, edges } = this.props;

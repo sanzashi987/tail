@@ -6,6 +6,7 @@
   // align-items: center;
   position: relative;
   border: 1px solid black;
+  background-color: white;
   &:global(.selected) {
     border-color: orange;
   }

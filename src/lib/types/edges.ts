@@ -114,12 +114,12 @@ export type EdgeInProgressAtomType = {
   handleId: string;
   to: HandleType;
   active: boolean;
-  reconnect?: boolean;
+  reconnect: boolean;
   prevEdgeId?: string;
 } & EdgeBasicProps;
 
 export type EdgeInProgressAtomUpdater = (
-  updater: EdgeInProgressAtomType | ((s: EdgeInProgressAtomType) => EdgeInProgressAtomType)
+  updater: EdgeInProgressAtomType | ((s: EdgeInProgressAtomType) => EdgeInProgressAtomType),
 ) => void;
 
 export type EdgeInProgressProps = {

@@ -3,15 +3,11 @@ import type {
   EdgeInProgressAtomType,
   EdgeTree,
   HandleType,
-  RecoilNexusInterface,
-  SelectedItemCollection,
   EdgeBasic,
   EdgeInProgressAtomUpdater,
-  SelectedItemType,
   NodeAtom,
   AtomStateGetterType,
 } from '@types';
-import { RecoilState } from 'recoil';
 
 export function enableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
   return {
@@ -29,13 +25,13 @@ export function disableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
 
 export function hasConnectedEdgeActive(
   edgeTree: EdgeTree,
-  activePool: SelectedItemCollection,
+  edgePool: IObject<string>,
   nodeId: string,
   handleId: string,
 ) {
   const arr = [...(edgeTree.get(nodeId)?.get(handleId)?.keys() ?? [])];
   for (const edge of arr) {
-    if (activePool[edge]?.type === 'edge') {
+    if (edgePool[edge]) {
       return edge;
     }
   }
@@ -103,6 +99,7 @@ export function createBasicConnect(
 ): EdgeInProgressAtomType {
   return {
     active: true,
+    reconnect: false,
     to: flipHandle[to],
     nodeId,
     handleId,
@@ -120,26 +117,28 @@ export function addReconnectToState(
   atomStateGetter: AtomStateGetterType,
 ) {
   const next = { ...state };
-  const [X, Y] = handleToCoor[type];
-  const toNode = addHandleNode[type];
   const opposite = flipHandle[type];
+  const [X, Y] = handleToCoor[opposite];
   const oppositeNode = addHandleNode[opposite];
+  const { [opposite]: storedHandle, [oppositeNode]: storedNode } = atomStateGetter<EdgeAtom>(
+    'edge',
+    prevEdgeId,
+  ).edge;
   const {
-    [toNode]: nodeId,
-    [type]: handleId,
-    [opposite]: storedHandle,
-    [oppositeNode]: storedNode,
-  } = atomStateGetter<EdgeAtom>('edge', prevEdgeId).edge;
-  const {
-    [handleId]: { x, y },
-  } = atomStateGetter<NodeAtom>('node', nodeId).handles[type];
-  [next[X], next[Y]] = [x, y];
+    handles: {
+      [opposite]: {
+        [storedHandle]: { x, y },
+      },
+    },
+    node: { top, left },
+  } = atomStateGetter<NodeAtom>('node', storedNode);
+  [next[X], next[Y]] = [x + left, y + top];
   next.nodeId = storedNode;
   next.handleId = storedHandle;
   next.to = type;
   next.reconnect = true;
   next.prevEdgeId = prevEdgeId;
-  return next;
+  return [opposite, next] as const;
 }
 
 export function createMoveCallback(setter: EdgeInProgressAtomUpdater, type: HandleType) {

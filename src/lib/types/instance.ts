@@ -47,10 +47,10 @@ export interface EdgeMutation {
 
 export type SelectedItemType = 'node' | 'edge';
 
-export type SelectedItemCollection = IObject<{
-  id: string;
-  type: SelectedItemType;
-}>;
+export type SelectedItemCollection = {
+  node: IObject<string>;
+  edge: IObject<string>;
+};
 
 export type HandleMap = {
   [handleId: string]: HandleElement;

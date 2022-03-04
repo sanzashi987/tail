@@ -68,6 +68,7 @@ export const edgeInProgressAtom = atom<EdgeInProgressAtomType>({
   key: 'tailEdgeInProgress',
   default: {
     active: false,
+    reconnect: false,
     to: 'target',
     nodeId: '',
     handleId: '',

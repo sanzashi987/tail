@@ -1,4 +1,4 @@
-import type { SelectedItemType, EdgeAtom, NodeAtom,  } from '@app/types';
+import type { SelectedItemType, EdgeAtom, NodeAtom, SelectedItemCollection } from '@app/types';
 import type { RecoilState } from 'recoil';
 import { getAtom } from './mutation';
 import type TailCore from '.';
@@ -38,7 +38,14 @@ function setSelectedHandle(
   });
 }
 
-export function switchActive(_this: TailCore, type: SelectedItemType, id: string, active: boolean) {
+export function switchActive(
+  _this: TailCore,
+  type: SelectedItemType,
+  id: string,
+  active: boolean,
+  activePool: IObject<string>,
+) {
+  active ? (activePool[id] = id) : delete activePool[id];
   const atom = _this.getAtom(type, id);
   _this.Set(atom as RecoilState<NodeAtom | EdgeAtom>, (prev) => {
     const next = { ...prev };
@@ -54,4 +61,3 @@ export function switchActive(_this: TailCore, type: SelectedItemType, id: string
   setSelectedHandle(sourceNode, source, pool, cb, _this.Set);
   setSelectedHandle(targetNode, target, pool, cb, _this.Set);
 }
-
