@@ -16,10 +16,11 @@ class Dragger extends DraggerCore<DraggerProps, DraggerIterState> {
   };
 
   onDragStart = (e: React.MouseEvent) => {
-    const coordniate = this._onMouseDown(e);
+    const coordniate = this.getEventCoordinate(e);
     const res = this.props.onDragStart(e, { ...coordniate, deltaX: 0, deltaY: 0 });
     if (res === false) return;
     e.stopPropagation();
+    this._onMouseDown(e);
     this.last.x = coordniate.x;
     this.last.y = coordniate.y;
     // this.setState({

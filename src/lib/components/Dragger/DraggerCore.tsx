@@ -19,12 +19,12 @@ class DraggerCore<T extends DraggerCoreBasic = DraggerCoreBasic, S = any> extend
   };
 
   onDrag = (e: MouseEvent) => {
-    if (!this.dragging) return;
+    if (!this.dragging) return this._onMouseUp(e);
     this._onMouseMove(e);
   };
 
   onDragEnd = (e: MouseEvent) => {
-    if (!this.dragging) return;
+    // if (!this.dragging) return;
     this._onMouseUp(e);
   };
 
