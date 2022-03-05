@@ -200,13 +200,13 @@ class EdgeConnects {
       );
       this.core.context.set(edgeAtoms[possibleEdge], enableEdgeReconnect);
     }
-    this.core.edgeInProgressUpdater(basicState);
+    this.edgeInProgressUpdater(basicState);
     this.dragger.start(e, {
       x: absX,
       y: absY,
       parent: document.body,
       getScale: this.core.getScale,
-      movecb: createMoveCallback(this.core.edgeInProgressUpdater, newType),
+      movecb: createMoveCallback(this.edgeInProgressUpdater, newType),
       endcb: this.tryConnect,
     });
   };
@@ -263,6 +263,10 @@ class EdgeConnects {
   private connectReset = () => {
     this.dragger.reset();
     this.core.context.reset(edgeInProgressAtom);
+  };
+
+  private edgeInProgressUpdater: EdgeInProgressAtomUpdater = (updater) => {
+    this.core.context.set(edgeInProgressAtom, updater);
   };
 }
 

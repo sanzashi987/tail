@@ -9,11 +9,8 @@ import type {
   EdgeAtom,
   NodeAtom,
   DeletePayload,
-  EdgeInProgressAtomUpdater,
   StoreRootInterface,
 } from '@types';
-import { edgeInProgressAtom } from '@app/atoms/edges';
-import { CoordinateCalc } from '@app/components/Dragger';
 import { findDeletedItem, getAtom } from './mutation';
 import ItemActives from './subInstances/itemActives';
 import NodeRenderer from '../NodeRenderer';
@@ -35,7 +32,6 @@ class TailCore extends Component<TailCoreProps> {
   viewer = createRef<InfiniteViewer>();
   edgeRef = createRef<EdgeRenderer>();
   nodeRef = createRef<NodeRenderer>();
-  dragger = new CoordinateCalc();
   contextInterface: InterfaceValue;
 
   ItemActives: ItemActives;
@@ -122,8 +118,6 @@ class TailCore extends Component<TailCoreProps> {
 
   getScale = () => this.viewer.current?.getScale() || 1;
 
-  edgeInProgressUpdater: EdgeInProgressAtomUpdater = (updater) =>
-    this.context.set(edgeInProgressAtom, updater);
 }
 
 export default TailCore;
