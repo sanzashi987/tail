@@ -16,8 +16,6 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
   nodeInstances: IObject<ReactNode> = {};
   memoNodes: ReactNode;
 
-  recoilInterface = createRef<RecoilNexusInterface>();
-
   constructor(props: NodeRendererPropsWithDefaults) {
     super(props);
     // this.memoTemplates = createMemoTemplates();
@@ -36,14 +34,11 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
     this.props.mounted();
   }
 
-  updateNodesNode = () => {
-    this.memoNodes = Object.keys(this.nodeInstances).map((k) => this.nodeInstances[k]);
-  };
-
   diffNodes(lastNodes: Nodes, nextNodes: Nodes) {
     const { mountNode, updateNode, unmountNode } = this;
     const dirty = diff(lastNodes, nextNodes, mountNode, updateNode, unmountNode);
-    dirty && this.updateNodesNode();
+    if (!dirty) return;
+    this.memoNodes = Object.keys(this.nodeInstances).map((k) => this.nodeInstances[k]);
   }
 
   mountNode = (node: Node) => {
@@ -62,10 +57,10 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
 
   updateNode = (lastNode: Node, nextNode: Node) => {
     if (lastNode.id !== nextNode.id) {
-      console.log('error input ==>', lastNode, nextNode);
+      console.error('error input ==>', lastNode, nextNode);
       throw new Error('fail to update the edge as their id is different');
     }
-    this.recoilInterface.current?.setRecoil(this.nodeAtoms[nextNode.id], (prev) => {
+    this.props.storeUpdater(this.nodeAtoms[nextNode.id], (prev) => {
       return {
         ...prev,
         node: nextNode,
@@ -79,12 +74,7 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
   };
 
   render() {
-    return (
-      <div className="tail-node-container select-none">
-        {this.memoNodes}
-        <RecoilNexus ref={this.recoilInterface} />
-      </div>
-    );
+    return <div className="tail-node-container select-none">{this.memoNodes}</div>;
   }
 }
 

@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { Component, ComponentType } from 'react';
 import type { RecoilState } from 'recoil';
-import type { HandlesInfo } from './instance';
-import type { coordinates, AtomForceRender, DraggerInterface, DraggerData } from '.';
+import type {
+  HandlesInfo,
+  UpdaterType,
+  coordinates,
+  AtomForceRender,
+  DraggerInterface,
+  DraggerData,
+} from '.';
 
 export type Node<T extends IObject = {}> = {
   id: string;
@@ -30,6 +36,7 @@ export type NodeRendererProps = {
   templates?: IObject<TemplateNodeClass>;
   templatePicker?: (node: Node) => [string, string];
   mounted(): void;
+  storeUpdater: (atom: RecoilState<NodeAtom>, updater: UpdaterType<NodeAtom>) => void;
 };
 
 export type NodeWrapperProps<T extends IObject = {}> = {

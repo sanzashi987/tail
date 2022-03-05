@@ -2,6 +2,7 @@
 import React, { ComponentType } from 'react';
 import type { RecoilState } from 'recoil';
 import { AtomForceRender, HandleType, NodeAtomsType } from '.';
+import { UpdaterType } from './instance';
 
 export type EdgeBasic = {
   source: string;
@@ -73,6 +74,7 @@ export type EdgeRendererProps = {
   // connecting: boolean;
   templates?: EdgeTemplatesType;
   getNodeAtoms(): NodeAtomsType;
+  storeUpdater: (atom: RecoilState<EdgeAtom>, updater: UpdaterType<EdgeAtom>) => void;
 };
 
 // export type EdgeParsed = Map<string,>

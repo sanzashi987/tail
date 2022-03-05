@@ -36,7 +36,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, template: EdgeComp
   ) {
     return null;
   }
-
+  // TODO event capture enhancer
   return (
     <g className="tail-edge__wrapper" onClick={onClick}>
       <EdgeComponent

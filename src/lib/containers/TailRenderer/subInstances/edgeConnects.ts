@@ -1,3 +1,4 @@
+import { CoordinateCalc } from '@app/components/Dragger';
 import type {
   EdgeAtom,
   EdgeInProgressAtomType,
@@ -7,7 +8,11 @@ import type {
   EdgeInProgressAtomUpdater,
   NodeAtom,
   AtomStateGetterType,
+  ConnectMethodType,
 } from '@types';
+import TailCore from '..';
+import ItemActives from './itemActives';
+import { edgeInProgressAtom } from '@app/atoms/edges';
 
 export function enableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
   return {
@@ -161,3 +166,104 @@ export function validateExistEdge(edgeBasic: EdgeBasic, edgeTree: EdgeTree) {
   }
   return false;
 }
+
+class EdgeConnects {
+  dragger = new CoordinateCalc();
+  constructor(private core: TailCore, private itemActives: ItemActives) {}
+  onHandleMouseDown: ConnectMethodType = (e, type, nodeId, handleId) => {
+    //only edge active will try reconnect
+    let newType = type;
+    const { edgeTree, edgeAtoms } = this.core.edgeRef.current!;
+    const possibleEdge = hasConnectedEdgeActive(
+      edgeTree,
+      this.core.activeItems['edge'],
+      nodeId,
+      handleId,
+    );
+    const {
+      handles: {
+        [newType]: {
+          [handleId]: { x, y },
+        },
+      },
+      node: { left, top },
+    } = this.core.getAtomState<NodeAtom>('node', nodeId);
+    const [absX, absY] = [x + left, y + top];
+    let basicState = createBasicConnect(newType, absX, absY, nodeId, handleId);
+    if (possibleEdge !== false) {
+      // reconnect
+      [newType, basicState] = addReconnectToState(
+        basicState,
+        newType,
+        possibleEdge,
+        this.core.getAtomState,
+      );
+      this.core.context.set(edgeAtoms[possibleEdge], enableEdgeReconnect);
+    }
+    this.core.edgeInProgressUpdater(basicState);
+    this.dragger.start(e, {
+      x: absX,
+      y: absY,
+      parent: document.body,
+      getScale: this.core.getScale,
+      movecb: createMoveCallback(this.core.edgeInProgressUpdater, newType),
+      endcb: this.tryConnect,
+    });
+  };
+
+  onHandleMouseUp: ConnectMethodType = (e, type, nodeId, handleId) => {
+    e.stopPropagation();
+    const {
+      active,
+      reconnect,
+      prevEdgeId,
+      to,
+      nodeId: storedNode,
+      handleId: storedHandle,
+    } = this.core.context.get(edgeInProgressAtom);
+    if (to === type && active) {
+      const newPayload = createEdgePayload(to, nodeId, handleId, storedNode, storedHandle);
+      if (reconnect && prevEdgeId) {
+        const toNode = addHandleNode[type];
+        const { [type]: prevHandleId, [toNode]: prevNodeId } = this.core.getAtomState<EdgeAtom>(
+          'edge',
+          prevEdgeId,
+        ).edge;
+        if (prevHandleId !== handleId || prevNodeId !== nodeId) {
+          this.core.props.onEdgeUpdate(prevEdgeId, newPayload);
+          this.core.setAtomState('edge', prevEdgeId, disableEdgeReconnect);
+        }
+      } else if (!validateExistEdge(newPayload, this.core.edgeRef.current!.edgeTree)) {
+        this.core.props.onEdgeCreate(newPayload);
+      }
+    }
+    this.connectReset();
+  };
+
+  private tryConnect = (x: number, y: number) => {
+    const { reconnect, prevEdgeId, to: type } = this.core.context.get(edgeInProgressAtom);
+    if (reconnect && prevEdgeId) {
+      const { getAtomState: GET, setAtomState: SET } = this.core;
+      const typeNode = addHandleNode[type];
+      const {
+        edge: { [typeNode]: originNode, [type]: originHandle },
+      } = GET<EdgeAtom>('edge', prevEdgeId);
+      const { x: X, y: Y } = GET<NodeAtom>('node', originNode).handles[type][originHandle];
+      const threshold = this.core.props.dropThreshold;
+      if (Math.abs(x - X) < threshold && Math.abs(y - Y) < threshold) {
+        SET<EdgeAtom>('edge', prevEdgeId, disableEdgeReconnect);
+      } else {
+        this.core.deleteItem([{ type: 'edge', id: prevEdgeId }]);
+        this.itemActives.switchActive('edge', prevEdgeId, false, this.core.activeItems['edge']);
+      }
+    }
+    this.core.context.reset(edgeInProgressAtom);
+  };
+
+  private connectReset = () => {
+    this.dragger.reset();
+    this.core.context.reset(edgeInProgressAtom);
+  };
+}
+
+export default EdgeConnects;

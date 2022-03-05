@@ -9,7 +9,7 @@ import type {
 } from '@types';
 import { EdgeInProgress, BasicEdge, EdgeWrapper } from '@app/components/Edge';
 import { createEdgeAtom } from '@app/atoms/edges';
-import { RecoilNexus, diff } from '@app/utils';
+import { diff } from '@app/utils';
 import styles from './index.module.scss';
 import { registerChild, removeChild, defaultProps } from './utils';
 
@@ -25,8 +25,6 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
   edgeAtoms: EdgeAtomsType = {};
   memoEdges: ReactNode;
 
-  recoilInterface = createRef<RecoilNexusInterface>();
-
   constructor(props: EdgeRendererPropsWithDefaults) {
     super(props);
     this.diffEdges({}, props.edges);
@@ -40,24 +38,21 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
     return true;
   }
 
-  updateEdgesNode() {
-    this.memoEdges = Object.keys(this.edgeInstances).map((k) => this.edgeInstances[k]);
-  }
-
   diffEdges(lastEdges: Edges, nextEdges: Edges) {
     const { mountEdge, updateEdge, unmountEdge } = this;
     const dirty = diff(lastEdges, nextEdges, mountEdge, updateEdge, unmountEdge);
-    dirty && this.updateEdgesNode();
+    if (!dirty) return;
+    this.memoEdges = Object.keys(this.edgeInstances).map((k) => this.edgeInstances[k]);
   }
 
   updateEdge = (lastEdge: Edge, nextEdge: Edge) => {
     if (lastEdge.id !== nextEdge.id) {
-      console.log('error input ==>', lastEdge, nextEdge);
+      console.error('error input ==>', lastEdge, nextEdge);
       throw new Error('fail to update the edge as their id is different');
     }
     removeChild(this.edgeTree, lastEdge);
     registerChild(this.edgeTree, nextEdge);
-    this.recoilInterface.current?.setRecoil(this.edgeAtoms[nextEdge.id], (prev) => {
+    this.props.storeUpdater(this.edgeAtoms[nextEdge.id], (prev) => {
       return {
         ...prev,
         edge: nextEdge,
@@ -90,7 +85,6 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
   render() {
     return (
       <svg className={`tail-edge-container ${styles['edge-container']}`}>
-        <RecoilNexus ref={this.recoilInterface} />
         {this.props.children /*for marker definition */}
         {this.memoEdges}
         <EdgeInProgress template={BasicEdge as any} />
