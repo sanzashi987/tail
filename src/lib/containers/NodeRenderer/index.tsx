@@ -2,7 +2,7 @@ import React, { Component, createRef, ReactNode } from 'react';
 import type { Nodes, Node, NodeRendererProps, RecoilNexusInterface, NodeAtomsType } from '@types';
 import { createNodeAtom } from '@app/atoms/nodes';
 import { NodeWrapper } from '@app/components/Node';
-import { RecoilNexus } from '@app/utils';
+import { diff, RecoilNexus } from '@app/utils';
 import { defaultProps, createMemoTemplates } from './utils';
 
 type NodeRendererPropsWithDefaults = NodeRendererProps & typeof defaultProps;
@@ -21,12 +21,12 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
   constructor(props: NodeRendererPropsWithDefaults) {
     super(props);
     // this.memoTemplates = createMemoTemplates();
-    this.diffNodes(props.nodes, {});
+    this.diffNodes({}, props.nodes);
   }
 
   shouldComponentUpdate(nextProps: NodeRendererPropsWithDefaults) {
     if (nextProps.nodes !== this.props.nodes) {
-      this.diffNodes(nextProps.nodes, this.props.nodes);
+      this.diffNodes(this.props.nodes, nextProps.nodes);
       return true;
     }
     return true;
@@ -40,26 +40,9 @@ class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
     this.memoNodes = Object.keys(this.nodeInstances).map((k) => this.nodeInstances[k]);
   };
 
-  diffNodes(nextNodes: Nodes, lastNodes: Nodes) {
-    let dirty = false;
-    const deleted = { ...lastNodes };
-    for (const key in nextNodes) {
-      const nextNode = nextNodes[key],
-        lastNode = lastNodes[key];
-      if (lastNode === undefined) {
-        !dirty && (dirty = true);
-        this.mountNode(nextNode);
-      } else {
-        delete deleted[key];
-        if (nextNode !== lastNode) {
-          this.updateNode(lastNode, nextNode);
-        }
-      }
-    }
-    for (const key in deleted) {
-      !dirty && (dirty = true);
-      this.unmountNode(deleted[key]);
-    }
+  diffNodes(lastNodes: Nodes, nextNodes: Nodes) {
+    const { mountNode, updateNode, unmountNode } = this;
+    const dirty = diff(lastNodes, nextNodes, mountNode, updateNode, unmountNode);
     dirty && this.updateNodesNode();
   }
 

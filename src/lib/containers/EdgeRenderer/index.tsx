@@ -9,13 +9,11 @@ import type {
 } from '@types';
 import { EdgeInProgress, BasicEdge, EdgeWrapper } from '@app/components/Edge';
 import { createEdgeAtom } from '@app/atoms/edges';
-import { RecoilNexus } from '@app/utils';
+import { RecoilNexus, diff } from '@app/utils';
 import styles from './index.module.scss';
-import { registerChild, removeChild } from './utils';
+import { registerChild, removeChild, defaultProps } from './utils';
 
 type Edges = EdgeRendererProps['edges'];
-
-const defaultProps = { templates: {} };
 
 type EdgeRendererPropsWithDefaults = EdgeRendererProps & typeof defaultProps;
 
@@ -25,8 +23,8 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
   edgeTree: EdgeTree = new Map();
   edgeInstances: IObject<ReactNode> = {};
   edgeAtoms: EdgeAtomsType = {};
-
   memoEdges: ReactNode;
+
   recoilInterface = createRef<RecoilNexusInterface>();
 
   constructor(props: EdgeRendererPropsWithDefaults) {
@@ -47,25 +45,8 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
   }
 
   diffEdges(lastEdges: Edges, nextEdges: Edges) {
-    let dirty = false;
-    const deleted = { ...lastEdges };
-    for (const key in nextEdges) {
-      const val = nextEdges[key],
-        lastVal = lastEdges[key];
-      if (lastVal === undefined) {
-        !dirty && (dirty = true);
-        this.mountEdge(val);
-      } else {
-        delete deleted[key];
-        if (lastVal !== val) {
-          this.updateEdge(lastVal, val);
-        }
-      }
-    }
-    for (const key in deleted) {
-      !dirty && (dirty = true);
-      this.unmountEdge(deleted[key]);
-    }
+    const { mountEdge, updateEdge, unmountEdge } = this;
+    const dirty = diff(lastEdges, nextEdges, mountEdge, updateEdge, unmountEdge);
     dirty && this.updateEdgesNode();
   }
 

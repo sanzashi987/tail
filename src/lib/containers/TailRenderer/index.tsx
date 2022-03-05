@@ -1,7 +1,7 @@
 import React, { Component, createRef } from 'react';
 import { InterfaceProvider } from '@app/contexts/instance';
-import { RecoilRoot, RecoilState, RecoilValue } from 'recoil';
-import { CtrlOrCmd, isModifierExact, RecoilNexus } from '@app/utils';
+import { RecoilState, RecoilValue } from 'recoil';
+import { CtrlOrCmd, isModifierExact } from '@app/utils';
 import type {
   Node,
   SelectedItemCollection,
@@ -9,14 +9,13 @@ import type {
   ConnectMethodType,
   TailCoreProps,
   SelectedItemType,
-  RecoilNexusInterface,
   EdgeAtom,
   NodeAtom,
   DeletePayload,
   EdgeInProgressAtomUpdater,
   MouseEventCollection,
-  coordinates,
   DraggerData,
+  StoreRootInterface,
 } from '@types';
 import { edgeInProgressAtom } from '@app/atoms/edges';
 import { CoordinateCalc } from '@app/components/Dragger';
@@ -38,6 +37,7 @@ import EdgeRenderer from '../EdgeRenderer';
 import InfiniteViewer from '../InfiniteViewer';
 import MarkerDefs from '../MarkerDefs';
 import '@app/styles/index.scss';
+import { StoreContext } from '@app/contexts/store';
 
 const emptyActives = { node: {}, edge: {} };
 
@@ -46,11 +46,12 @@ class TailCore extends Component<TailCoreProps> {
   viewer = createRef<InfiniteViewer>();
   edgeRef = createRef<EdgeRenderer>();
   nodeRef = createRef<NodeRenderer>();
-  nexus = createRef<RecoilNexusInterface>();
   dragger = new CoordinateCalc();
   state = { nodesReady: false };
   contextInterface: InterfaceValue;
 
+  static contextType = StoreContext;
+  context!: StoreRootInterface;
   constructor(props: TailCoreProps) {
     super(props);
     const { onEdgeClick, onDragStart, onNodeClick } = props;
@@ -122,7 +123,7 @@ class TailCore extends Component<TailCoreProps> {
         possibleEdge,
         this.getAtomState,
       );
-      this.Set(edgeAtoms[possibleEdge], enableEdgeReconnect);
+      this.context.set(edgeAtoms[possibleEdge], enableEdgeReconnect);
     }
     this.edgeInProgressUpdater(basicState);
     this.dragger.start(e, {
@@ -144,7 +145,7 @@ class TailCore extends Component<TailCoreProps> {
       to,
       nodeId: storedNode,
       handleId: storedHandle,
-    } = this.Get(edgeInProgressAtom);
+    } = this.context.get(edgeInProgressAtom);
     if (to === type && active) {
       const newPayload = createEdgePayload(to, nodeId, handleId, storedNode, storedHandle);
       if (reconnect && prevEdgeId) {
@@ -165,7 +166,7 @@ class TailCore extends Component<TailCoreProps> {
   };
 
   tryConnect = (x: number, y: number) => {
-    const { reconnect, prevEdgeId, to: type } = this.Get(edgeInProgressAtom);
+    const { reconnect, prevEdgeId, to: type } = this.context.get(edgeInProgressAtom);
     if (reconnect && prevEdgeId) {
       const { getAtomState: GET, setAtomState: SET } = this;
       const typeNode = addHandleNode[type];
@@ -181,12 +182,12 @@ class TailCore extends Component<TailCoreProps> {
         switchActive(this, 'edge', prevEdgeId, false, this.activeItems['edge']);
       }
     }
-    this.Reset(edgeInProgressAtom);
+    this.context.reset(edgeInProgressAtom);
   };
 
   connectReset = () => {
     this.dragger.reset();
-    this.Reset(edgeInProgressAtom);
+    this.context.reset(edgeInProgressAtom);
   };
 
   batchNodeDrag = (e: MouseEventCollection, n: Node, d: DraggerData) => {
@@ -216,20 +217,22 @@ class TailCore extends Component<TailCoreProps> {
   };
 
   render() {
-    const { nodes, edges } = this.props;
+    const { nodes, edges, nodeTemplates } = this.props;
     return (
       <InfiniteViewer ref={this.viewer}>
-        <RecoilRoot>
-          <RecoilNexus ref={this.nexus} />
-          <InterfaceProvider value={this.contextInterface}>
-            <NodeRenderer nodes={nodes} ref={this.nodeRef} mounted={this.nodesReady} />
-            {this.state.nodesReady && (
-              <EdgeRenderer edges={edges} ref={this.edgeRef} getNodeAtoms={this.getNodeAtoms}>
-                <MarkerDefs />
-              </EdgeRenderer>
-            )}
-          </InterfaceProvider>
-        </RecoilRoot>
+        <InterfaceProvider value={this.contextInterface}>
+          <NodeRenderer
+            templates={nodeTemplates}
+            nodes={nodes}
+            ref={this.nodeRef}
+            mounted={() => this.setState({ nodesReady: true })}
+          />
+          {this.state.nodesReady && (
+            <EdgeRenderer edges={edges} ref={this.edgeRef} getNodeAtoms={this.getNodeAtoms}>
+              <MarkerDefs />
+            </EdgeRenderer>
+          )}
+        </InterfaceProvider>
       </InfiniteViewer>
     );
   }
@@ -241,21 +244,16 @@ class TailCore extends Component<TailCoreProps> {
   getAtom = <T extends EdgeAtom | NodeAtom>(type: SelectedItemType, id: string) => {
     const pool =
       type === 'edge' ? this.edgeRef.current!.edgeAtoms : this.nodeRef.current!.nodeAtoms;
-    return getAtom(id, pool as unknown as IObject<RecoilState<T>>);
+    return getAtom(id, (pool as unknown) as IObject<RecoilState<T>>);
   };
   getAtomState = <T,>(type: SelectedItemType, id: string) =>
-    this.Get(this.getAtom(type, id) as unknown as RecoilState<T>);
+    this.context.get((this.getAtom(type, id) as unknown) as RecoilState<T>);
   setAtomState = <T,>(type: SelectedItemType, id: string, updater: T | ((cur: T) => T)) =>
-    this.Set(this.getAtom(type, id) as unknown as RecoilState<T>, updater);
-  Set = <T,>(atom: RecoilState<T>, updater: T | ((cur: T) => T)) =>
-    this.nexus.current!.setRecoil<T>(atom, updater); // ! shall be ok
-  Get = <T,>(atom: RecoilValue<T>) => this.nexus.current!.getRecoil<T>(atom);
-  Reset = (atom: RecoilState<any>) => this.nexus.current!.resetRecoil(atom);
+    this.context.set((this.getAtom(type, id) as unknown) as RecoilState<T>, updater);
   getNodeAtoms = () => this.nodeRef.current?.nodeAtoms ?? {};
   getScale = () => this.viewer.current?.getScale() || 1;
   edgeInProgressUpdater: EdgeInProgressAtomUpdater = (updater) =>
-    this.Set(edgeInProgressAtom, updater);
-  nodesReady = () => this.setState({ nodesReady: true });
+    this.context.set(edgeInProgressAtom, updater);
 }
 
 export default TailCore;

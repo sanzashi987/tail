@@ -1,5 +1,7 @@
 import type { Edge, EdgeTree, EdgeRendererProps } from "@types";
 
+export const defaultProps = { templates: {} };
+
 export function removeChild(edgeTree: EdgeTree, edge: Edge) {
   const { source, sourceNode, target, targetNode, id } = edge;
   edgeTree.get(sourceNode)?.get(source)?.delete(id);

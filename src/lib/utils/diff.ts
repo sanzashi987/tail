@@ -1,16 +1,30 @@
-export function diff<T>(curr: IObject<T>, last: IObject<T>) {
-  const updated: IObject<T> = {};
+export function diff<T>(
+  last: IObject<T>,
+  next: IObject<T>,
+  creater: (item: T) => void,
+  updater: (last: T, next: T) => void,
+  deleter: (item: T) => void,
+) {
+  let dirty = false;
   const deleted: IObject<T> = { ...last };
-  const created: IObject<T> = {};
-  for (const key in curr) {
-    const val = curr[key], lastVal = last[key];
+  for (const key in next) {
+    const val = next[key],
+      lastVal = last[key];
     if (lastVal === undefined) {
-      created[key] = val;
+      !dirty && (dirty = true);
+      creater(val);
     } else {
       delete deleted[key];
       if (lastVal !== val) {
-        updated[key] = val;
+        updater(lastVal, val);
       }
     }
   }
+  if (!dirty) {
+    dirty = Object.keys(deleted).length > 0;
+  }
+  for (const key in deleted) {
+    deleter(deleted[key]);
+  }
+  return dirty;
 }

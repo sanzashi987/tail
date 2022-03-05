@@ -90,8 +90,17 @@ export interface HandleInterface {
 export interface RecoilNexusInterface {
   getRecoil: <T>(atom: RecoilValue<T>) => T;
   getRecoilPromise: <T>(atom: RecoilValue<T>) => Promise<T>;
-  setRecoil: <T>(atom: RecoilState<T>, valOrUpdater: T | ((currVal: T) => T)) => void;
+  setRecoil: <T>(atom: RecoilState<T>, valOrUpdater: UpdaterType<T>) => void;
   resetRecoil: (atom: RecoilState<any>) => void;
+}
+
+export type UpdaterType<T> = T | ((currVal: T) => T);
+
+export interface StoreRootInterface {
+  get: <T>(atom: RecoilValue<T>) => T;
+  getPromise: <T>(atom: RecoilValue<T>) => Promise<T>;
+  set: <T>(atom: RecoilState<T>, valOrUpdater: UpdaterType<T>) => void;
+  reset: (atom: RecoilState<any>) => void;
 }
 
 export type AtomForceRender = {
