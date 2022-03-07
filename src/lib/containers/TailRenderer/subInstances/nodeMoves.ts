@@ -1,11 +1,12 @@
-import TailCore from '..';
 import type { MouseEventCollection, Node, DraggerData, NodeAtom } from '@types';
+import TailCore from '..';
 import { createNodeDeltaMove } from '../mutation';
 
 class NodeMoves {
   constructor(private core: TailCore) {}
 
   batchNodeDrag = (e: MouseEventCollection, n: Node, d: DraggerData) => {
+
     if (!this.core.props.quickNodeUpdate) {
       this.batchEmitUpdate(e, n, d);
     } else {

@@ -11,16 +11,17 @@ import type {
   DeletePayload,
   StoreRootInterface,
 } from '@types';
+import { StoreContext } from '@app/contexts/store';
 import { findDeletedItem, getAtom } from './mutation';
 import ItemActives from './subInstances/itemActives';
+import NodeMoves from './subInstances/nodeMoves';
+import EdgeConnects from './subInstances/edgeConnects';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
 import InfiniteViewer from '../InfiniteViewer';
 import MarkerDefs from '../MarkerDefs';
 import '@app/styles/index.scss';
-import { StoreContext } from '@app/contexts/store';
-import NodeMoves from './subInstances/nodeMoves';
-import EdgeConnects from './subInstances/edgeConnects';
+
 const emptyActives = { node: {}, edge: {} };
 
 class TailCore extends Component<TailCoreProps> {
@@ -42,7 +43,7 @@ class TailCore extends Component<TailCoreProps> {
     super(props);
     const { onEdgeClick, onDragStart, onNodeClick } = props;
 
-    // TODO DI 
+    // TODO DI
     this.NodeMoves = new NodeMoves(this);
     this.ItemActives = new ItemActives(this);
     this.EdgeConnects = new EdgeConnects(this, this.ItemActives);
@@ -50,6 +51,7 @@ class TailCore extends Component<TailCoreProps> {
     const { batchNodeDrag, batchNodeDragEnd } = this.NodeMoves;
     const { onHandleMouseUp, onHandleMouseDown } = this.EdgeConnects;
 
+    // context methods are not responsive
     this.contextInterface = {
       edge: { onEdgeClick },
       node: {
@@ -67,11 +69,15 @@ class TailCore extends Component<TailCoreProps> {
     };
   }
 
+  deactiveAll = () => {
+    this.ItemActives.deactivateLast();
+  };
+
   render() {
     const { nodes, edges, nodeTemplates } = this.props;
     const { set } = this.context;
     return (
-      <InfiniteViewer ref={this.viewer}>
+      <InfiniteViewer ref={this.viewer} deactivateAll={this.deactiveAll}>
         <InterfaceProvider value={this.contextInterface}>
           <NodeRenderer
             templates={nodeTemplates}
@@ -108,16 +114,15 @@ class TailCore extends Component<TailCoreProps> {
 
   getAtomState = <T,>(type: SelectedItemType, id: string) =>
     this.context.get((this.getAtom(type, id) as unknown) as RecoilState<T>);
-  
+
   setAtomState = <T,>(type: SelectedItemType, id: string, updater: T | ((cur: T) => T)) =>
     this.context.set((this.getAtom(type, id) as unknown) as RecoilState<T>, updater);
-  
+
   getEdgeAtoms = () => this.edgeRef.current?.edgeAtoms ?? {};
 
   getNodeAtoms = () => this.nodeRef.current?.nodeAtoms ?? {};
 
   getScale = () => this.viewer.current?.getScale() || 1;
-
 }
 
 export default TailCore;

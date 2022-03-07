@@ -4,7 +4,7 @@ import TailCore from './containers/TailRenderer';
 import { TailCoreProps } from './types';
 
 const Tail: FC<TailCoreProps> = (props) => {
-  return h(StoreRoot, {}, [h(TailCore, props)]);
+  return h(StoreRoot, {}, [h(TailCore, { ...props, key: 'TailCore' })]);
 };
 
 export { Tail };

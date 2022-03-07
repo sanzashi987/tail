@@ -1,16 +1,64 @@
-import React, { Component } from 'react';
+import React, { Component, createRef } from 'react';
 import type { InfiniteViewerProps, InfiniteViewerState } from '@types';
+import ResizeObserver from 'resize-observer-polyfill';
 import styles from './index.module.scss';
 
 class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState> {
-  state = {
+  public observer: ResizeObserver | undefined;
+  ref = createRef<HTMLDivElement>();
+
+  state: InfiniteViewerState = {
     scale: 1,
     offset: { x: 0, y: 0 },
+    selectMode: 'single',
   };
 
   getScale() {
     return this.state.scale;
   }
+
+  componentDidMount() {
+    this.observer = new ResizeObserver(this.onDomResize);
+    this.observer.observe(this.ref.current!);
+  }
+
+  componentWillUnmount() {
+    this.observer?.disconnect();
+  }
+
+  // onWheeling = () => {};
+
+  onDomResize = () => {
+    return;
+  };
+
+  scaling = (r: React.WheelEvent) => {
+    const e = r.nativeEvent;
+    const { deltaY, offsetX, offsetY } = e;
+    const {
+      offset: { x, y },
+      scale: preScale,
+    } = this.state;
+
+    const [mouseX, mouseY] = [offsetX + x, offsetY + y];
+
+    const newScale = preScale + (8 * deltaY > 0 ? 1 : -1) / 100;
+    const k = newScale/preScale
+
+    const [] = 
+
+
+    const newX = offsetX - x;
+    const newY = offsetY - y;
+
+    const newOffsetX = ((newX * (scale - preScale * 100)) / preScale) * 100;
+    const newOffsetY = ((newY * (scale - preScale * 100)) / preScale) * 100;
+
+    this.setState({
+      scale,
+      offset: { x: x + newOffsetX, y: y + newOffsetY },
+    });
+  };
 
   render() {
     const {
@@ -18,13 +66,15 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
       offset: { x, y },
     } = this.state;
     return (
-      <div
-        className={styles['infinite-wrapper']}
-        style={{
-          transform: `translate(${x}px,${y}px), scale(${scale})`,
-        }}
-      >
-        {this.props.children}
+      <div ref={this.ref} className={styles['infinite-wrapper']} onWheel={this.scaling}>
+        <div
+          className="fake-layer"
+          style={{
+            transform: `translate(${x}px,${y}px)  scale(${scale})`,
+          }}
+        >
+          {this.props.children}
+        </div>
       </div>
     );
   }
