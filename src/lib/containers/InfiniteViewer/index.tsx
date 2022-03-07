@@ -40,23 +40,20 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
       scale: preScale,
     } = this.state;
 
-    const [mouseX, mouseY] = [offsetX + x, offsetY + y];
+    const absX = offsetX / preScale + x;
+    const absY = offsetY / preScale + y;
+
+    // const [absX, absY] = [offsetX + x, offsetY + y];
 
     const newScale = preScale + (8 * deltaY > 0 ? 1 : -1) / 100;
-    const k = newScale/preScale
+    const k = newScale / preScale;
 
-    const [] = 
+    const [newAbsX, newAbsY] = [absX * k, absY * k];
 
-
-    const newX = offsetX - x;
-    const newY = offsetY - y;
-
-    const newOffsetX = ((newX * (scale - preScale * 100)) / preScale) * 100;
-    const newOffsetY = ((newY * (scale - preScale * 100)) / preScale) * 100;
-
+    const [dx, dy] = [newAbsX - absX, newAbsY - absY];
     this.setState({
-      scale,
-      offset: { x: x + newOffsetX, y: y + newOffsetY },
+      scale: newScale,
+      offset: { x: x + dx, y: y + dy },
     });
   };
 
