@@ -10,3 +10,10 @@ export type InfiniteViewerState = {
 export type InfiniteViewerProps = {
   deactivateAll(): void;
 };
+
+export type SelectAreaProps = {
+  dragStart: coordinates;
+  dragEnd: coordinates;
+  offset: coordinates;
+  offsetSnap: coordinates;
+};

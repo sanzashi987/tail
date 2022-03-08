@@ -3,6 +3,7 @@ import type { DraggerData, InfiniteViewerProps, InfiniteViewerState } from '@typ
 import ResizeObserver from 'resize-observer-polyfill';
 import { CoordinateCalc } from '@app/components/Dragger';
 import styles from './index.module.scss';
+import { getCSSVar } from './utils';
 
 class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState> {
   public observer: ResizeObserver | undefined;
@@ -111,17 +112,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
       scale,
       offset: { x, y },
     } = this.state;
-    const bg = 96 * scale,
-      bgs = 24 * scale,
-      posX = 1 + x,
-      posY = 1 + y;
-    const cssvar: any = {
-      '--x': `${x}px`,
-      '--y': `${y}px`,
-      '--scale': scale,
-      '--bgsize': `${bg}px ${bg}px, ${bg}px ${bg}px, ${bgs}px ${bgs}px, ${bgs}px ${bgs}px`,
-      '--bgpos': `${posX}px ${posY}px, ${posX}px ${posY}px, ${posX}px ${posY}px, ${posX}px ${posY}px`,
-    };
+    const cssvar = getCSSVar(x, y, scale);
     return (
       <div
         ref={this.ref}

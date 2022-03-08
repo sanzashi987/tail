@@ -1,0 +1,13 @@
+.select-area {
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  :global {
+    .select-area {
+      outline: 1px dashed #333; //var(--canvas-select-area-border);
+    }
+  }
+}
