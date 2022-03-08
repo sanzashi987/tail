@@ -30,7 +30,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   //built-in event callbacks
   const dragStart = useCallback(
     (e: React.MouseEvent, c: DraggerData) => {
-      if (!selected) return false;
+      // if (!selected) return false;
       return rootInterface.node.onDragStart?.(e, node, c);
     },
     [node, selected],

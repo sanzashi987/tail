@@ -43,6 +43,8 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
   onMouseDown = (e: React.MouseEvent) => {
     if (this.state.selectMode === 'single') {
       this.onDragStart(e);
+    } else if (this.state.selectMode === 'select') {
+      return;
     }
   };
 
@@ -54,16 +56,14 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
       parent: document.body,
       getScale: () => 1,
       movecb: this.onMove,
-      endcb: this.blockClick,
+      endcb: this.onEnd,
       moveOpt: {},
       endOpt: { capture: true },
     });
-    window.addEventListener('click', this.blockClick, { capture: true });
   };
 
-  blockClick = (e: MouseEvent) => {
+  onEnd = (e: MouseEvent) => {
     e.stopPropagation();
-    window.removeEventListener('click', this.blockClick, { capture: true });
   };
 
   onMove = (e: MouseEvent, { deltaX, deltaY }: DraggerData) => {
@@ -85,14 +85,14 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
 
   scaling = (e: React.WheelEvent) => {
     const { deltaY, clientY, clientX } = e;
-    const rec = this.ref.current!.getBoundingClientRect();
-    const [mouseX, mouseY] = [clientX - rec?.x, clientY - rec?.y];
+    const rec = this.ref.current?.getBoundingClientRect() ?? { x: 0, y: 0 };
+    const [mouseX, mouseY] = [clientX - rec.x, clientY - rec.y];
     const {
       offset: { x, y },
       scale: preScale,
     } = this.state;
     const nextScale = preScale + (deltaY > 0 ? 1 : -1) * 0.08;
-    if (nextScale < 0.2 || nextScale > 2) return;
+    if (nextScale < 0.2 || nextScale > 4) return;
     const ix = (mouseX - x) / preScale;
     const iy = (mouseY - y) / preScale;
     const nx = ix * nextScale;
@@ -111,6 +111,17 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
       scale,
       offset: { x, y },
     } = this.state;
+    const bg = 96 * scale,
+      bgs = 24 * scale,
+      posX = 1 + x,
+      posY = 1 + y;
+    const cssvar: any = {
+      '--x': `${x}px`,
+      '--y': `${y}px`,
+      '--scale': scale,
+      '--bgsize': `${bg}px ${bg}px, ${bg}px ${bg}px, ${bgs}px ${bgs}px, ${bgs}px ${bgs}px`,
+      '--bgpos': `${posX}px ${posY}px, ${posX}px ${posY}px, ${posX}px ${posY}px, ${posX}px ${posY}px`,
+    };
     return (
       <div
         ref={this.ref}
@@ -118,12 +129,9 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
         onWheel={this.onWheeling}
         onMouseDown={this.onMouseDown}
         onClick={this.deactivate}
+        style={cssvar}
       >
-        <div
-          ref={this.container}
-          className="scroller"
-          style={{ transform: `translate(${x}px,${y}px) scale(${scale})` }}
-        >
+        <div ref={this.container} className="scroller">
           {this.props.children}
         </div>
       </div>

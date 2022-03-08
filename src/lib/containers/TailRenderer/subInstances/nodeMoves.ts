@@ -4,14 +4,19 @@ import { createNodeDeltaMove } from '../mutation';
 
 class NodeMoves {
   constructor(private core: TailCore) {}
+  node: IObject<string> = {};
 
   batchNodeDrag = (e: MouseEventCollection, n: Node, d: DraggerData) => {
-
+    if (!this.core.activeItems.node[n.id]) {
+      this.node = { [n.id]: n.id };
+    } else {
+      this.node = this.core.activeItems.node;
+    }
     if (!this.core.props.quickNodeUpdate) {
       this.batchEmitUpdate(e, n, d);
     } else {
       const updater = createNodeDeltaMove(d.deltaX, d.deltaY);
-      Object.keys(this.core.activeItems.node).forEach((e: string) => {
+      Object.keys(this.node).forEach((e: string) => {
         this.core.setAtomState('node', e, updater);
       });
     }
@@ -26,7 +31,7 @@ class NodeMoves {
   private batchEmitUpdate = (e: MouseEventCollection, n: Node, d: DraggerData) => {
     const updater = createNodeDeltaMove(d.deltaX, d.deltaY);
     const updatePayload: Node[] = [];
-    Object.keys(this.core.activeItems.node).forEach((e: string) => {
+    Object.keys(this.node).forEach((e: string) => {
       updatePayload.push(updater(this.core.getAtomState<NodeAtom>('node', e)).node);
     });
     this.core.props.onNodeUpdate(updatePayload);
