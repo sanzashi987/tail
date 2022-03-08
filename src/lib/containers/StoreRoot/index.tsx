@@ -1,5 +1,5 @@
-import { RecoilNexus } from '@app/utils';
 import React, { Component, createRef } from 'react';
+import { RecoilNexus } from '@app/utils';
 import { RecoilRoot, RecoilState, RecoilValue } from 'recoil';
 import type { RecoilNexusInterface, UpdaterType } from '@types';
 import { StoreProvider } from '@app/contexts/store';

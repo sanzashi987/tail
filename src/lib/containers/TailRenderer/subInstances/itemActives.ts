@@ -1,8 +1,8 @@
 import type { SelectedItemType, EdgeAtom, NodeAtom, SelectedItemCollection } from '@app/types';
 import type { RecoilState } from 'recoil';
+import { CtrlOrCmd, isModifierExact } from '@app/utils';
 import { getAtom } from '../mutation';
 import type TailCore from '..';
-import { CtrlOrCmd, isModifierExact } from '@app/utils';
 
 function immutableSelectedHandles(prev: NodeAtom) {
   const next = { ...prev };

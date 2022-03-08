@@ -32,28 +32,28 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     return;
   };
 
-  scaling = (r: React.WheelEvent) => {
-    const e = r.nativeEvent;
-    const { deltaY, offsetX, offsetY } = e;
+  scaling = (e: React.WheelEvent) => {
+    const { deltaY, clientY, clientX } = e;
+    const rec = this.ref.current!.getBoundingClientRect();
+    const [mouseX, mouseY] = [clientX - rec?.x, clientY - rec?.y];
     const {
       offset: { x, y },
       scale: preScale,
     } = this.state;
+    const nextScale = preScale + (deltaY > 0 ? 1 : -1) * 0.08;
+    if (nextScale < 0.2) return;
+    // const [projectX, projectY] = [mouseX / preScale, mouseY / preScale];
+    // const k = 1 - nextScale / preScale;
+    const ix = (mouseX - x) / preScale;
+    const iy = (mouseY - y) / preScale;
+    const nx = ix * nextScale;
+    const ny = iy * nextScale;
+    const cx = ix + (mouseX - ix) - nx;
+    const cy = iy + (mouseY - iy) - ny;
 
-    const absX = offsetX / preScale + x;
-    const absY = offsetY / preScale + y;
-
-    // const [absX, absY] = [offsetX + x, offsetY + y];
-
-    const newScale = preScale + (8 * deltaY > 0 ? 1 : -1) / 100;
-    const k = newScale / preScale;
-
-    const [newAbsX, newAbsY] = [absX * k, absY * k];
-
-    const [dx, dy] = [newAbsX - absX, newAbsY - absY];
     this.setState({
-      scale: newScale,
-      offset: { x: x + dx, y: y + dy },
+      scale: nextScale,
+      offset: { x: cx, y: cy },
     });
   };
 
@@ -64,13 +64,10 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     } = this.state;
     return (
       <div ref={this.ref} className={styles['infinite-wrapper']} onWheel={this.scaling}>
-        <div
-          className="fake-layer"
-          style={{
-            transform: `translate(${x}px,${y}px)  scale(${scale})`,
-          }}
-        >
-          {this.props.children}
+        <div className="scroller" style={{ transform: `translate(${x}px,${y}px) scale(${scale})` }}>
+          <div className="scaler" style={{ transform: `scale(${scale})` }}>
+            {this.props.children}
+          </div>
         </div>
       </div>
     );

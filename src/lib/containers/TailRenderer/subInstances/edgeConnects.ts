@@ -10,9 +10,9 @@ import type {
   AtomStateGetterType,
   ConnectMethodType,
 } from '@types';
-import TailCore from '..';
-import ItemActives from './itemActives';
 import { edgeInProgressAtom } from '@app/atoms/edges';
+import ItemActives from './itemActives';
+import TailCore from '..';
 
 export function enableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
   return {

@@ -37,7 +37,6 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   );
   const drag = useCallback(
     (e: MouseEvent, c: DraggerData) => {
-      console.log(233);
       return rootInterface.node.onDrag?.(e, node, c);
     },
     [node],
