@@ -50,6 +50,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   );
   const onNodeSelect = useCallback(
     (e: React.MouseEvent) => {
+      // e.stopPropagation();
       rootInterface.activateItem(e, 'node', node.id, selected);
       rootInterface.node.onNodeClick(e, node);
     },

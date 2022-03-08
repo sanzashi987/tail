@@ -9,6 +9,7 @@ import type {
   NodeAtom,
   AtomStateGetterType,
   ConnectMethodType,
+  DraggerData,
 } from '@types';
 import { edgeInProgressAtom } from '@app/atoms/edges';
 import ItemActives from './itemActives';
@@ -148,7 +149,7 @@ export function addReconnectToState(
 
 export function createMoveCallback(setter: EdgeInProgressAtomUpdater, type: HandleType) {
   const moveUpdater = flipHandle[type] === 'source' ? setSource : setTarget;
-  return (x: number, y: number) => {
+  return (e: MouseEvent, { x, y }: DraggerData) => {
     setter(moveUpdater(x, y));
   };
 }
@@ -240,7 +241,7 @@ class EdgeConnects {
     this.connectReset();
   };
 
-  private tryConnect = (x: number, y: number) => {
+  private tryConnect = (e: MouseEvent, { x, y }: DraggerData) => {
     const { reconnect, prevEdgeId, to: type } = this.core.context.get(edgeInProgressAtom);
     if (reconnect && prevEdgeId) {
       const { getAtomState: GET, setAtomState: SET } = this.core;

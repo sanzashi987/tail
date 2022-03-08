@@ -1,4 +1,4 @@
-import type { MouseEventCollection } from '@app/types';
+import type { DraggerData, MouseEventCollection } from '@app/types';
 import { getCoordinatesFromParent, getDraggerRelativeCoordinates } from './utils/calc';
 
 const defaultState = {
@@ -6,11 +6,13 @@ const defaultState = {
   y: NaN,
   lastX: NaN,
   lastY: NaN,
+  deltaX: NaN,
+  deltaY: NaN,
 };
 
 const noop = () => defaultState;
 
-type cb = (x: number, y: number) => void;
+type cb = (e: MouseEvent, d: DraggerData) => void;
 type StartPayload = {
   x: number;
   y: number;
@@ -18,6 +20,8 @@ type StartPayload = {
   movecb: cb;
   endcb: cb;
   getScale(): number;
+  moveOpt?: AddEventListenerOptions;
+  endOpt?: AddEventListenerOptions;
 };
 class CoordinateCalc {
   private state = defaultState;
@@ -25,33 +29,43 @@ class CoordinateCalc {
   private movecb: cb = noop;
   private endcb: cb = noop;
   private getScale = () => 1;
-  start = (e: MouseEventCollection, { x, y, parent, movecb, endcb, getScale }: StartPayload) => {
+  private moveOpt: AddEventListenerOptions | null = null;
+  private endOpt: AddEventListenerOptions | null = null;
+
+  start = (
+    e: MouseEventCollection,
+    { x, y, parent, movecb, endcb, getScale, endOpt, moveOpt }: StartPayload,
+  ) => {
     e.stopPropagation();
     const cor = getCoordinatesFromParent(e, parent, getScale());
     this.domParent = parent;
     this.movecb = movecb;
     this.endcb = endcb;
     this.getScale = getScale;
-    this.state = { x, y, lastX: cor.x, lastY: cor.y };
-    document.addEventListener('mousemove', this.move);
-    document.addEventListener('mouseup', this.end);
+    this.moveOpt = moveOpt ?? {};
+    this.endOpt = endOpt ?? {};
+    this.state = { x, y, lastX: cor.x, lastY: cor.y, deltaX: 0, deltaY: 0 };
+    document.addEventListener('mousemove', this.move, this.moveOpt);
+    document.addEventListener('mouseup', this.end, this.endOpt);
   };
 
-  move = (e: MouseEventCollection) => {
+  move = (e: MouseEvent) => {
     this.iter(e);
-    this.movecb(this.state.x, this.state.y);
+    this.movecb(e, this.state);
   };
 
-  private iter(e: MouseEventCollection) {
+  private iter(e: MouseEvent) {
     e.stopPropagation();
     const cor = getCoordinatesFromParent(e, this.domParent!, this.getScale());
     const { x, y, lastY, lastX } = this.state;
     this.state = getDraggerRelativeCoordinates(x, y, lastX, lastY, cor);
   }
 
-  end = (e: MouseEventCollection) => {
+  end = (e: MouseEvent) => {
+    e.stopPropagation();
+    e.stopImmediatePropagation();
     this.iter(e);
-    this.endcb(this.state.x, this.state.y);
+    this.endcb(e, this.state);
     this.reset();
   };
 
@@ -59,8 +73,10 @@ class CoordinateCalc {
     this.domParent = null;
     this.state = defaultState;
     this.movecb = this.endcb = noop;
-    document.removeEventListener('mousemove', this.move);
-    document.removeEventListener('mouseup', this.end);
+    document.removeEventListener('mousemove', this.move, this.moveOpt!);
+    document.removeEventListener('mouseup', this.end, this.endOpt!);
+    this.moveOpt = null;
+    this.endOpt = null;
   }
 }
 

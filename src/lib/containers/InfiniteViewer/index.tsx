@@ -1,17 +1,21 @@
 import React, { Component, createRef } from 'react';
-import type { InfiniteViewerProps, InfiniteViewerState } from '@types';
+import type { DraggerData, InfiniteViewerProps, InfiniteViewerState } from '@types';
 import ResizeObserver from 'resize-observer-polyfill';
+import { CoordinateCalc } from '@app/components/Dragger';
 import styles from './index.module.scss';
 
 class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState> {
   public observer: ResizeObserver | undefined;
   ref = createRef<HTMLDivElement>();
+  container = createRef<HTMLDivElement>();
 
   state: InfiniteViewerState = {
     scale: 1,
     offset: { x: 0, y: 0 },
     selectMode: 'single',
   };
+
+  dragger = new CoordinateCalc();
 
   getScale() {
     return this.state.scale;
@@ -26,10 +30,57 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     this.observer?.disconnect();
   }
 
-  // onWheeling = () => {};
+  onWheeling = (e: React.WheelEvent) => {
+    if (this.state.selectMode === 'single') {
+      this.scaling(e);
+    }
+  };
 
   onDomResize = () => {
     return;
+  };
+
+  onMouseDown = (e: React.MouseEvent) => {
+    if (this.state.selectMode === 'single') {
+      this.onDragStart(e);
+    }
+  };
+
+  onDragStart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    this.dragger.start(e, {
+      x: 0,
+      y: 0,
+      parent: document.body,
+      getScale: () => 1,
+      movecb: this.onMove,
+      endcb: this.blockClick,
+      moveOpt: {},
+      endOpt: { capture: true },
+    });
+    window.addEventListener('click', this.blockClick, { capture: true });
+  };
+
+  blockClick = (e: MouseEvent) => {
+    e.stopPropagation();
+    window.removeEventListener('click', this.blockClick, { capture: true });
+  };
+
+  onMove = (e: MouseEvent, { deltaX, deltaY }: DraggerData) => {
+    this.setState((prev) => ({
+      ...prev,
+      offset: {
+        x: prev.offset.x + deltaX,
+        y: prev.offset.y + deltaY,
+      },
+    }));
+  };
+
+  deactivate = (e: React.MouseEvent) => {
+    if (Array.from(this.container.current?.children ?? []).includes(e.target as any)) {
+      e.stopPropagation();
+      this.props.deactivateAll();
+    }
   };
 
   scaling = (e: React.WheelEvent) => {
@@ -41,9 +92,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
       scale: preScale,
     } = this.state;
     const nextScale = preScale + (deltaY > 0 ? 1 : -1) * 0.08;
-    if (nextScale < 0.2) return;
-    // const [projectX, projectY] = [mouseX / preScale, mouseY / preScale];
-    // const k = 1 - nextScale / preScale;
+    if (nextScale < 0.2 || nextScale > 2) return;
     const ix = (mouseX - x) / preScale;
     const iy = (mouseY - y) / preScale;
     const nx = ix * nextScale;
@@ -63,11 +112,19 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
       offset: { x, y },
     } = this.state;
     return (
-      <div ref={this.ref} className={styles['infinite-wrapper']} onWheel={this.scaling}>
-        <div className="scroller" style={{ transform: `translate(${x}px,${y}px) scale(${scale})` }}>
-          <div className="scaler" style={{ transform: `scale(${scale})` }}>
-            {this.props.children}
-          </div>
+      <div
+        ref={this.ref}
+        className={styles['infinite-wrapper']}
+        onWheel={this.onWheeling}
+        onMouseDown={this.onMouseDown}
+        onClick={this.deactivate}
+      >
+        <div
+          ref={this.container}
+          className="scroller"
+          style={{ transform: `translate(${x}px,${y}px) scale(${scale})` }}
+        >
+          {this.props.children}
         </div>
       </div>
     );
