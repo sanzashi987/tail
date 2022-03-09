@@ -11,7 +11,7 @@ import type { NodeWrapperProps, coordinates, NodeCom, DraggerData } from '@types
 import { InstanceInterface } from '@app/contexts/instance';
 import { useRecoilState } from 'recoil';
 import Dragger from './Dragger';
-import { getHandlesPosition } from './utils';
+import { getNodeInfo } from './utils';
 import styles from './Wrapper.module.scss';
 import { BasicNode } from '.';
 
@@ -57,11 +57,12 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
     [selected, node],
   );
   const updateNodeHandles = useCallback(() => {
-    const handles = getHandlesPosition(ref, node);
+    const [rect, handles] = getNodeInfo(ref, node);
     setNodeInternal((prev) => {
       return {
         ...prev,
         handles,
+        rect,
       };
     });
   }, [node]);

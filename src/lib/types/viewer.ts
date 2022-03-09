@@ -1,14 +1,28 @@
+import React from 'react';
 import type { coordinates } from '.';
 
-type SelectModeType = 'single' | 'select';
+export type SelectModeType = 'single' | 'select';
+
 export type InfiniteViewerState = {
   scale: number;
   offset: coordinates;
   selectMode: SelectModeType;
+  selecting: boolean;
+  dragStart: coordinates;
+  dragEnd: coordinates;
 };
 
+export type SelectCallback = (
+  start: coordinates,
+  end: coordinates,
+  offset: coordinates,
+  scale: number,
+) => void;
+
 export type InfiniteViewerProps = {
-  deactivateAll(): void;
+  onClick?(e: React.MouseEvent): void;
+  onSelecting?: SelectCallback;
+  onSelectEnd?: SelectCallback;
 };
 
 export type SelectAreaProps = {

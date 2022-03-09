@@ -77,7 +77,11 @@ class TailCore extends Component<TailCoreProps> {
     const { nodes, edges, nodeTemplates } = this.props;
     const { set } = this.context;
     return (
-      <InfiniteViewer ref={this.viewer} deactivateAll={this.deactiveAll}>
+      <InfiniteViewer
+        ref={this.viewer}
+        onClick={this.deactiveAll}
+        onSelectEnd={this.ItemActives.batchActivateNodes}
+      >
         <InterfaceProvider value={this.contextInterface}>
           <NodeRenderer
             templates={nodeTemplates}

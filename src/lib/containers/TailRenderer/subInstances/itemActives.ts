@@ -1,4 +1,11 @@
-import type { SelectedItemType, EdgeAtom, NodeAtom, SelectedItemCollection } from '@app/types';
+import type {
+  SelectedItemType,
+  EdgeAtom,
+  NodeAtom,
+  SelectedItemCollection,
+  coordinates,
+  SelectCallback,
+} from '@app/types';
 import type { RecoilState } from 'recoil';
 import { CtrlOrCmd, isModifierExact } from '@app/utils';
 import { getAtom } from '../mutation';
@@ -37,6 +44,29 @@ function setSelectedHandle(
     cb(next, handleId);
     return next;
   });
+}
+
+function sort(a: number, b: number) {
+  return a - b;
+}
+
+function isInside(
+  comStart: coordinates,
+  comEnd: coordinates,
+  svgStart: coordinates,
+  svgEnd: coordinates,
+): boolean {
+  if (
+    comStart.x > svgEnd.x ||
+    svgStart.x > comEnd.x ||
+    comStart.y > svgEnd.y ||
+    svgStart.y > comEnd.y ||
+    svgStart.x === svgEnd.x ||
+    svgStart.y === svgEnd.y
+  ) {
+    return false;
+  }
+  return true;
 }
 
 export function switchActive(
@@ -84,7 +114,7 @@ class ItemActives {
   batchDeactivate(type: SelectedItemType) {
     const pool = this.core.activeItems[type];
     Object.keys(pool).forEach((key) => {
-      this.switchActive('node', key, false, pool);
+      this.switchActive(type, key, false, pool);
     });
   }
 
@@ -93,20 +123,42 @@ class ItemActives {
     const _this = this.core;
     const atom = _this.getAtom(type, id);
     const { set, get } = _this.context;
-    set(atom as RecoilState<NodeAtom | EdgeAtom>, (prev) => {
-      const next = { ...prev };
-      next.selected = active;
-      return next;
-    });
+    set(atom as RecoilState<NodeAtom | EdgeAtom>, (prev) => ({ ...prev, selected: active }));
     if (type !== 'edge') return;
     const cb = active ? activateHandle : deactivateHandle;
     const {
       edge: { sourceNode, target, targetNode, source },
-    } = get(atom as RecoilState<EdgeAtom>)!;
+    } = get(atom as RecoilState<EdgeAtom>);
     const pool = _this.getNodeAtoms();
     setSelectedHandle(sourceNode, source, pool, cb, set);
     setSelectedHandle(targetNode, target, pool, cb, set);
   }
+
+  batchActivateNodes: SelectCallback = (topleft, bottomRight, offset, scale) => {
+    const pool = this.core.activeItems['node'];
+    const startX = (topleft.x - offset.x) / scale;
+    const startY = (topleft.y - offset.y) / scale;
+    const endX = (bottomRight.x - offset.x) / scale;
+    const endY = (bottomRight.y - offset.y) / scale;
+    const [xMin, xMax, yMin, yMax] = [...[startX, endX].sort(sort), ...[startY, endY].sort(sort)];
+    Object.keys(this.core.nodeRef.current!.nodeAtoms).forEach((key) => {
+      const {
+        rect: { width, height },
+        node: { left, top },
+      } = this.core.getAtomState<NodeAtom>('node', key);
+      const [xCurMin, xCurMax, yCurMin, yCurMax] = [left, left + width, top, top + height];
+      if (
+        isInside(
+          { x: xCurMin, y: yCurMin },
+          { x: xCurMax, y: yCurMax },
+          { x: xMin, y: yMin },
+          { x: xMax, y: yMax },
+        )
+      ) {
+        this.switchActive('node', key, true, pool);
+      }
+    });
+  };
 }
 
 export default ItemActives;

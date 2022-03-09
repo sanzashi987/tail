@@ -1,5 +1,12 @@
 import type { Node, NodeAtom } from '@app/types';
-import { atom, RecoilState } from 'recoil';
+import { atom } from 'recoil';
+
+export const defaultRect = {
+  x: NaN,
+  y: NaN,
+  width: NaN,
+  height: NaN,
+};
 
 export function createNodeAtom<T>(node: Node<T>) {
   return atom<NodeAtom<T>>({
@@ -12,6 +19,7 @@ export function createNodeAtom<T>(node: Node<T>) {
         source: {},
         target: {},
       },
+      rect: defaultRect,
       forceRender: 0,
     },
   });

@@ -1,4 +1,6 @@
-export function getCSSVar(x: number, y: number, scale: number) {
+import { coordinates } from '@app/types';
+
+export function getCSSVar({ x, y }: coordinates, scale: number) {
   const bg = 96 * scale,
     bgs = 24 * scale,
     posX = (1 + x) % 96,
@@ -12,3 +14,21 @@ export function getCSSVar(x: number, y: number, scale: number) {
   };
   return cssvar;
 }
+
+export function scaleOne() {
+  return 1;
+}
+
+export const captureTrue = {
+  capture: true,
+};
+
+export const commonDragOpt = {
+  x: 0,
+  y: 0,
+  parent: document.body,
+  getScale: scaleOne,
+  endOpt: captureTrue,
+};
+
+// export function findInsideNodes() {}

@@ -15,7 +15,7 @@ export type coordinates = {
 export type rect = {
   width: number;
   height: number;
-};
+} & coordinates;
 
 export type DraggerCoreBasic = {
   disable?: boolean;

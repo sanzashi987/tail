@@ -1,5 +1,6 @@
 import React from 'react';
-import type { Node, HandleElement, HandleMap, HandlesInfo, coordinates } from '@types';
+import type { Node, HandleElement, HandleMap, HandlesInfo, rect } from '@types';
+import { defaultRect } from '@app/atoms/nodes';
 
 export const getHandleBounds = (nodeElement: HTMLDivElement, scale: number) => {
   const bounds = nodeElement.getBoundingClientRect();
@@ -50,13 +51,13 @@ export const getHandleBoundsByHandleType = (
 
 const EmptyHandles = { source: {}, target: {} };
 
-export const getHandlesPosition = (
+export const getNodeInfo = (
   ref: React.RefObject<HTMLDivElement | undefined>,
   node: Node,
-): HandlesInfo => {
+): [rect, HandlesInfo] => {
   if (!ref.current) {
     console.warn('fail to retrieve the DOM instance of', node);
-    return EmptyHandles;
+    return [defaultRect, EmptyHandles];
   }
-  return getHandleBounds(ref.current, 1);
+  return [ref.current.getBoundingClientRect(), getHandleBounds(ref.current, 1)];
 };
