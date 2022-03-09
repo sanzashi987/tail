@@ -18,6 +18,8 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
   private ref = createRef<HTMLDivElement>();
   private container = createRef<HTMLDivElement>();
 
+  blockClick = false;
+
   state: InfiniteViewerState = {
     scale: 1,
     offset: { x: 0, y: 0 },
@@ -85,6 +87,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
       payload['dragStart'] = payload['dragEnd'];
       this.offsetSnapshot = offset;
       payload['selecting'] = true;
+      this.blockClick = true;
     } else {
       this.props.onSelecting?.(dragStart, payload['dragEnd'], offset, scale);
     }
@@ -95,7 +98,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     if (this.state.selecting && e.button === 0) {
       const { dragEnd, dragStart, offset, scale } = this.state;
       if (dragStart.x !== dragEnd.x && dragStart.y !== dragEnd.y) {
-        this.props.onSelecting?.(dragStart, dragEnd, offset, scale);
+        this.props.onSelectEnd?.(dragStart, dragEnd, offset, scale);
       }
       this.setState({ selecting: false });
     }
@@ -126,6 +129,10 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
   };
 
   private onClick = (e: React.MouseEvent) => {
+    if (this.blockClick) {
+      this.blockClick = false;
+      return;
+    }
     if (Array.from(this.container.current?.children ?? []).includes(e.target as any)) {
       e.stopPropagation();
       this.props.onClick?.(e);
