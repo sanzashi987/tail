@@ -101,6 +101,7 @@ class TailCore extends Component<TailCoreProps> {
             </EdgeRenderer>
           )}
         </InterfaceProvider>
+        {this.props.children}
       </InfiniteViewer>
     );
   }
@@ -113,14 +114,14 @@ class TailCore extends Component<TailCoreProps> {
   getAtom = <T extends EdgeAtom | NodeAtom>(type: SelectedItemType, id: string) => {
     const pool =
       type === 'edge' ? this.edgeRef.current!.edgeAtoms : this.nodeRef.current!.nodeAtoms;
-    return getAtom(id, pool as unknown as IObject<RecoilState<T>>);
+    return getAtom(id, (pool as unknown) as IObject<RecoilState<T>>);
   };
 
   getAtomState = <T,>(type: SelectedItemType, id: string) =>
-    this.context.get(this.getAtom(type, id) as unknown as RecoilState<T>);
+    this.context.get((this.getAtom(type, id) as unknown) as RecoilState<T>);
 
   setAtomState = <T,>(type: SelectedItemType, id: string, updater: T | ((cur: T) => T)) =>
-    this.context.set(this.getAtom(type, id) as unknown as RecoilState<T>, updater);
+    this.context.set((this.getAtom(type, id) as unknown) as RecoilState<T>, updater);
 
   getEdgeAtoms = () => this.edgeRef.current?.edgeAtoms ?? {};
 
