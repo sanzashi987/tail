@@ -7,6 +7,7 @@ export function createEdgeAtom(edge: Edge) {
     default: {
       edge,
       selected: false,
+      hovered: false,
       reconnect: false,
       forceRender: 0,
     },
@@ -26,42 +27,40 @@ const emptyHandle = {
 
 export const computedEdgeSelector = selectorFamily({
   key: 'edgeWrapperSelector',
-  get:
-    (input: any) =>
-    ({ get }) => {
-      const { edge, nodeAtoms } = input as SelectorInput;
-      const edgeState = get(edge);
-      const {
-        edge: { sourceNode, targetNode, source, target },
-      } = edgeState;
-      const sourceAtom = nodeAtoms[sourceNode],
-        targetAtom = nodeAtoms[targetNode];
-      if (!sourceAtom || !targetAtom) {
-        return {
-          ...edgeState,
-          ...emptySourceTarget,
-        };
-      }
-      const {
-        handles: { source: sourceHandles },
-        node: { left: sourceLeft, top: sourceTop },
-      } = get(sourceAtom);
-      const {
-        handles: { target: targetHandles },
-        node: { left: targetLeft, top: targetTop },
-      } = get(targetAtom);
-
-      const { x: sourceX, y: sourceY } = sourceHandles[source] ?? emptyHandle;
-      const { x: targetX, y: targetY } = targetHandles[target] ?? emptyHandle;
-
+  get: (input: any) => ({ get }) => {
+    const { edge, nodeAtoms } = input as SelectorInput;
+    const edgeState = get(edge);
+    const {
+      edge: { sourceNode, targetNode, source, target },
+    } = edgeState;
+    const sourceAtom = nodeAtoms[sourceNode],
+      targetAtom = nodeAtoms[targetNode];
+    if (!sourceAtom || !targetAtom) {
       return {
         ...edgeState,
-        sourceX: sourceX + sourceLeft,
-        sourceY: sourceY + sourceTop,
-        targetX: targetX + targetLeft,
-        targetY: targetY + targetTop,
+        ...emptySourceTarget,
       };
-    },
+    }
+    const {
+      handles: { source: sourceHandles },
+      node: { left: sourceLeft, top: sourceTop },
+    } = get(sourceAtom);
+    const {
+      handles: { target: targetHandles },
+      node: { left: targetLeft, top: targetTop },
+    } = get(targetAtom);
+
+    const { x: sourceX, y: sourceY } = sourceHandles[source] ?? emptyHandle;
+    const { x: targetX, y: targetY } = targetHandles[target] ?? emptyHandle;
+
+    return {
+      ...edgeState,
+      sourceX: sourceX + sourceLeft,
+      sourceY: sourceY + sourceTop,
+      targetX: targetX + targetLeft,
+      targetY: targetY + targetTop,
+    };
+  },
 });
 
 export const edgeInProgressAtom = atom<EdgeInProgressAtomType>({

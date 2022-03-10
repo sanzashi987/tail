@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import React, { ComponentType } from 'react';
 import type { RecoilState } from 'recoil';
-import { AtomForceRender, HandleType, NodeAtomsType } from '.';
 import { UpdaterType } from './instance';
+import { AtomForceRender, HandleType, NodeAtomsType } from '.';
 
 export type EdgeBasic = {
   source: string;
@@ -32,6 +32,7 @@ export type EdgeBasicProps = {
 export type EdgeAtomRaw<T extends IObject = {}> = {
   edge: Edge<T>;
   selected: boolean;
+  hovered: boolean;
   reconnect: boolean;
 };
 
@@ -56,7 +57,8 @@ export type EdgeWrapperProps<T extends IObject = {}> = {
   // id: string
   atom: RecoilState<EdgeAtom<T>>;
   nodeAtoms: NodeAtomsType;
-  template: EdgeComponentType;
+  template: ComponentType<EdgeProps>;
+  shadow: ComponentType<EdgeBasicProps>;
   // onClick?: (evt: React.MouseEvent, edge: Edge) => void
 }; /* & EdgeProps */
 
@@ -65,14 +67,17 @@ export type SelectorInput = {
   nodeAtoms: NodeAtomsType;
 };
 
-export type EdgeComponentType = ComponentType<EdgeProps>;
+export type EdgeComponentPackType = {
+  default: ComponentType<EdgeProps>;
+  shadow: ComponentType<EdgeBasicProps>;
+};
 
-export type EdgeTemplatesType = IObject<EdgeComponentType>;
+export type EdgeTemplatesType = IObject<EdgeComponentPackType>;
 
 export type EdgeRendererProps = {
   edges: IObject<Edge>;
   // connecting: boolean;
-  templates?: EdgeTemplatesType;
+  templates: EdgeTemplatesType;
   getNodeAtoms(): NodeAtomsType;
   storeUpdater: (atom: RecoilState<EdgeAtom>, updater: UpdaterType<EdgeAtom>) => void;
 };

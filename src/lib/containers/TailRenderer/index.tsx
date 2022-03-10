@@ -74,7 +74,7 @@ class TailCore extends Component<TailCoreProps> {
   };
 
   render() {
-    const { nodes, edges, nodeTemplates } = this.props;
+    const { nodes, edges, nodeTemplates, nodeTemplatePicker } = this.props;
     const { set } = this.context;
     return (
       <InfiniteViewer
@@ -87,6 +87,7 @@ class TailCore extends Component<TailCoreProps> {
             templates={nodeTemplates}
             nodes={nodes}
             ref={this.nodeRef}
+            templatePicker={nodeTemplatePicker}
             mounted={() => this.setState({ nodesReady: true })}
             storeUpdater={set}
           />

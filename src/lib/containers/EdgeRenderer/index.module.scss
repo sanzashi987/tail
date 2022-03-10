@@ -2,4 +2,18 @@
   height: 100%;
   width: 100%;
   overflow: visible;
+  :global {
+    .tail-edge__wrapper > * {
+      fill: none;
+      // stroke: #bfbfbf;
+    }
+    .tail-edge__event-enhancer > * {
+      stroke-width: 15px;
+      fill: none;
+      stroke: transparent !important;
+      marker-start: none;
+      marker-end: none;
+      marker-mid: none;
+    }
+  }
 }

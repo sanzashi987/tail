@@ -18,6 +18,7 @@ const wrapAnchor = (Symbol: ComponentType<AnchorProps>) => {
         markerWidth={width}
         markerHeight={height}
         viewBox="-20 -20 40 40"
+        // viewBox="0 0 40 40"
         markerUnits={markerUnits}
         orient={orient}
         refX="0"

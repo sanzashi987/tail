@@ -11,6 +11,7 @@ const BasicAnchor: FC<AnchorProps> = ({ color = 'black', strokeWidth = 2 }) => {
       strokeLinejoin="round"
       fill="none"
       points="-20,-7 -10,0 -20,7"
+      // points="0,13 10,20 0,13"
       orient=""
     ></polyline>
   );

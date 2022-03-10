@@ -31,11 +31,12 @@ export type NodeCom<T extends IObject = {}> = ComponentType<NodeProps<T>>;
 
 export type TemplateNodeClass = IObject<NodeCom>;
 
+export type TemplatePickerType = (node: Node) => [string, string];
+
 export type NodeRendererProps = {
   nodes: IObject<Node>;
-  foldable?: boolean;
-  templates?: IObject<TemplateNodeClass>;
-  templatePicker?: (node: Node) => [string, string];
+  templates: IObject<TemplateNodeClass>;
+  templatePicker: TemplatePickerType;
   mounted(): void;
   storeUpdater: (atom: RecoilState<NodeAtom>, updater: UpdaterType<NodeAtom>) => void;
 };
@@ -44,7 +45,7 @@ export type NodeWrapperProps<T extends IObject = {}> = {
   atom: RecoilState<NodeAtom<T>>;
   // atom: RecoilState<NodeAtom>;
   templates: IObject<TemplateNodeClass>;
-  templatePicker: (node: Node) => [string, string];
+  templatePicker: TemplatePickerType;
 };
 
 export type Nodes = NodeRendererProps['nodes'];

@@ -29,6 +29,10 @@ const edges: IObject<Edge> = {
 function noop() {
   return;
 }
+function templatePicker(node: Node) {
+  return [node.type, node.fold ? 'folded' : 'default'] as [string, string];
+}
+
 function Overview() {
   const [nodeState, setNodeState] = useState(nodes);
   const [edgeState, setEdgeState] = useState(edges);
@@ -64,6 +68,7 @@ function Overview() {
       nodeTemplates={{}}
       edgeTemplates={{}}
       markerTemplates={{}}
+      nodeTemplatePicker={templatePicker}
       dropThreshold={40}
       quickNodeUpdate={true}
     />

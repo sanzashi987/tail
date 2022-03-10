@@ -12,12 +12,14 @@ import type {
   EdgeAtom,
   NodeAtom,
   HandleType,
+  TemplatePickerType,
 } from '.';
 
 export type TailCoreOptionalProps = {
   nodeTemplates: NodeTemplatesType;
   edgeTemplates: EdgeTemplatesType;
   markerTemplates: MarkerTemplatesType;
+  nodeTemplatePicker: TemplatePickerType;
   dropThreshold: number;
   quickNodeUpdate: boolean;
   onDelete(nodes: string[], edges: string[]): void; //come with id array

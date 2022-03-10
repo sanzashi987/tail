@@ -1,28 +1,24 @@
-import React, { Component, createRef, ReactNode } from 'react';
-import type { Nodes, Node, NodeRendererProps, RecoilNexusInterface, NodeAtomsType } from '@types';
+import React, { Component, ReactNode } from 'react';
+import type { Nodes, Node, NodeRendererProps, NodeAtomsType } from '@types';
 import { createNodeAtom } from '@app/atoms/nodes';
 import { NodeWrapper } from '@app/components/Node';
-import { diff, RecoilNexus } from '@app/utils';
-import { defaultProps, createMemoTemplates } from './utils';
+import { diff } from '@app/utils';
+import { createMemoTemplates } from './utils';
 
-type NodeRendererPropsWithDefaults = NodeRendererProps & typeof defaultProps;
-
-class NodeRenderer extends Component<NodeRendererPropsWithDefaults> {
-  static defaultProps = defaultProps;
-
+class NodeRenderer extends Component<NodeRendererProps> {
   // memoTemplates: ReturnType<typeof createMemoTemplates>;
 
   nodeAtoms: NodeAtomsType = {};
   nodeInstances: IObject<ReactNode> = {};
   memoNodes: ReactNode;
 
-  constructor(props: NodeRendererPropsWithDefaults) {
+  constructor(props: NodeRendererProps) {
     super(props);
     // this.memoTemplates = createMemoTemplates();
     this.diffNodes({}, props.nodes);
   }
 
-  shouldComponentUpdate(nextProps: NodeRendererPropsWithDefaults) {
+  shouldComponentUpdate(nextProps: NodeRendererProps) {
     if (nextProps.nodes !== this.props.nodes) {
       this.diffNodes(this.props.nodes, nextProps.nodes);
       return true;

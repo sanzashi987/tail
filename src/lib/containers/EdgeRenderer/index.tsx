@@ -15,9 +15,9 @@ import { registerChild, removeChild, defaultProps } from './utils';
 
 type Edges = EdgeRendererProps['edges'];
 
-type EdgeRendererPropsWithDefaults = EdgeRendererProps & typeof defaultProps;
+// type EdgeRendererPropsWithDefaults = EdgeRendererProps & typeof defaultProps;
 
-class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
+class EdgeRenderer extends Component<EdgeRendererProps> {
   static defaultProps = defaultProps;
 
   edgeTree: EdgeTree = new Map();
@@ -25,7 +25,7 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
   edgeAtoms: EdgeAtomsType = {};
   memoEdges: ReactNode;
 
-  constructor(props: EdgeRendererPropsWithDefaults) {
+  constructor(props: EdgeRendererProps) {
     super(props);
     this.diffEdges({}, props.edges);
   }
@@ -64,7 +64,8 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
     const { type = '', id } = edge;
     this.edgeAtoms[id] = createEdgeAtom(edge);
     registerChild(this.edgeTree, edge);
-    const EdgeComponent = this.props.templates[type] ?? BasicEdge;
+    const EdgeComponent = this.props.templates[type].default ?? BasicEdge;
+    const ShadowComponent = this.props.templates[type].shadow ?? BasicEdge;
     const NodeAtoms = this.props.getNodeAtoms();
     this.edgeInstances[id] = (
       <EdgeWrapper
@@ -72,6 +73,7 @@ class EdgeRenderer extends Component<EdgeRendererPropsWithDefaults> {
         nodeAtoms={NodeAtoms}
         atom={this.edgeAtoms[id]}
         template={EdgeComponent}
+        shadow={ShadowComponent}
       />
     );
   };

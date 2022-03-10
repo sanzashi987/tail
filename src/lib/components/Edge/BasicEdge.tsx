@@ -4,7 +4,18 @@ import type { EdgeProps } from '@app/types';
 //Straight Edge
 class BasicEdge extends Component<EdgeProps> {
   render() {
-    const { sourceX, sourceY, targetX, targetY, markerEnd, markerStart, selected } = this.props;
+    const {
+      sourceX,
+      sourceY,
+      targetX,
+      targetY,
+      markerEnd,
+      markerStart,
+      selected,
+      hovered,
+    } = this.props;
+    const stroke = selected ? 'orange' : hovered ? '#bfbfbf' : 'black';
+    const width = selected || hovered ? 4 : 1;
     return (
       <path
         className="tail-edge__basic"
@@ -12,7 +23,8 @@ class BasicEdge extends Component<EdgeProps> {
         // markerEnd={markerEnd}
         markerEnd="url(#tail-marker__basic)"
         markerStart={markerStart}
-        stroke={selected ? 'orange' : 'black'}
+        stroke={stroke}
+        strokeWidth={width}
       />
     );
   }
