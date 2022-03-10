@@ -52,14 +52,6 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({
 
   return (
     <>
-      <g
-        className="tail-edge__event-enhancer"
-        onClick={onClick}
-        onMouseOver={onHoverIn}
-        onMouseLeave={onHoverOut}
-      >
-        <ShadowEdge sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY={targetY} />
-      </g>
       <g className="tail-edge__wrapper">
         <EdgeComponent
           edge={edge}
@@ -72,6 +64,14 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({
           markerEnd={markerEndUrl}
           markerStart={markerStartUrl}
         />
+      </g>
+      <g
+        className="tail-edge__event-enhancer"
+        onClick={onClick}
+        onMouseOver={onHoverIn}
+        onMouseLeave={onHoverOut}
+      >
+        <ShadowEdge sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY={targetY} />
       </g>
     </>
   );
