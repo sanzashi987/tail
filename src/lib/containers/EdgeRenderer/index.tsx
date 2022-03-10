@@ -64,8 +64,8 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
     const { type = '', id } = edge;
     this.edgeAtoms[id] = createEdgeAtom(edge);
     registerChild(this.edgeTree, edge);
-    const EdgeComponent = this.props.templates[type].default ?? BasicEdge;
-    const ShadowComponent = this.props.templates[type].shadow ?? BasicEdge;
+    const EdgeComponent = this.props.templates[type]?.default ?? BasicEdge;
+    const ShadowComponent = this.props.templates[type]?.shadow ?? BasicEdge;
     const NodeAtoms = this.props.getNodeAtoms();
     this.edgeInstances[id] = (
       <EdgeWrapper
