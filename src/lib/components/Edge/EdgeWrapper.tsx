@@ -10,7 +10,12 @@ const getMarkerId = (markerId?: string) => {
   return undefined;
 };
 
-const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, template: EdgeComponent }) => {
+const EdgeWrapper: FC<EdgeWrapperProps> = ({
+  atom,
+  nodeAtoms,
+  template: EdgeComponent,
+  shadow: ShadowEdge,
+}) => {
   const { edge, selected, sourceX, sourceY, targetX, targetY, reconnect, hovered } = useRecoilValue(
     computedEdgeSelector({ edge: atom, nodeAtoms }),
   );
@@ -53,15 +58,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, template: EdgeComp
         onMouseOver={onHoverIn}
         onMouseLeave={onHoverOut}
       >
-        <EdgeComponent
-          edge={edge}
-          hovered={false}
-          selected={false}
-          sourceX={sourceX}
-          sourceY={sourceY}
-          targetX={targetX}
-          targetY={targetY}
-        />
+        <ShadowEdge sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY={targetY} />
       </g>
       <g className="tail-edge__wrapper">
         <EdgeComponent
