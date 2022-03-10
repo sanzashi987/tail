@@ -10,6 +10,7 @@ export type InfiniteViewerState = {
   selecting: boolean;
   dragStart: coordinates;
   dragEnd: coordinates;
+  duration: number;
 };
 
 export type SelectCallback = (
@@ -23,6 +24,7 @@ export type InfiniteViewerProps = {
   onClick?(e: React.MouseEvent): void;
   onSelecting?: SelectCallback;
   onSelectEnd?: SelectCallback;
+  onContainerResize?(width: number, height: number): void;
 };
 
 export type SelectAreaProps = {

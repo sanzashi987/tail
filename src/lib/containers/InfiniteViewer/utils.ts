@@ -1,6 +1,6 @@
 import { coordinates } from '@app/types';
 
-export function getCSSVar({ x, y }: coordinates, scale: number) {
+export function getCSSVar({ x, y }: coordinates, scale: number, duration: number) {
   const bg = 96 * scale,
     bgs = 24 * scale,
     posX = (1 + x) % 96,
@@ -11,6 +11,7 @@ export function getCSSVar({ x, y }: coordinates, scale: number) {
     '--scale': scale,
     '--bgsize': `${bg}px ${bg}px, ${bg}px ${bg}px, ${bgs}px ${bgs}px, ${bgs}px ${bgs}px`,
     '--bgpos': `${posX}px ${posY}px, ${posX}px ${posY}px, ${posX}px ${posY}px, ${posX}px ${posY}px`,
+    '--duration': `${duration}s`,
   };
   return cssvar;
 }
@@ -31,4 +32,15 @@ export const commonDragOpt = {
   endOpt: captureTrue,
 };
 
+export const defaultRect: DOMRectReadOnly = {
+  x: NaN,
+  y: NaN,
+  width: NaN,
+  height: NaN,
+  top: NaN,
+  bottom: NaN,
+  left: NaN,
+  right: NaN,
+  toJSON: () => NaN,
+};
 // export function findInsideNodes() {}

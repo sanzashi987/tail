@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Tail } from '@app/index';
-import { coordinates, DraggerData, Edge, EdgeBasic, Node } from '@app/types';
+import { DraggerData, Edge, EdgeBasic, Node } from '@app/types';
 
 const nodes: IObject<Node> = {
   id1: {

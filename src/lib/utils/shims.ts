@@ -15,6 +15,10 @@ export function isNum(num: any): boolean {
   return typeof num === 'number' && !isNaN(num);
 }
 
+export function isNotNum(num: any) {
+  return !isNum(num);
+}
+
 export function int(a: string): number {
   return parseInt(a, 10);
 }

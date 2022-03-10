@@ -12,17 +12,17 @@ function getHanldeClassName(type: string, selected: boolean) {
 }
 class Handle extends Component<HandlePropsInner> {
   static contextType = InstanceInterface;
-
+  context!: InterfaceValue;
   onMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
     const { type, handleId, nodeId } = this.props;
-    (this.context as InterfaceValue).handle.onMouseDown(e, type, nodeId, handleId);
+    this.context.handle.onMouseDown(e, type, nodeId, handleId);
   };
 
   onMouseUp = (e: React.MouseEvent) => {
     const { type, handleId, nodeId } = this.props;
     e.stopPropagation();
-    (this.context as InterfaceValue).handle.onMouseUp(e, type, nodeId, handleId);
+    this.context.handle.onMouseUp(e, type, nodeId, handleId);
   };
 
   applyMouseActions = () => {

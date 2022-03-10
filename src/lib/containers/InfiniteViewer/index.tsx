@@ -10,23 +10,25 @@ import ResizeObserver from 'resize-observer-polyfill';
 import { CoordinateCalc } from '@app/components/Dragger';
 import SelectArea from '@app/components/SelectArea';
 import styles from './index.module.scss';
-import { getCSSVar, captureTrue, commonDragOpt } from './utils';
+import { getCSSVar, captureTrue, commonDragOpt, defaultRect } from './utils';
 
 class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState> {
   private observer: ResizeObserver | undefined;
   private dragger = new CoordinateCalc();
   private ref = createRef<HTMLDivElement>();
   private container = createRef<HTMLDivElement>();
-
+  private containerRect = defaultRect;
+  // the global mouse up event also fires the click, flag it when mouse up
   blockClick = false;
 
   state: InfiniteViewerState = {
     scale: 1,
     offset: { x: 0, y: 0 },
-    selectMode: 'select', //'single',
+    selectMode: /*  'select', // */ 'single',
     selecting: false,
     dragStart: { x: 0, y: 0 },
     dragEnd: { x: 0, y: 0 },
+    duration: 0,
   };
 
   getScale = () => {
@@ -38,9 +40,28 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     this.setState({ selectMode: mode });
   };
 
+  moveCamera = (x: number, y: number) => {
+    const { scale } = this.state;
+    let { width, height } = this.containerRect;
+    (width /= 2), (height /= 2);
+    const offsetX = width - scale * x;
+    const offsetY = height - scale * y;
+    this.setState({ offset: { x: offsetX, y: offsetY }, duration: 0.5 }, async () => {
+      await new Promise((res) =>
+      setTimeout(() => {
+          res(null);
+        }, 500),
+      );
+      this.setState({ duration: 0 });
+    });
+  };
+
   componentDidMount() {
-    this.observer = new ResizeObserver(this.onDomResize);
-    this.observer.observe(this.ref.current!);
+    this.observer = new ResizeObserver(this.onContainerResize);
+    this.observer.observe(this.container.current!);
+    // setTimeout(() => {
+    //   this.moveCamera(10, 20);
+    // }, 2000);
   }
 
   componentWillUnmount() {
@@ -55,8 +76,10 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     }
   };
 
-  private onDomResize = () => {
-    return;
+  private onContainerResize = (entries: ResizeObserverEntry[]) => {
+    const rect = entries[0].contentRect;
+    this.containerRect = rect;
+    this.props.onContainerResize?.(rect.width, rect.height);
   };
 
   private onMouseDown = (e: React.MouseEvent) => {
@@ -168,8 +191,8 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
   }
 
   render() {
-    const { scale, offset, selecting, dragEnd, dragStart } = this.state;
-    const cssvar = getCSSVar(offset, scale);
+    const { scale, offset, selecting, dragEnd, dragStart, duration } = this.state;
+    const cssvar = getCSSVar(offset, scale, duration);
     return (
       <div
         ref={this.ref}
