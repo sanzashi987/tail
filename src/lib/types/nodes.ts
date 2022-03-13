@@ -53,12 +53,14 @@ export type Nodes = NodeRendererProps['nodes'];
 export type NodeProps<T extends IObject = {}> = {
   node: Node<T>;
   selected: boolean;
+  hovered: boolean;
   selectedHandles: IObject<number>;
   updateNodeHandles(): void;
 };
 
 export interface NodeMouseInterface extends WrapperDraggerInterface {
   onNodeClick: (e: React.MouseEvent, node: Node) => void;
+  onNodeContextMenu: (e: React.MouseEvent, node: Node) => void;
 }
 
 export type WrapperDraggerInterface = DraggerCallbacksType;

@@ -10,13 +10,14 @@ import React, {
 import type { NodeWrapperProps, coordinates, NodeCom, DraggerData } from '@types';
 import { InstanceInterface } from '@app/contexts/instance';
 import { useRecoilState } from 'recoil';
+import { setHovered, setNotHovered } from '@app/atoms/reducers';
 import Dragger from './Dragger';
 import { getNodeInfo } from './utils';
 import styles from './Wrapper.module.scss';
 import { BasicNode } from '.';
 
 const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) => {
-  const [{ node, selected, selectedHandles }, setNodeInternal] = useRecoilState(atom);
+  const [{ node, selected, selectedHandles, hovered }, setNodeInternal] = useRecoilState(atom);
   const ref = useRef<HTMLDivElement>(null);
   const rootInterface = useContext(InstanceInterface)!;
   const { left: x, top: y } = node;
@@ -56,6 +57,14 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
     },
     [selected, node],
   );
+
+  const onHoverIn = useCallback((e: React.MouseEvent) => {
+    setNodeInternal(setHovered);
+  }, []);
+  const onHoverOut = useCallback((e: React.MouseEvent) => {
+    setNodeInternal(setNotHovered);
+  }, []);
+
   const updateNodeHandles = useCallback(() => {
     const [rect, handles] = getNodeInfo(ref, node);
     setNodeInternal((prev) => {
@@ -90,10 +99,13 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
         className={`tail-node__wrapper ${styles.wrapper}`}
         style={style}
         ref={ref}
+        onMouseOver={onHoverIn}
+        onMouseLeave={onHoverOut}
         onClick={onNodeSelect}
       >
         <NodeComponent
           node={node}
+          hovered={hovered}
           selected={selected}
           selectedHandles={selectedHandles}
           updateNodeHandles={updateNodeHandles}

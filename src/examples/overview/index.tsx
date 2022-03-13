@@ -62,8 +62,10 @@ function Overview() {
       onEdgeClick={noop}
       onNodeClick={noop}
       onNodeUpdate={noop}
+      onNodeContextMenu={noop}
       onEdgeCreate={onEdgeCreate}
       onEdgeUpdate={noop}
+      onEdgeContextMenu={noop}
       onDelete={noop}
       nodeTemplates={{}}
       edgeTemplates={{}}

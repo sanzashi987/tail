@@ -4,6 +4,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { computedEdgeSelector } from '@app/atoms/edges';
 import { InstanceInterface } from '@app/contexts/instance';
 import { isNum } from '@app/utils';
+import { setHovered, setNotHovered } from '@app/atoms/reducers';
 
 const getMarkerId = (markerId?: string) => {
   if (typeof markerId === 'string') return `url(#${markerId})`;
@@ -30,11 +31,18 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({
   );
 
   const onHoverIn = useCallback((e: React.MouseEvent) => {
-    setEdge((prev) => ({ ...prev, hovered: true }));
+    setEdge(setHovered);
   }, []);
   const onHoverOut = useCallback((e: React.MouseEvent) => {
-    setEdge((prev) => ({ ...prev, hovered: false }));
+    setEdge(setNotHovered);
   }, []);
+
+  const onContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      rootInterface.edge.onEdgeContextMenu(e, edge);
+    },
+    [edge],
+  );
 
   const { markerEnd, markerStart } = edge;
   const markerStartUrl = useMemo(() => getMarkerId(markerStart), [markerStart]);
@@ -70,6 +78,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({
         onClick={onClick}
         onMouseOver={onHoverIn}
         onMouseLeave={onHoverOut}
+        onContextMenu={onContextMenu}
       >
         <ShadowEdge sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY={targetY} />
       </g>

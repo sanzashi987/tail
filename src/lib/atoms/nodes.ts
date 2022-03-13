@@ -13,6 +13,7 @@ export function createNodeAtom<T>(node: Node<T>) {
     key: `${node.id}__node`,
     default: {
       node,
+      hovered: false,
       selected: false,
       selectedHandles: {},
       handles: {
@@ -24,3 +25,4 @@ export function createNodeAtom<T>(node: Node<T>) {
     },
   });
 }
+
