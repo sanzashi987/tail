@@ -3,8 +3,8 @@ import { coordinates } from '@app/types';
 export function getCSSVar({ x, y }: coordinates, scale: number, duration: number) {
   const bg = 96 * scale,
     bgs = 24 * scale,
-    posX = (1 + x) % 96,
-    posY = (1 + y) % 96;
+    posX = x,
+    posY = y;
   const cssvar: any = {
     '--x': `${x}px`,
     '--y': `${y}px`,

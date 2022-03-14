@@ -49,7 +49,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
     },
     [node],
   );
-  const onNodeSelect = useCallback(
+  const onNodeClick = useCallback(
     (e: React.MouseEvent) => {
       // e.stopPropagation();
       rootInterface.activateItem(e, 'node', node.id, selected);
@@ -64,6 +64,13 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   const onHoverOut = useCallback((e: React.MouseEvent) => {
     setNodeInternal(setNotHovered);
   }, []);
+
+  const onContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      rootInterface.node.onNodeContextMenu(e, node);
+    },
+    [node],
+  );
 
   const updateNodeHandles = useCallback(() => {
     const [rect, handles] = getNodeInfo(ref, node);
@@ -101,7 +108,8 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
         ref={ref}
         onMouseOver={onHoverIn}
         onMouseLeave={onHoverOut}
-        onClick={onNodeSelect}
+        onClick={onNodeClick}
+        onContextMenu={onContextMenu}
       >
         <NodeComponent
           node={node}
