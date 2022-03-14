@@ -169,7 +169,7 @@ export function validateExistEdge(edgeBasic: EdgeBasic, edgeTree: EdgeTree) {
 }
 
 class EdgeConnects {
-  dragger = new CoordinateCalc();
+  private dragger = new CoordinateCalc();
   constructor(private core: TailCore, private itemActives: ItemActives) {}
   onHandleMouseDown: ConnectMethodType = (e, type, nodeId, handleId) => {
     //only edge active will try reconnect

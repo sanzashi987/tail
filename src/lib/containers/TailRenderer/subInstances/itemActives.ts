@@ -111,14 +111,19 @@ class ItemActives {
     this.batchDeactivate('edge');
   };
 
-  batchDeactivate(type: SelectedItemType) {
+  private batchDeactivate(type: SelectedItemType) {
     const pool = this.core.activeItems[type];
     Object.keys(pool).forEach((key) => {
       this.switchActive(type, key, false, pool);
     });
   }
 
-  switchActive(type: SelectedItemType, id: string, active: boolean, activePool: IObject<string>) {
+  switchActive = (
+    type: SelectedItemType,
+    id: string,
+    active: boolean,
+    activePool: IObject<string>,
+  ) => {
     active ? (activePool[id] = id) : delete activePool[id];
     const _this = this.core;
     const atom = _this.getAtom(type, id);
@@ -132,7 +137,7 @@ class ItemActives {
     const pool = _this.getNodeAtoms();
     setSelectedHandle(sourceNode, source, pool, cb, set);
     setSelectedHandle(targetNode, target, pool, cb, set);
-  }
+  };
 
   batchActivateNodes: SelectCallback = (topleft, bottomRight, offset, scale) => {
     const pool = this.core.activeItems['node'];

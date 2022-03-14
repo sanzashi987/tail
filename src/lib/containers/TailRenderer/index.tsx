@@ -70,19 +70,12 @@ class TailCore extends Component<TailCoreProps> {
     };
   }
 
-  deactiveAll = () => {
-    this.ItemActives.deactivateLast();
-  };
-
   render() {
     const { nodes, edges, nodeTemplates, nodeTemplatePicker } = this.props;
     const { set } = this.context;
+    const { deactivateLast, batchActivateNodes } = this.ItemActives;
     return (
-      <InfiniteViewer
-        ref={this.viewer}
-        onClick={this.deactiveAll}
-        onSelectEnd={this.ItemActives.batchActivateNodes}
-      >
+      <InfiniteViewer ref={this.viewer} onClick={deactivateLast} onSelectEnd={batchActivateNodes}>
         <InterfaceProvider value={this.contextInterface}>
           <NodeRenderer
             templates={nodeTemplates}
@@ -116,14 +109,14 @@ class TailCore extends Component<TailCoreProps> {
   getAtom = <T extends EdgeAtom | NodeAtom>(type: SelectedItemType, id: string) => {
     const pool =
       type === 'edge' ? this.edgeRef.current!.edgeAtoms : this.nodeRef.current!.nodeAtoms;
-    return getAtom(id, (pool as unknown) as IObject<RecoilState<T>>);
+    return getAtom(id, pool as unknown as IObject<RecoilState<T>>);
   };
 
   getAtomState = <T,>(type: SelectedItemType, id: string) =>
-    this.context.get((this.getAtom(type, id) as unknown) as RecoilState<T>);
+    this.context.get(this.getAtom(type, id) as unknown as RecoilState<T>);
 
   setAtomState = <T,>(type: SelectedItemType, id: string, updater: T | ((cur: T) => T)) =>
-    this.context.set((this.getAtom(type, id) as unknown) as RecoilState<T>, updater);
+    this.context.set(this.getAtom(type, id) as unknown as RecoilState<T>, updater);
 
   getEdgeAtoms = () => this.edgeRef.current?.edgeAtoms ?? {};
 

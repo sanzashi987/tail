@@ -18,8 +18,9 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
   private ref = createRef<HTMLDivElement>();
   private container = createRef<HTMLDivElement>();
   private containerRect = defaultRect;
+  private offsetSnapshot: coordinates = { x: 0, y: 0 };
   // the global mouse up event also fires the click, flag it when mouse up
-  blockClick = false;
+  private blockClick = false;
 
   state: InfiniteViewerState = {
     scale: 1,
@@ -48,7 +49,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     const offsetY = height - scale * y;
     this.setState({ offset: { x: offsetX, y: offsetY }, duration: 0.5 }, async () => {
       await new Promise((res) =>
-      setTimeout(() => {
+        setTimeout(() => {
           res(null);
         }, 500),
       );
@@ -59,13 +60,14 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
   componentDidMount() {
     this.observer = new ResizeObserver(this.onContainerResize);
     this.observer.observe(this.container.current!);
-    // setTimeout(() => {
-    //   this.moveCamera(10, 20);
-    // }, 2000);
   }
 
   componentWillUnmount() {
     this.observer?.disconnect();
+  }
+
+  private isSelfEvent(event: React.UIEvent) {
+    return Array.from(this.container.current?.children ?? []).includes(event.target as any);
   }
 
   private onWheeling = (e: React.WheelEvent) => {
@@ -100,7 +102,6 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     });
   }
 
-  private offsetSnapshot: coordinates = { x: 0, y: 0 };
   private onSelecting = ({ clientX, clientY }: MouseEvent) => {
     const payload: Partial<InfiniteViewerState> = {};
     const { offset, selecting, dragStart, scale } = this.state;
@@ -156,7 +157,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
       this.blockClick = false;
       return;
     }
-    if (Array.from(this.container.current?.children ?? []).includes(e.target as any)) {
+    if (this.isSelfEvent(e)) {
       e.stopPropagation();
       this.props.onClick?.(e);
     }
@@ -190,6 +191,11 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     this.setState({ offset: { x: x + deltaX, y: y + deltaY } });
   }
 
+  private onDrop = (e: React.DragEvent) => {
+    const { offset, scale } = this.state;
+    this.props.onDrop?.(e, offset, scale);
+  };
+
   render() {
     const { scale, offset, selecting, dragEnd, dragStart, duration } = this.state;
     const cssvar = getCSSVar(offset, scale, duration);
@@ -200,6 +206,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
         onWheel={this.onWheeling}
         onMouseDown={this.onMouseDown}
         onClick={this.onClick}
+        onDrop={this.onDrop}
         style={cssvar}
       >
         <div ref={this.container} className="scroller">

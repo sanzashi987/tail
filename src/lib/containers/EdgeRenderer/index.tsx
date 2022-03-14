@@ -1,22 +1,12 @@
-import React, { Component, ReactNode, createRef } from 'react';
-import type {
-  EdgeRendererProps,
-  EdgeAtomsType,
-  EdgeAtom,
-  EdgeTree,
-  Edge,
-  RecoilNexusInterface,
-} from '@types';
-import { EdgeInProgress, BasicEdge, EdgeWrapper } from '@app/components/Edge';
+import React, { Component, ReactNode } from 'react';
+import type { EdgeRendererProps, EdgeAtomsType, EdgeTree, Edge } from '@types';
+import { EdgeInProgress, BasicEdge, EdgeWrapper, BasicShadow } from '@app/components/Edge';
 import { createEdgeAtom } from '@app/atoms/edges';
 import { diff } from '@app/utils';
 import styles from './index.module.scss';
 import { registerChild, removeChild, defaultProps } from './utils';
 
 type Edges = EdgeRendererProps['edges'];
-
-// type EdgeRendererPropsWithDefaults = EdgeRendererProps & typeof defaultProps;
-
 class EdgeRenderer extends Component<EdgeRendererProps> {
   static defaultProps = defaultProps;
 
@@ -65,7 +55,7 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
     this.edgeAtoms[id] = createEdgeAtom(edge);
     registerChild(this.edgeTree, edge);
     const EdgeComponent = this.props.templates[type]?.default ?? BasicEdge;
-    const ShadowComponent = this.props.templates[type]?.shadow ?? BasicEdge;
+    const ShadowComponent = this.props.templates[type]?.shadow ?? BasicShadow;
     const NodeAtoms = this.props.getNodeAtoms();
     this.edgeInstances[id] = (
       <EdgeWrapper
