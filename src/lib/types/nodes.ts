@@ -58,21 +58,15 @@ export type NodeProps<T extends IObject = {}> = {
   updateNodeHandles(): void;
 };
 
-export interface NodeMouseInterface extends WrapperDraggerInterface {
+export interface NodeMouseInterface extends DraggerCallbacksType {
   onNodeClick?: (e: React.MouseEvent, node: Node) => void;
   onNodeContextMenu?: (e: React.MouseEvent, node: Node) => void;
 }
 
-export type WrapperDraggerInterface = DraggerCallbacksType;
-
-export type TailNodeDraggerCallback = (
-  e: MouseEventCollection,
-  n: Node,
-  c: DraggerData,
-) => boolean | void;
-
 export type DraggerCallbacksType = {
-  [key in keyof DraggerInterface]?: TailNodeDraggerCallback;
+  onDragStart?: (e: React.MouseEvent, n: Node, c: DraggerData) => boolean | void;
+  onDrag?: (e: MouseEvent, n: Node, c: DraggerData) => boolean | void;
+  onDragEnd?: (e: MouseEvent, n: Node, c: DraggerData) => boolean | void;
 };
 
 export type NodeAtomRaw<T extends IObject = {}> = Omit<NodeProps<T>, 'updateNodeHandles'> & {

@@ -45,14 +45,13 @@ class TailCore extends Component<TailCoreProps> {
 
   constructor(props: TailCoreProps) {
     super(props);
-    const { onEdgeClick, onDragStart, onNodeClick, onEdgeContextMenu, onNodeContextMenu } = props;
+    const { onEdgeClick, onNodeClick, onEdgeContextMenu, onNodeContextMenu } = props;
 
-    // TODO DI
     this.NodeMoves = new NodeMoves(this);
     this.ItemActives = new ItemActives(this);
     this.EdgeConnects = new EdgeConnects(this, this.ItemActives);
 
-    const { batchNodeDrag, batchNodeDragEnd } = this.NodeMoves;
+    const { batchNodeDrag, batchNodeDragEnd, onDragStart } = this.NodeMoves;
     const { onHandleMouseUp, onHandleMouseDown } = this.EdgeConnects;
 
     // context methods are not responsive

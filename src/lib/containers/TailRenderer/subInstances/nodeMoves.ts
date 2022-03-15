@@ -1,4 +1,4 @@
-import type { MouseEventCollection, Node, DraggerData, NodeAtom } from '@types';
+import type { Node, DraggerData, NodeAtom } from '@types';
 import TailCore from '..';
 import { createNodeDeltaMove } from '../mutation';
 
@@ -6,7 +6,11 @@ class NodeMoves {
   constructor(private core: TailCore) {}
   node: IObject<string> = {};
 
-  batchNodeDrag = (e: MouseEventCollection, n: Node, d: DraggerData) => {
+  onDragStart = (e: React.MouseEvent, n: Node, c: DraggerData) => {
+    return this.core.props.onDragStart?.(e, n, c);
+  };
+
+  batchNodeDrag = (e: MouseEvent, n: Node, d: DraggerData) => {
     if (!this.core.activeItems.node[n.id]) {
       this.node = { [n.id]: n.id };
     } else {
@@ -23,12 +27,12 @@ class NodeMoves {
     this.core.props.onDrag?.(e, n, d);
   };
 
-  batchNodeDragEnd = (e: MouseEventCollection, n: Node, d: DraggerData) => {
+  batchNodeDragEnd = (e: MouseEvent, n: Node, d: DraggerData) => {
     this.batchEmitUpdate(e, n, d);
     this.core.props.onDragEnd?.(e, n, d);
   };
 
-  private batchEmitUpdate = (e: MouseEventCollection, n: Node, d: DraggerData) => {
+  private batchEmitUpdate = (e: MouseEvent, n: Node, d: DraggerData) => {
     const updater = createNodeDeltaMove(d.deltaX, d.deltaY);
     const updatePayload: Node[] = [];
     Object.keys(this.node).forEach((e: string) => {

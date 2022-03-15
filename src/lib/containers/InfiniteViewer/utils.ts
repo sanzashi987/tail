@@ -1,6 +1,7 @@
-import { coordinates } from '@app/types';
+import { defaultVal } from '@app/contexts/viewer';
+import { coordinates, ViewerContextType } from '@app/types';
 
-export function getCSSVar({ x, y }: coordinates, scale: number, duration: number) {
+export function getCSSVar({ x, y }: coordinates, scale: number) {
   const bg = 96 * scale,
     bgs = 24 * scale,
     posX = x,
@@ -11,7 +12,6 @@ export function getCSSVar({ x, y }: coordinates, scale: number, duration: number
     '--scale': scale,
     '--bgsize': `${bg}px ${bg}px, ${bg}px ${bg}px, ${bgs}px ${bgs}px, ${bgs}px ${bgs}px`,
     '--bgpos': `${posX}px ${posY}px, ${posX}px ${posY}px, ${posX}px ${posY}px, ${posX}px ${posY}px`,
-    '--duration': `${duration}s`,
   };
   return cssvar;
 }
@@ -44,3 +44,12 @@ export const defaultRect: DOMRectReadOnly = {
   toJSON: () => NaN,
 };
 // export function findInsideNodes() {}
+
+export function getViewerContext(
+  offset: coordinates,
+  scale: number,
+  viewerHeight: number,
+  viewerWidth: number,
+) {
+  return { offset, scale, viewerHeight, viewerWidth };
+}

@@ -29,7 +29,6 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     selecting: false,
     dragStart: { x: 0, y: 0 },
     dragEnd: { x: 0, y: 0 },
-    duration: 0,
   };
 
   getScale = () => {
@@ -47,14 +46,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     (width /= 2), (height /= 2);
     const offsetX = width - scale * x;
     const offsetY = height - scale * y;
-    this.setState({ offset: { x: offsetX, y: offsetY }, duration: 0.5 }, async () => {
-      await new Promise((res) =>
-        setTimeout(() => {
-          res(null);
-        }, 500),
-      );
-      this.setState({ duration: 0 });
-    });
+    this.setState({ offset: { x: offsetX, y: offsetY } });
   };
 
   componentDidMount() {
@@ -197,8 +189,8 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
   };
 
   render() {
-    const { scale, offset, selecting, dragEnd, dragStart, duration } = this.state;
-    const cssvar = getCSSVar(offset, scale, duration);
+    const { scale, offset, selecting, dragEnd, dragStart } = this.state;
+    const cssvar = getCSSVar(offset, scale);
     return (
       <div
         ref={this.ref}

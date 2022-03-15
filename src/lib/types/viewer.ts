@@ -10,7 +10,6 @@ export type InfiniteViewerState = {
   selecting: boolean;
   dragStart: coordinates;
   dragEnd: coordinates;
-  duration: number;
 };
 
 export type SelectCallback = (
@@ -38,4 +37,11 @@ export type SelectAreaProps = {
   dragEnd: coordinates;
   offset: coordinates;
   offsetSnap: coordinates;
+};
+
+export type ViewerContextType = {
+  offset: coordinates;
+  viewerHeight: number;
+  viewerWidth: number;
+  scale: number;
 };

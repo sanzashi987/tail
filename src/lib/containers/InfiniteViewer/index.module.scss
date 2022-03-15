@@ -21,6 +21,6 @@ $grid-border-colour: rgba(#333, 0.125);
     width: 100%;
     height: 100%;
     transform: translate(var(--x), var(--y)) scale(var(--scale));
-    transition: transform var(--duration) ease;
+    // transition: transform var(--duration) ease;
   }
 }
