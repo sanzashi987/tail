@@ -42,8 +42,8 @@ export type EdgePropsFromWrapper = {
 };
 
 export interface EdgeMouseInterface {
-  onEdgeClick: (e: React.MouseEvent, edge: Edge) => void;
-  onEdgeContextMenu: (e: React.MouseEvent, edge: Edge) => void;
+  onEdgeClick?: (e: React.MouseEvent, edge: Edge) => void;
+  onEdgeContextMenu?: (e: React.MouseEvent, edge: Edge) => void;
 }
 
 export type EdgeAtom<T extends IObject = {}> = EdgeAtomRaw<T> & AtomForceRender;

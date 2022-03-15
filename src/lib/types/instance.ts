@@ -9,24 +9,24 @@ import type {
   EdgeTemplatesType,
   NodeTemplatesType,
   MarkerTemplatesType,
-  EdgeAtom,
-  NodeAtom,
+  ViewerInterface,
   HandleType,
   TemplatePickerType,
 } from '.';
 
 export type TailCoreOptionalProps = {
-  nodeTemplates: NodeTemplatesType;
-  edgeTemplates: EdgeTemplatesType;
-  markerTemplates: MarkerTemplatesType;
-  nodeTemplatePicker: TemplatePickerType;
-  dropThreshold: number;
-  quickNodeUpdate: boolean;
-  onDelete(nodes: string[], edges: string[]): void; //come with id array
+  nodeTemplates?: NodeTemplatesType;
+  edgeTemplates?: EdgeTemplatesType;
+  markerTemplates?: MarkerTemplatesType;
+  nodeTemplatePicker?: TemplatePickerType;
+  dropThreshold?: number;
+  quickNodeUpdate?: boolean;
+  onDelete?(nodes: string[], edges: string[]): void; //come with id array
 } & NodeMutation &
   EdgeMutation &
   NodeMouseInterface &
-  EdgeMouseInterface;
+  EdgeMouseInterface &
+  ViewerInterface;
 
 export type TailCoreProps = {
   nodes: IObject<Node>;
@@ -37,13 +37,13 @@ export type TailCoreProps = {
 
 export interface NodeMutation {
   // onNodeCreate(): void;
-  onNodeUpdate(id: Node[]): void;
+  onNodeUpdate?(id: Node[]): void;
   // onNodeDelete(): void;
 }
 
 export interface EdgeMutation {
-  onEdgeCreate(edgeBasic: EdgeBasic): void;
-  onEdgeUpdate(id: string, edgeBasic: EdgeBasic): void;
+  onEdgeCreate?(edgeBasic: EdgeBasic): void;
+  onEdgeUpdate?(id: string, edgeBasic: EdgeBasic): void;
   // onEdgeDelete(): void;
 }
 

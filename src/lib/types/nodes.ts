@@ -59,8 +59,8 @@ export type NodeProps<T extends IObject = {}> = {
 };
 
 export interface NodeMouseInterface extends WrapperDraggerInterface {
-  onNodeClick: (e: React.MouseEvent, node: Node) => void;
-  onNodeContextMenu: (e: React.MouseEvent, node: Node) => void;
+  onNodeClick?: (e: React.MouseEvent, node: Node) => void;
+  onNodeContextMenu?: (e: React.MouseEvent, node: Node) => void;
 }
 
 export type WrapperDraggerInterface = DraggerCallbacksType;

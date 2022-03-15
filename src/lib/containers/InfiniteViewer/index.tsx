@@ -193,7 +193,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
 
   private onDrop = (e: React.DragEvent) => {
     const { offset, scale } = this.state;
-    this.props.onDrop?.(e, offset, scale);
+    this.props.onViewerDrop?.(e, offset, scale);
   };
 
   render() {

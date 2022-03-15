@@ -34,7 +34,7 @@ class NodeMoves {
     Object.keys(this.node).forEach((e: string) => {
       updatePayload.push(updater(this.core.getAtomState<NodeAtom>('node', e)).node);
     });
-    this.core.props.onNodeUpdate(updatePayload);
+    this.core.props.onNodeUpdate?.(updatePayload);
   };
 }
 

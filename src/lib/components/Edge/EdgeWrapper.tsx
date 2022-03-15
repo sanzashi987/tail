@@ -25,7 +25,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({
   const onClick = useCallback(
     (e: React.MouseEvent) => {
       rootInterface.activateItem(e, 'edge', edge.id, selected);
-      rootInterface.edge.onEdgeClick(e, edge);
+      rootInterface.edge.onEdgeClick?.(e, edge);
     },
     [selected, edge],
   );
@@ -39,7 +39,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({
 
   const onContextMenu = useCallback(
     (e: React.MouseEvent) => {
-      rootInterface.edge.onEdgeContextMenu(e, edge);
+      rootInterface.edge.onEdgeContextMenu?.(e, edge);
     },
     [edge],
   );

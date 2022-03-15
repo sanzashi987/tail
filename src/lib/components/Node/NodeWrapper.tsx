@@ -53,7 +53,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
     (e: React.MouseEvent) => {
       // e.stopPropagation();
       rootInterface.activateItem(e, 'node', node.id, selected);
-      rootInterface.node.onNodeClick(e, node);
+      rootInterface.node.onNodeClick?.(e, node);
     },
     [selected, node],
   );
@@ -67,7 +67,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
 
   const onContextMenu = useCallback(
     (e: React.MouseEvent) => {
-      rootInterface.node.onNodeContextMenu(e, node);
+      rootInterface.node.onNodeContextMenu?.(e, node);
     },
     [node],
   );

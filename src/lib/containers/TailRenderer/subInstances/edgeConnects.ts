@@ -231,11 +231,11 @@ class EdgeConnects {
           prevEdgeId,
         ).edge;
         if (prevHandleId !== handleId || prevNodeId !== nodeId) {
-          this.core.props.onEdgeUpdate(prevEdgeId, newPayload);
+          this.core.props.onEdgeUpdate?.(prevEdgeId, newPayload);
           this.core.setAtomState('edge', prevEdgeId, disableEdgeReconnect);
         }
       } else if (!validateExistEdge(newPayload, this.core.edgeRef.current!.edgeTree)) {
-        this.core.props.onEdgeCreate(newPayload);
+        this.core.props.onEdgeCreate?.(newPayload);
       }
     }
     this.connectReset();
@@ -250,7 +250,7 @@ class EdgeConnects {
         edge: { [typeNode]: originNode, [type]: originHandle },
       } = GET<EdgeAtom>('edge', prevEdgeId);
       const { x: X, y: Y } = GET<NodeAtom>('node', originNode).handles[type][originHandle];
-      const threshold = this.core.props.dropThreshold;
+      const threshold = this.core.props.dropThreshold!;
       if (Math.abs(x - X) < threshold && Math.abs(y - Y) < threshold) {
         SET<EdgeAtom>('edge', prevEdgeId, disableEdgeReconnect);
       } else {

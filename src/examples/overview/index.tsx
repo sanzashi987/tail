@@ -71,8 +71,6 @@ function Overview() {
       edgeTemplates={{}}
       markerTemplates={{}}
       nodeTemplatePicker={templatePicker}
-      dropThreshold={40}
-      quickNodeUpdate={true}
     />
   );
 }

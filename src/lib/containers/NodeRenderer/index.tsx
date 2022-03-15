@@ -3,11 +3,11 @@ import type { Nodes, Node, NodeRendererProps, NodeAtomsType } from '@types';
 import { createNodeAtom } from '@app/atoms/nodes';
 import { NodeWrapper } from '@app/components/Node';
 import { diff } from '@app/utils';
-import { createMemoTemplates } from './utils';
+import { createMemoTemplates, defaultProps } from './utils';
 
 class NodeRenderer extends Component<NodeRendererProps> {
   // memoTemplates: ReturnType<typeof createMemoTemplates>;
-
+  static defaultProps = defaultProps;
   nodeAtoms: NodeAtomsType = {};
   nodeInstances: IObject<ReactNode> = {};
   memoNodes: ReactNode;

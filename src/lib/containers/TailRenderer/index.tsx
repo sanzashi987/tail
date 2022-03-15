@@ -25,6 +25,10 @@ import '@app/styles/index.scss';
 const emptyActives = { node: {}, edge: {} };
 
 class TailCore extends Component<TailCoreProps> {
+  static defaultProps = {
+    dropThreshold: 40,
+    quickNodeUpdate: true,
+  };
   static contextType = StoreContext;
   context!: StoreRootInterface;
   state = { nodesReady: false };
@@ -71,11 +75,16 @@ class TailCore extends Component<TailCoreProps> {
   }
 
   render() {
-    const { nodes, edges, nodeTemplates, nodeTemplatePicker } = this.props;
+    const { nodes, edges, nodeTemplates, nodeTemplatePicker, onViewerDrop } = this.props;
     const { set } = this.context;
     const { deactivateLast, batchActivateNodes } = this.ItemActives;
     return (
-      <InfiniteViewer ref={this.viewer} onClick={deactivateLast} onSelectEnd={batchActivateNodes}>
+      <InfiniteViewer
+        ref={this.viewer}
+        onClick={deactivateLast}
+        onSelectEnd={batchActivateNodes}
+        onViewerDrop={onViewerDrop}
+      >
         <InterfaceProvider value={this.contextInterface}>
           <NodeRenderer
             templates={nodeTemplates}
@@ -103,7 +112,7 @@ class TailCore extends Component<TailCoreProps> {
 
   deleteItem(payload: DeletePayload) {
     const { nodes, edges } = findDeletedItem(this.edgeRef.current!.edgeTree, payload);
-    this.props.onDelete(nodes, edges);
+    this.props.onDelete?.(nodes, edges);
   }
 
   getAtom = <T extends EdgeAtom | NodeAtom>(type: SelectedItemType, id: string) => {
