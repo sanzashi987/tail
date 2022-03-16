@@ -1,15 +1,14 @@
+import type { CSSProperties } from 'react';
 import type { RecoilState } from 'recoil';
 import { NodeAtom } from '.';
 
 export type MinimapProps = {
   height?: number;
   width?: number;
-  backgroundColor?: string;
   activeColor?: string;
   nodeColor?: string;
-  viewWidth: number;
-  viewHeight: number;
-  scale: number;
+  style?: CSSProperties;
+  viewportFrameColor?:string
 };
 
 export type MiniNodeProps = {

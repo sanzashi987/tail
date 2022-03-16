@@ -25,6 +25,7 @@ import '@app/styles/index.scss';
 const emptyActives = { node: {}, edge: {} };
 
 class TailCore extends Component<TailCoreProps> {
+  static displayName = 'TailCore';
   static defaultProps = {
     dropThreshold: 40,
     quickNodeUpdate: true,
@@ -83,6 +84,7 @@ class TailCore extends Component<TailCoreProps> {
         onClick={deactivateLast}
         onSelectEnd={batchActivateNodes}
         onViewerDrop={onViewerDrop}
+        outerChildren={this.props.children}
       >
         <InterfaceProvider value={this.contextInterface}>
           <NodeRenderer
@@ -104,7 +106,6 @@ class TailCore extends Component<TailCoreProps> {
             </EdgeRenderer>
           )}
         </InterfaceProvider>
-        {this.props.children}
       </InfiniteViewer>
     );
   }

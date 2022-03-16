@@ -10,5 +10,5 @@ export const defaultVal: ViewerContextType = {
 
 export const ViewerContext = createContext<ViewerContextType>(defaultVal);
 ViewerContext.displayName = 'ViewerContext';
-export const ViewerProvieder = ViewerContext.Provider;
+export const ViewerProvider = ViewerContext.Provider;
 export const ViewerConsumer = ViewerContext.Consumer;

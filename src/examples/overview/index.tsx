@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Tail } from '@app/index';
+import { MiniMap, Tail } from '@app/index';
 import { DraggerData, Edge, EdgeBasic, Node } from '@app/types';
 
 const nodes: IObject<Node> = {
@@ -71,7 +71,9 @@ function Overview() {
       edgeTemplates={{}}
       markerTemplates={{}}
       nodeTemplatePicker={templatePicker}
-    />
+    >
+      <MiniMap />
+    </Tail>
   );
 }
 

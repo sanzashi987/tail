@@ -19,6 +19,7 @@ class BasicEdge extends Component<EdgeProps> {
     return (
       <path
         className="tail-edge__basic"
+        style={{transition:'all 0.2s linear'}}
         d={`M ${sourceX},${sourceY}L ${targetX},${targetY}`}
         // markerEnd={markerEnd}
         markerEnd="url(#tail-marker__basic)"

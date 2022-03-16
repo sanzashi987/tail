@@ -9,19 +9,23 @@ import {
 import ResizeObserver from 'resize-observer-polyfill';
 import { CoordinateCalc } from '@app/components/Dragger';
 import SelectArea from '@app/components/SelectArea';
+import { createMemo } from '@app/utils';
+import debounce from 'lodash.debounce';
+import { ViewerProvider } from '@app/contexts/viewer';
 import styles from './index.module.scss';
-import { getCSSVar, captureTrue, commonDragOpt, defaultRect } from './utils';
+import { getCSSVar, captureTrue, commonDragOpt, getViewerContext } from './utils';
 
 class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState> {
   private observer: ResizeObserver | undefined;
   private dragger = new CoordinateCalc();
   private ref = createRef<HTMLDivElement>();
   private container = createRef<HTMLDivElement>();
-  private containerRect = defaultRect;
   private offsetSnapshot: coordinates = { x: 0, y: 0 };
   // the global mouse up event also fires the click, flag it when mouse up
   private blockClick = false;
-
+  private onContainerResize;
+  private memoContext: typeof getViewerContext;
+  private memoCSSVar: typeof getCSSVar;
   state: InfiniteViewerState = {
     scale: 1,
     offset: { x: 0, y: 0 },
@@ -29,7 +33,21 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     selecting: false,
     dragStart: { x: 0, y: 0 },
     dragEnd: { x: 0, y: 0 },
+    viewerHeight: NaN,
+    viewerWidth: NaN,
   };
+
+  constructor(props: InfiniteViewerProps) {
+    super(props);
+    this.memoContext = createMemo(getViewerContext);
+    this.memoCSSVar = createMemo(getCSSVar);
+    const onContainerResize = (entries: ResizeObserverEntry[]) => {
+      const { width, height } = entries[0].contentRect;
+      this.props.onContainerResize?.(width, height);
+      this.setState({ viewerHeight: height, viewerWidth: width });
+    };
+    this.onContainerResize = debounce(onContainerResize, 200);
+  }
 
   getScale = () => {
     return this.state.scale;
@@ -42,10 +60,10 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
 
   moveCamera = (x: number, y: number) => {
     const { scale } = this.state;
-    let { width, height } = this.containerRect;
-    (width /= 2), (height /= 2);
-    const offsetX = width - scale * x;
-    const offsetY = height - scale * y;
+    let { viewerWidth, viewerHeight } = this.state;
+    (viewerWidth /= 2), (viewerHeight /= 2);
+    const offsetX = viewerWidth - scale * x;
+    const offsetY = viewerHeight - scale * y;
     this.setState({ offset: { x: offsetX, y: offsetY } });
   };
 
@@ -68,12 +86,6 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     } else if (this.state.selectMode === 'select') {
       this.scrolling(e);
     }
-  };
-
-  private onContainerResize = (entries: ResizeObserverEntry[]) => {
-    const rect = entries[0].contentRect;
-    this.containerRect = rect;
-    this.props.onContainerResize?.(rect.width, rect.height);
   };
 
   private onMouseDown = (e: React.MouseEvent) => {
@@ -189,8 +201,9 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
   };
 
   render() {
-    const { scale, offset, selecting, dragEnd, dragStart } = this.state;
-    const cssvar = getCSSVar(offset, scale);
+    const { scale, offset, selecting, dragEnd, dragStart, viewerHeight, viewerWidth } = this.state;
+    const cssvar = this.memoCSSVar(offset, scale);
+    const contextVal = this.memoContext(offset, scale, viewerHeight, viewerWidth);
     return (
       <div
         ref={this.ref}
@@ -201,9 +214,12 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
         onDrop={this.onDrop}
         style={cssvar}
       >
-        <div ref={this.container} className="scroller">
-          {this.props.children}
-        </div>
+        <ViewerProvider value={contextVal}>
+          <div ref={this.container} className="scroller">
+            {this.props.children}
+          </div>
+          {this.props.outerChildren}
+        </ViewerProvider>
         {selecting && (
           <SelectArea
             dragEnd={dragEnd}

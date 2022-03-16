@@ -10,6 +10,8 @@ export type InfiniteViewerState = {
   selecting: boolean;
   dragStart: coordinates;
   dragEnd: coordinates;
+  viewerHeight: number;
+  viewerWidth: number;
 };
 
 export type SelectCallback = (
@@ -26,6 +28,7 @@ export type InfiniteViewerProps = {
   onSelecting?: SelectCallback;
   onSelectEnd?: SelectCallback;
   onContainerResize?(width: number, height: number): void;
+  outerChildren?: React.ReactNode;
 } & ViewerInterface;
 
 export type ViewerInterface = {

@@ -7,4 +7,6 @@ const Tail: FC<TailCoreProps> = (props) => {
   return h(StoreRoot, {}, [h(TailCore, { ...props, key: 'TailCore' })]);
 };
 
+export { default as MiniMap } from './components/MiniMap';
+
 export { Tail };
