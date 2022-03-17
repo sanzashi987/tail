@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-export const useArrayKeysObject = <T extends {} = {}>(arr: T[], key: keyof T) => {
+export const useArrayKeysObject = <T extends {} = {}>(arr: T[], key: keyof T) => { //eslint-disable-line
   const object = useMemo(() => {
     const res: IObject<T> = {};
     arr.forEach((item) => {
@@ -12,3 +12,7 @@ export const useArrayKeysObject = <T extends {} = {}>(arr: T[], key: keyof T) =>
 };
 
 // export const useObjectValuesArray = <T extends {} = {}>(obj: IObject<T>) => {};
+
+export function noop() {
+  return;
+}

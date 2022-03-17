@@ -15,6 +15,12 @@ const nodes: IObject<Node> = {
     top: 200,
     type: 'logical',
   },
+  id3: {
+    id: 'id3',
+    left: 1510,
+    top: 850,
+    type: 'logical',
+  },
 };
 
 const edges: IObject<Edge> = {

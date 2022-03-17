@@ -1,6 +1,12 @@
 import React, { Component, ReactNode } from 'react';
 import type { EdgeRendererProps, EdgeAtomsType, EdgeTree, Edge } from '@types';
-import { EdgeInProgress, BasicEdge, EdgeWrapper, BasicShadow } from '@app/components/Edge';
+import {
+  EdgeInProgress,
+  BasicEdge,
+  EdgeWrapper,
+  BasicShadow,
+  BezierEdge,
+} from '@app/components/Edge';
 import { createEdgeAtom } from '@app/atoms/edges';
 import { diff } from '@app/utils';
 import styles from './index.module.scss';
@@ -54,7 +60,7 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
     const { type = '', id } = edge;
     this.edgeAtoms[id] = createEdgeAtom(edge);
     registerChild(this.edgeTree, edge);
-    const EdgeComponent = this.props.templates[type]?.default ?? BasicEdge;
+    const EdgeComponent = this.props.templates[type]?.default ?? BezierEdge; //BasicEdge;
     const ShadowComponent = this.props.templates[type]?.shadow ?? BasicShadow;
     const NodeAtoms = this.props.getNodeAtoms();
     this.edgeInstances[id] = (

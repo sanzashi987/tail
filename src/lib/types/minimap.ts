@@ -7,8 +7,9 @@ export type MinimapProps = {
   width?: number;
   activeColor?: string;
   nodeColor?: string;
+  padding?: number;
   style?: CSSProperties;
-  viewportFrameColor?:string
+  viewportFrameColor?: string;
 };
 
 export type MiniNodeProps = {

@@ -1,11 +1,13 @@
 import { createContext } from 'react';
 import type { ViewerContextType } from '@types';
+import { noop } from '@app/utils/converter';
 
 export const defaultVal: ViewerContextType = {
   offset: { x: NaN, y: NaN },
   viewerHeight: NaN,
   viewerWidth: NaN,
   scale: NaN,
+  setOffset: noop,
 };
 
 export const ViewerContext = createContext<ViewerContextType>(defaultVal);

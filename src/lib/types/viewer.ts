@@ -1,5 +1,5 @@
 import React from 'react';
-import type { coordinates } from '.';
+import type { coordinates, UpdaterType } from '.';
 
 export type SelectModeType = 'single' | 'select';
 
@@ -47,4 +47,5 @@ export type ViewerContextType = {
   viewerHeight: number;
   viewerWidth: number;
   scale: number;
+  setOffset: (offset: UpdaterType<coordinates>) => void;
 };

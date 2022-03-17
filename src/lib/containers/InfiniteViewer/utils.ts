@@ -1,5 +1,5 @@
 // import { defaultVal } from '@app/contexts/viewer';
-import { coordinates } from '@app/types';
+import { coordinates, UpdaterType } from '@app/types';
 
 export function getCSSVar({ x, y }: coordinates, scale: number) {
   const bg = 96 * scale,
@@ -50,6 +50,7 @@ export function getViewerContext(
   scale: number,
   viewerHeight: number,
   viewerWidth: number,
+  setOffset: (c: UpdaterType<coordinates>) => void,
 ) {
-  return { offset, scale, viewerHeight, viewerWidth };
+  return { offset, scale, viewerHeight, viewerWidth, setOffset };
 }

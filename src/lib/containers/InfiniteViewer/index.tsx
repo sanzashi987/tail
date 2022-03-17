@@ -5,6 +5,7 @@ import {
   InfiniteViewerProps,
   InfiniteViewerState,
   SelectModeType,
+  UpdaterType,
 } from '@types';
 import ResizeObserver from 'resize-observer-polyfill';
 import { CoordinateCalc } from '@app/components/Dragger';
@@ -60,11 +61,10 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
 
   moveCamera = (x: number, y: number) => {
     const { scale } = this.state;
-    let { viewerWidth, viewerHeight } = this.state;
-    (viewerWidth /= 2), (viewerHeight /= 2);
-    const offsetX = viewerWidth - scale * x;
-    const offsetY = viewerHeight - scale * y;
-    this.setState({ offset: { x: offsetX, y: offsetY } });
+    const { viewerWidth, viewerHeight } = this.state;
+    const offsetX = viewerWidth / 2 - scale * x;
+    const offsetY = viewerHeight / 2 - scale * y;
+    this.setOffset({ x: offsetX, y: offsetY });
   };
 
   componentDidMount() {
@@ -192,7 +192,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
       deltaX = deltaY;
       deltaY = 0;
     }
-    this.setState({ offset: { x: x + deltaX, y: y + deltaY } });
+    this.setOffset({ x: x + deltaX, y: y + deltaY });
   }
 
   private onDrop = (e: React.DragEvent) => {
@@ -200,10 +200,17 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     this.props.onViewerDrop?.(e, offset, scale);
   };
 
+  private setOffset = (offsetUpdater: UpdaterType<coordinates>) => {
+    this.setState((prev) => ({
+      ...prev,
+      offset: typeof offsetUpdater === 'function' ? offsetUpdater(prev.offset) : offsetUpdater,
+    }));
+  };
+
   render() {
     const { scale, offset, selecting, dragEnd, dragStart, viewerHeight, viewerWidth } = this.state;
     const cssvar = this.memoCSSVar(offset, scale);
-    const contextVal = this.memoContext(offset, scale, viewerHeight, viewerWidth);
+    const contextVal = this.memoContext(offset, scale, viewerHeight, viewerWidth, this.setOffset);
     return (
       <div
         ref={this.ref}
