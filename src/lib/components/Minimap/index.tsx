@@ -10,7 +10,6 @@ const { 'minimap-wrapper': c } = styles;
 const Minimap: FC<MinimapProps> = ({
   width = 200,
   height = 150,
-  padding = 30,
   nodeColor = '',
   activeColor = 'orange',
   viewportFrameColor = 'orange',
@@ -24,20 +23,27 @@ const Minimap: FC<MinimapProps> = ({
     setOffset,
   } = useContext(ViewerContext);
 
-  const [horizontal, setHorizontal] = useState([0]);
-  const [vertical, setVertical] = useState([0]);
+  // sorted value
+  const [sortedX, setSortedX] = useState([0]);
+  const [sortedY, setSortedY] = useState([0]);
   if (isNotNum(viewerWidth) || isNotNum(viewerHeight)) return null;
 
-  const raww = Math.max(horizontal[0] - horizontal[horizontal.length - 1], viewerWidth);
-  const rawh = Math.max(vertical[0] - vertical[vertical.length - 1], viewerHeight);
+  const [viewerX, viewerY] = [-x / scale, -y / scale];
+  const [viewerXEnd, viewerYEnd] = [viewerX + viewerWidth / scale, viewerY + viewerHeight / scale];
 
-  const maxRatio = Math.max(raww / width, rawh / height);
+  const [boundingX, boundingY] = [Math.min(viewerX, sortedX[0]), Math.min(viewerY, sortedY[0])];
+  const boundingXEnd = Math.max(viewerXEnd, sortedX[sortedX.length - 1]);
+  const boundingYEnd = Math.max(viewerYEnd, sortedY[sortedY.length - 1]);
+
+  const [boundingWidth, boundingHeight] = [boundingXEnd - boundingX, boundingYEnd - boundingY];
+  const maxRatio = Math.max(boundingWidth / width, boundingHeight / height);
+
   const offset = 5 * maxRatio;
+  let [vw, vh] = [width * maxRatio, height * maxRatio];
+  const left = boundingX - (vw - boundingWidth) / 2 - offset;
+  const top = boundingY - (vh - boundingHeight) / 2 - offset;
+  [vw, vh] = [vw + offset * 2, vh + offset * 2];
 
-  const [vw, vh] = [width * maxRatio, height * maxRatio];
-  
-
-  const [ox, oy] = [x / scale, y / scale];
   return (
     <svg
       width={width}
@@ -45,7 +51,6 @@ const Minimap: FC<MinimapProps> = ({
       className={'tail-minimap__container ' + c}
       style={style}
       viewBox={`${left} ${top} ${vw} ${vh}`}
-      onClick={(e) => console.log(e)}
     >
       <rect
         className="tail-minimap__mini-node"
@@ -68,9 +73,14 @@ const Minimap: FC<MinimapProps> = ({
         fill="none"
         strokeWidth={3 / scale}
         stroke={viewportFrameColor}
-        d={`M ${-ox},${-oy} L ${-ox},${viewerHeight / scale - oy} L ${-ox + viewerWidth / scale},${
-          viewerHeight / scale - oy
-        } L ${viewerWidth / scale - ox}, ${-oy} z `}
+        d={`
+          M${left - offset},${top - offset}h${vw + offset * 2}v${vh + offset * 2}h${
+          -vw - offset * 2
+        }z
+          M${viewerX},${viewerY}h${viewerXEnd - viewerX}v${viewerYEnd - viewerY}h${-(
+          viewerXEnd - viewerX
+        )}z
+        `}
       ></path>
     </svg>
   );

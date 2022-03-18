@@ -7,7 +7,7 @@ const wrapAnchor = (Symbol: ComponentType<AnchorProps>) => {
     color,
     width = 20,
     height = 20,
-    markerUnits = 'strokeWidth',
+    markerUnits = 'userSpaceOnUse', // 'strokeWidth',
     strokeWidth,
     orient = 'auto',
   }) => {
