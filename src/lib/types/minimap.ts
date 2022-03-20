@@ -16,4 +16,6 @@ export type MiniNodeProps = {
   atom: RecoilState<NodeAtom>;
   activeColor: string;
   nodeColor: string;
+  setSpanX:(xStart:number,xEnd:number)=>void
+  setSpanY:(yStart:number,yEnd:number)=>void
 };

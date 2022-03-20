@@ -24,16 +24,27 @@ const Minimap: FC<MinimapProps> = ({
   } = useContext(ViewerContext);
 
   // sorted value
-  const [sortedX, setSortedX] = useState([0]);
-  const [sortedY, setSortedY] = useState([0]);
+  const [sortedX, setSortedX] = useState([10, 1712]);
+  const [sortedY, setSortedY] = useState([20, 892]);
   if (isNotNum(viewerWidth) || isNotNum(viewerHeight)) return null;
 
   const [viewerX, viewerY] = [-x / scale, -y / scale];
   const [viewerXEnd, viewerYEnd] = [viewerX + viewerWidth / scale, viewerY + viewerHeight / scale];
 
-  const [boundingX, boundingY] = [Math.min(viewerX, sortedX[0]), Math.min(viewerY, sortedY[0])];
-  const boundingXEnd = Math.max(viewerXEnd, sortedX[sortedX.length - 1]);
-  const boundingYEnd = Math.max(viewerYEnd, sortedY[sortedY.length - 1]);
+  const condition = sortedX.length === 0 || sortedY.length === 0;
+  const { boundingX, boundingY, boundingXEnd, boundingYEnd } = condition
+    ? {
+        boundingX: viewerX,
+        boundingY: viewerY,
+        boundingXEnd: viewerXEnd,
+        boundingYEnd: viewerYEnd,
+      }
+    : {
+        boundingX: Math.min(viewerX, sortedX[0]),
+        boundingY: Math.min(viewerY, sortedY[0]),
+        boundingXEnd: Math.max(viewerXEnd, sortedX[sortedX.length - 1]),
+        boundingYEnd: Math.max(viewerYEnd, sortedY[sortedY.length - 1]),
+      };
 
   const [boundingWidth, boundingHeight] = [boundingXEnd - boundingX, boundingYEnd - boundingY];
   const maxRatio = Math.max(boundingWidth / width, boundingHeight / height);
