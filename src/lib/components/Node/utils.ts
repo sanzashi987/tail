@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Node, HandleElement, HandleMap, HandlesInfo, rect } from '@types';
+import type { Node, HandleElement, HandleMap, HandlesInfo, Rect } from '@types';
 import { defaultRect } from '@app/atoms/nodes';
 
 export const getHandleBounds = (nodeElement: HTMLDivElement, scale: number) => {
@@ -54,7 +54,7 @@ const EmptyHandles = { source: {}, target: {} };
 export const getNodeInfo = (
   ref: React.RefObject<HTMLDivElement | undefined>,
   node: Node,
-): [rect, HandlesInfo] => {
+): [Rect, HandlesInfo] => {
   if (!ref.current) {
     console.warn('fail to retrieve the DOM instance of', node);
     return [defaultRect, EmptyHandles];

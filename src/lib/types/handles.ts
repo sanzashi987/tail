@@ -1,4 +1,4 @@
-import type { rect } from '.';
+import type { Rect } from '.';
 
 export type HandleType = 'target' | 'source';
 
@@ -22,6 +22,6 @@ export enum HandlePosition {
   Bottom = 'bottom',
 }
 
-export interface HandleElement extends rect {
+export interface HandleElement extends Rect {
   id: string;
 }

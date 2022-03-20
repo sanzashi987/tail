@@ -8,7 +8,7 @@ import type {
   AtomForceRender,
   DraggerInterface,
   DraggerData,
-  rect,
+  Rect,
 } from '.';
 
 export type Node<T extends IObject = {}> = {
@@ -71,7 +71,7 @@ export type DraggerCallbacksType = {
 
 export type NodeAtomRaw<T extends IObject = {}> = Omit<NodeProps<T>, 'updateNodeHandles'> & {
   handles: HandlesInfo;
-  rect: rect;
+  rect: Rect;
 };
 
 export type NodeAtom<T extends IObject = {}> = NodeAtomRaw<T> & AtomForceRender;

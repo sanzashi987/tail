@@ -12,9 +12,14 @@ export type coordinates = {
   y: number;
 };
 
-export type rect = {
+export type Rect = {
   width: number;
   height: number;
+} & coordinates;
+
+export type Box = {
+  x2: number;
+  y2: number;
 } & coordinates;
 
 export type DraggerCoreBasic = {

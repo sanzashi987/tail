@@ -12,10 +12,15 @@ export type MinimapProps = {
   viewportFrameColor?: string;
 };
 
+export type MinimapState = {
+  sortedX: number[];
+  sortedY: number[];
+};
+
 export type MiniNodeProps = {
   atom: RecoilState<NodeAtom>;
   activeColor: string;
   nodeColor: string;
-  setSpanX:(xStart:number,xEnd:number)=>void
-  setSpanY:(yStart:number,yEnd:number)=>void
+  setSpanX: (xStart: number, xEnd: number, lastXStart?: number, lastXEnd?: number) => void;
+  setSpanY: (yStart: number, yEnd: number, lastYStart?: number, lastYEnd?: number) => void;
 };
