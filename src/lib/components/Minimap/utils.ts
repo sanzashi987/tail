@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
 import { Box, Rect } from '@app/types';
 
 export function binarySearch(sortedArr: number[], val: number) {
@@ -14,21 +13,28 @@ export function binarySearch(sortedArr: number[], val: number) {
 }
 
 // mutatably
-export function binaryInsert(sortedArr: number[], val: number) {
+function binaryInsert(sortedArr: number[], val: number) {
   const index = binarySearch(sortedArr, val);
   sortedArr.splice(index, 0, val);
 }
 
-export function binaryDelete(sortedArr: number[], val: number) {
+function binaryDelete(sortedArr: number[], val: number) {
   const index = binarySearch(sortedArr, val);
   sortedArr.splice(index, 1);
 }
 
-export function binaryUpdate(sortedArr: number[], val: number, lastVal?: number) {
+function binaryUpdate(sortedArr: number[], val: number, lastVal?: number) {
   if (lastVal) {
     binaryDelete(sortedArr, lastVal);
   }
   binaryInsert(sortedArr, val);
+}
+
+export function binaryUpdateBox(sortedX: number[], sortedY: number[], box: Box, lastBox?: Box) {
+  binaryUpdate(sortedX, box.x, lastBox?.x);
+  binaryUpdate(sortedX, box.x2, lastBox?.x2);
+  binaryUpdate(sortedY, box.y, lastBox?.y);
+  binaryUpdate(sortedY, box.y2, lastBox?.y2);
 }
 
 export function toBox(rect: Rect): Box {

@@ -128,3 +128,5 @@ export type AtomStateSetterType = <T>(
   id: string,
   updater: T | ((c: T) => T),
 ) => T;
+
+export type AtomUpdater<T> = (atom: RecoilState<T>, updater: UpdaterType<T>) => void;

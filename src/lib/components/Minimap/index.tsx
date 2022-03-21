@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { MinimapProps, MinimapState, ViewerContextType } from '@app/types';
+import { MinimapProps, MinimapState, ViewerContextType, Box, NodeAtom } from '@app/types';
 import { ViewerContext } from '@app/contexts/viewer';
 import { isNotNum } from '@app/utils';
+import type { RecoilState } from 'recoil';
 import styles from './index.module.scss';
 import MiniNode from './MiniNode';
-import { binaryUpdate, getLargeBox, toBox, toRect } from './utils';
+import { binaryUpdateBox, getLargeBox, toBox, toRect } from './utils';
 
 const { 'minimap-wrapper': c } = styles;
 
@@ -25,16 +26,14 @@ class Minimap extends Component<MinimapProps, MinimapState> {
     sortedY: [20, 892],
   };
 
-  setSpanX = (xStart: number, xEnd: number, lastXStart?: number, lastXEnd?: number) => {
-    const sortedX = [...this.state.sortedX];
-    binaryUpdate(sortedX, xStart, lastXStart);
-    binaryUpdate(sortedX, xEnd, lastXEnd);
-  };
+  mountNode = (id: string, atom: RecoilState<NodeAtom>) => {};
+  unmountNode = (id: string, atom: RecoilState<NodeAtom>) => {};
 
-  setSpanY = (yStart: number, yEnd: number, lastYStart?: number, lastYEnd?: number) => {
+  updateBox = (box: Box, lastBox?: Box) => {
+    const sortedX = [...this.state.sortedX];
     const sortedY = [...this.state.sortedY];
-    binaryUpdate(sortedY, yStart, lastYStart);
-    binaryUpdate(sortedY, yEnd, lastYEnd);
+    binaryUpdateBox(sortedX, sortedY, box, lastBox);
+    this.setState({ sortedX, sortedY });
   };
 
   getMinimapInfo() {
@@ -53,8 +52,6 @@ class Minimap extends Component<MinimapProps, MinimapState> {
       height: viewerHeight / scale,
     };
     const viewerBox = toBox(viewerRect);
-    const { x: viewerX, y: viewerY } = viewerBox;
-
     const boundingBox =
       sortedX.length === 0 || sortedY.length === 0
         ? viewerBox
@@ -64,9 +61,12 @@ class Minimap extends Component<MinimapProps, MinimapState> {
             x2: sortedX[sortedX.length - 1],
             y2: sortedY[sortedY.length - 1],
           });
-    const { x: boundingX, y: boundingY, width: boundingWidth, height: boundingHeight } = toRect(
-      boundingBox,
-    );
+    const {
+      x: boundingX,
+      y: boundingY,
+      width: boundingWidth,
+      height: boundingHeight,
+    } = toRect(boundingBox);
     const maxRatio = Math.max(boundingWidth / width!, boundingHeight / height!);
 
     const offset = 5 * maxRatio;

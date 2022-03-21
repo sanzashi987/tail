@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { RecoilState } from 'recoil';
-import { NodeAtom } from '.';
+import { Box, NodeAtom } from '.';
 
 export type MinimapProps = {
   height?: number;
@@ -21,6 +21,5 @@ export type MiniNodeProps = {
   atom: RecoilState<NodeAtom>;
   activeColor: string;
   nodeColor: string;
-  setSpanX: (xStart: number, xEnd: number, lastXStart?: number, lastXEnd?: number) => void;
-  setSpanY: (yStart: number, yEnd: number, lastYStart?: number, lastYEnd?: number) => void;
+  updateBox(box: Box, lastBox?: Box): void;
 };

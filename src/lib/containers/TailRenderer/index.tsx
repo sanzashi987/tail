@@ -22,8 +22,6 @@ import InfiniteViewer from '../InfiniteViewer';
 import MarkerDefs from '../MarkerDefs';
 import '@app/styles/index.scss';
 
-const emptyActives = { node: {}, edge: {} };
-
 class TailCore extends Component<TailCoreProps> {
   static displayName = 'TailCore';
   static defaultProps = {
@@ -34,7 +32,7 @@ class TailCore extends Component<TailCoreProps> {
   context!: StoreRootInterface;
   state = { nodesReady: false };
 
-  activeItems: SelectedItemCollection = emptyActives;
+  activeItems: SelectedItemCollection = { node: {}, edge: {} };
   viewer = createRef<InfiniteViewer>();
   edgeRef = createRef<EdgeRenderer>();
   nodeRef = createRef<NodeRenderer>();
