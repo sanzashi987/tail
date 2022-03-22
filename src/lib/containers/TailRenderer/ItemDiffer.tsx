@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { DifferProvider } from '@app/contexts/differ';
-import { ItemDifferProps } from '@app/types';
+import type { ItemDifferProps, ItemDifferInterface } from '@app/types';
 import { EdgeUpdater, NodeUpdater } from './subInstances/itemUpdater';
 
 class ItemDiffer extends Component<ItemDifferProps> {
@@ -15,10 +15,9 @@ class ItemDiffer extends Component<ItemDifferProps> {
     };
   }
 
-  componentDidUpdate(lastProps:ItemDifferProps) {
-    
+  componentDidUpdate(lastProps: ItemDifferProps) {
+    const { nodeUpdater, edgeUpdater } = this.differInterface;
   }
-
 
   render() {
     return <DifferProvider value={this.differInterface}>{this.props.children}</DifferProvider>;
