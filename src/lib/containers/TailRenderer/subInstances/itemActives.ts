@@ -2,7 +2,6 @@ import type {
   SelectedItemType,
   EdgeAtom,
   NodeAtom,
-  SelectedItemCollection,
   coordinates,
   SelectCallback,
 } from '@app/types';

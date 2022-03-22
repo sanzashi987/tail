@@ -1,8 +1,9 @@
 import React from 'react';
-import { RecoilValue, RecoilState } from 'recoil';
-import { NodeMouseInterface } from './nodes';
-import { EdgeBasic, EdgeMouseInterface } from './edges';
+import type { RecoilValue, RecoilState } from 'recoil';
 import type {
+  NodeMouseInterface,
+  EdgeBasic,
+  EdgeMouseInterface,
   HandleElement,
   Node,
   Edge,
@@ -130,3 +131,11 @@ export type AtomStateSetterType = <T>(
 ) => T;
 
 export type AtomUpdater<T> = (atom: RecoilState<T>, updater: UpdaterType<T>) => void;
+
+export type ItemDifferProps = {
+  nodes: IObject<Node>;
+  edges: IObject<Edge>;
+  atomSetter: <T>(atom: RecoilState<T>, updater: UpdaterType<T>) => void;
+};
+
+export type ItemDifferInterface = {};

@@ -22,7 +22,7 @@ abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
     };
   }
 
-  diff(next: IObject<T>) {
+  private diff(next: IObject<T>) {
     let dirty = false;
     const deleted: IObject<T> = { ...this.lastItems };
     const last = { ...this.lastItems };
@@ -49,7 +49,7 @@ abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
     this.lastItems = next;
   }
 
-  deleteItem(item: T) {
+  private deleteItem(item: T) {
     const { id } = item;
     this.emit('delete', id);
     delete this.itemAtoms[id];
@@ -57,13 +57,13 @@ abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
 
   abstract createAtom(item: T): RecoilState<A>;
   abstract createAtomUpdater(item: T): UpdaterType<A>;
-  mountItem(item: T) {
+  private mountItem(item: T) {
     const { id } = item;
     const atom = this.createAtom(item);
     this.itemAtoms[id] = atom;
     this.emit('mount', id, atom);
   }
-  updateItem(lastItem: T, nextItem: T) {
+  private updateItem(lastItem: T, nextItem: T) {
     if (lastItem.id !== nextItem.id) {
       console.error('error input ==>', lastItem, nextItem);
       throw new Error('fail to update the item as their id is different');
@@ -72,9 +72,13 @@ abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
     this.updater(this.itemAtoms[nextItem.id], updater);
     this.emit('update');
   }
+
+  getItemAtoms() {
+    return this.itemAtoms;
+  }
 }
 
-class NodeUpdater extends ItemUpdater<Node, NodeAtom> {
+export class NodeUpdater extends ItemUpdater<Node, NodeAtom> {
   createAtom(item: Node) {
     return createNodeAtom(item);
   }
@@ -83,7 +87,7 @@ class NodeUpdater extends ItemUpdater<Node, NodeAtom> {
   }
 }
 
-class EdgeUpdater extends ItemUpdater<Edge, EdgeAtom> {
+export class EdgeUpdater extends ItemUpdater<Edge, EdgeAtom> {
   createAtom(item: Edge) {
     return createEdgeAtom(item);
   }
@@ -92,4 +96,4 @@ class EdgeUpdater extends ItemUpdater<Edge, EdgeAtom> {
   }
 }
 
-export default ItemUpdater;
+// export default ItemUpdater;
