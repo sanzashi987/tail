@@ -79,15 +79,15 @@ class TailCore extends Component<TailCoreProps> {
     const { set } = this.context;
     const { deactivateLast, batchActivateNodes } = this.ItemActives;
     return (
-      <InfiniteViewer
-        ref={this.viewer}
-        onClick={deactivateLast}
-        onSelectEnd={batchActivateNodes}
-        onViewerDrop={onViewerDrop}
-        outerChildren={this.props.children}
-      >
-        <InterfaceProvider value={this.contextInterface}>
-          <ItemDiffer ref={this.differRef} nodes={nodes} edges={edges} atomSetter={set}>
+      <ItemDiffer ref={this.differRef} nodes={nodes} edges={edges} atomSetter={set}>
+        <InfiniteViewer
+          ref={this.viewer}
+          onClick={deactivateLast}
+          onSelectEnd={batchActivateNodes}
+          onViewerDrop={onViewerDrop}
+          outerChildren={this.props.children}
+        >
+          <InterfaceProvider value={this.contextInterface}>
             <NodeRenderer
               templates={nodeTemplates}
               // nodes={nodes}
@@ -106,9 +106,9 @@ class TailCore extends Component<TailCoreProps> {
               <MarkerDefs />
             </EdgeRenderer>
             {/* )} */}
-          </ItemDiffer>
-        </InterfaceProvider>
-      </InfiniteViewer>
+          </InterfaceProvider>
+        </InfiniteViewer>
+      </ItemDiffer>
     );
   }
 
@@ -119,14 +119,14 @@ class TailCore extends Component<TailCoreProps> {
 
   getAtom = <T extends EdgeAtom | NodeAtom>(type: SelectedItemType, id: string) => {
     const pool = type === 'edge' ? this.getEdgeAtoms() : this.getNodeAtoms();
-    return getAtom(id, pool as unknown as IObject<RecoilState<T>>);
+    return getAtom(id, (pool as unknown) as IObject<RecoilState<T>>);
   };
 
   getAtomState = <T,>(type: SelectedItemType, id: string) =>
-    this.context.get(this.getAtom(type, id) as unknown as RecoilState<T>);
+    this.context.get((this.getAtom(type, id) as unknown) as RecoilState<T>);
 
   setAtomState = <T,>(type: SelectedItemType, id: string, updater: T | ((cur: T) => T)) =>
-    this.context.set(this.getAtom(type, id) as unknown as RecoilState<T>, updater);
+    this.context.set((this.getAtom(type, id) as unknown) as RecoilState<T>, updater);
 
   getEdgeAtoms = () => this.differRef.current?.differInterface.edgeUpdater.getItemAtoms() ?? {};
 

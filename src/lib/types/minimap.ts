@@ -3,13 +3,23 @@ import type { RecoilState } from 'recoil';
 import { Box, NodeAtom } from '.';
 
 export type MinimapProps = {
-  height?: number;
-  width?: number;
   activeColor?: string;
   nodeColor?: string;
   // padding?: number;
-  style?: CSSProperties;
-  viewportFrameColor?: string;
+} & {
+  [key in keyof MapStyleProps]?: MapStyleProps[key];
+};
+
+export type MapStyleProps = {
+  height: number;
+  width: number;
+  style: CSSProperties;
+  viewportFrameColor: string;
+};
+
+export type MapContainerProps = MapStyleProps & {
+  sortedX: number[];
+  sortedY: number[];
 };
 
 export type MinimapState = {
