@@ -13,8 +13,9 @@ abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
     const _on = EventEmitter.prototype.on;
     this.on = function (eventName: string | symbol, listener: (...args: any[]) => void) {
       if (eventName === 'mount') {
-        Object.entries(this.itemAtoms).forEach(([id, atom]) => {
-          listener(id, atom);
+        const { lastItems, itemAtoms } = this;
+        Object.entries(itemAtoms).forEach(([id, atom]) => {
+          listener(lastItems[id], atom);
         });
       }
       _on.call(this, eventName, listener);
@@ -22,7 +23,7 @@ abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
     };
   }
 
-  private diff(next: IObject<T>) {
+  diff(next: IObject<T>) {
     let dirty = false;
     const deleted: IObject<T> = { ...this.lastItems };
     const last = { ...this.lastItems };
@@ -50,18 +51,14 @@ abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
   }
 
   private deleteItem(item: T) {
-    const { id } = item;
-    this.emit('delete', id);
-    delete this.itemAtoms[id];
+    this.emit('delete', item);
+    delete this.itemAtoms[item.id];
   }
 
-  abstract createAtom(item: T): RecoilState<A>;
-  abstract createAtomUpdater(item: T): UpdaterType<A>;
   private mountItem(item: T) {
-    const { id } = item;
     const atom = this.createAtom(item);
-    this.itemAtoms[id] = atom;
-    this.emit('mount', id, atom);
+    this.itemAtoms[item.id] = atom;
+    this.emit('mount', item, atom);
   }
   private updateItem(lastItem: T, nextItem: T) {
     if (lastItem.id !== nextItem.id) {
@@ -72,6 +69,9 @@ abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
     this.updater(this.itemAtoms[nextItem.id], updater);
     this.emit('update');
   }
+
+  abstract createAtom(item: T): RecoilState<A>;
+  abstract createAtomUpdater(item: T): UpdaterType<A>;
 
   getItemAtoms() {
     return this.itemAtoms;

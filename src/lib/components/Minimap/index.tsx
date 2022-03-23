@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { MinimapProps, MinimapState, ViewerContextType, Box, NodeAtom } from '@app/types';
+import { MinimapProps, MinimapState, ViewerContextType, Box, NodeAtom, Node } from '@app/types';
 import { ViewerContext } from '@app/contexts/viewer';
 import { isNotNum } from '@app/utils';
 import type { RecoilState } from 'recoil';
@@ -26,8 +26,12 @@ class Minimap extends Component<MinimapProps, MinimapState> {
     sortedY: [20, 892],
   };
 
-  mountNode = (id: string, atom: RecoilState<NodeAtom>) => {};
-  unmountNode = (id: string, atom: RecoilState<NodeAtom>) => {};
+  mountNode = (node: Node, atom: RecoilState<NodeAtom>) => {
+    return;
+  };
+  unmountNode = (node: Node) => {
+    return;
+  };
 
   updateBox = (box: Box, lastBox?: Box) => {
     const sortedX = [...this.state.sortedX];

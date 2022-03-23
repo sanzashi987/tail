@@ -16,6 +16,7 @@ import { findDeletedItem, getAtom } from './mutation';
 import ItemActives from './subInstances/itemActives';
 import NodeMoves from './subInstances/nodeMoves';
 import EdgeConnects from './subInstances/edgeConnects';
+import ItemDiffer from './ItemDiffer';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
 import InfiniteViewer from '../InfiniteViewer';
@@ -36,6 +37,7 @@ class TailCore extends Component<TailCoreProps> {
   viewer = createRef<InfiniteViewer>();
   edgeRef = createRef<EdgeRenderer>();
   nodeRef = createRef<NodeRenderer>();
+  differRef = createRef<ItemDiffer>();
   contextInterface: InterfaceValue;
 
   ItemActives: ItemActives;
@@ -85,24 +87,26 @@ class TailCore extends Component<TailCoreProps> {
         outerChildren={this.props.children}
       >
         <InterfaceProvider value={this.contextInterface}>
-          <NodeRenderer
-            templates={nodeTemplates}
-            nodes={nodes}
-            ref={this.nodeRef}
-            templatePicker={nodeTemplatePicker}
-            mounted={() => this.setState({ nodesReady: true })}
-            storeUpdater={set}
-          />
-          {this.state.nodesReady && (
+          <ItemDiffer ref={this.differRef} nodes={nodes} edges={edges} atomSetter={set}>
+            <NodeRenderer
+              templates={nodeTemplates}
+              // nodes={nodes}
+              ref={this.nodeRef}
+              templatePicker={nodeTemplatePicker}
+              // mounted={() => this.setState({ nodesReady: true })}
+              // storeUpdater={set}
+            />
+            {/* {this.state.nodesReady && ( */}
             <EdgeRenderer
-              edges={edges}
+              // edges={edges}
               ref={this.edgeRef}
-              getNodeAtoms={this.getNodeAtoms}
-              storeUpdater={set}
+              // getNodeAtoms={this.getNodeAtoms}
+              // storeUpdater={set}
             >
               <MarkerDefs />
             </EdgeRenderer>
-          )}
+            {/* )} */}
+          </ItemDiffer>
         </InterfaceProvider>
       </InfiniteViewer>
     );
@@ -114,8 +118,7 @@ class TailCore extends Component<TailCoreProps> {
   }
 
   getAtom = <T extends EdgeAtom | NodeAtom>(type: SelectedItemType, id: string) => {
-    const pool =
-      type === 'edge' ? this.edgeRef.current!.edgeAtoms : this.nodeRef.current!.nodeAtoms;
+    const pool = type === 'edge' ? this.getEdgeAtoms() : this.getNodeAtoms();
     return getAtom(id, pool as unknown as IObject<RecoilState<T>>);
   };
 
@@ -125,9 +128,9 @@ class TailCore extends Component<TailCoreProps> {
   setAtomState = <T,>(type: SelectedItemType, id: string, updater: T | ((cur: T) => T)) =>
     this.context.set(this.getAtom(type, id) as unknown as RecoilState<T>, updater);
 
-  getEdgeAtoms = () => this.edgeRef.current?.edgeAtoms ?? {};
+  getEdgeAtoms = () => this.differRef.current?.differInterface.edgeUpdater.getItemAtoms() ?? {};
 
-  getNodeAtoms = () => this.nodeRef.current?.nodeAtoms ?? {};
+  getNodeAtoms = () => this.differRef.current?.differInterface.nodeUpdater.getItemAtoms() ?? {};
 
   getScale = () => this.viewer.current?.getScale() || 1;
 }

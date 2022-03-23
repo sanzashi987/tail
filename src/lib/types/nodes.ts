@@ -34,21 +34,23 @@ export type TemplateNodeClass = IObject<NodeCom>;
 export type TemplatePickerType = (node: Node) => [string, string];
 
 export type NodeRendererProps = {
-  nodes: IObject<Node>;
+  // nodes: IObject<Node>;
   templates: IObject<TemplateNodeClass>;
   templatePicker: TemplatePickerType;
-  mounted(): void;
-  storeUpdater: (atom: RecoilState<NodeAtom>, updater: UpdaterType<NodeAtom>) => void;
+  // mounted(): void;
+  // storeUpdater: (atom: RecoilState<NodeAtom>, updater: UpdaterType<NodeAtom>) => void;
 };
 
+export type NodeAtomType<T extends IObject = {}> = RecoilState<NodeAtom<T>>;
+
 export type NodeWrapperProps<T extends IObject = {}> = {
-  atom: RecoilState<NodeAtom<T>>;
+  atom: NodeAtomType<T>;
   // atom: RecoilState<NodeAtom>;
   templates: IObject<TemplateNodeClass>;
   templatePicker: TemplatePickerType;
 };
 
-export type Nodes = NodeRendererProps['nodes'];
+export type Nodes = IObject<Node>; // NodeRendererProps['nodes'];
 
 export type NodeProps<T extends IObject = {}> = {
   node: Node<T>;

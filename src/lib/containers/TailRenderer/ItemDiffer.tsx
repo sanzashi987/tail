@@ -17,6 +17,13 @@ class ItemDiffer extends Component<ItemDifferProps> {
 
   componentDidUpdate(lastProps: ItemDifferProps) {
     const { nodeUpdater, edgeUpdater } = this.differInterface;
+    const { nodes, edges } = this.props;
+    if (nodes !== lastProps.nodes) {
+      nodeUpdater.diff(nodes);
+    }
+    if (edges !== lastProps.edges) {
+      edgeUpdater.diff(edges);
+    }
   }
 
   render() {

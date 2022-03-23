@@ -1,4 +1,5 @@
 import React from 'react';
+import { EdgeUpdater, NodeUpdater } from '@app/containers/TailRenderer/subInstances/itemUpdater';
 import type { RecoilValue, RecoilState } from 'recoil';
 import type {
   NodeMouseInterface,
@@ -138,4 +139,7 @@ export type ItemDifferProps = {
   atomSetter: <T>(atom: RecoilState<T>, updater: UpdaterType<T>) => void;
 };
 
-export type ItemDifferInterface = {};
+export type ItemDifferInterface = {
+  nodeUpdater: NodeUpdater;
+  edgeUpdater: EdgeUpdater;
+};

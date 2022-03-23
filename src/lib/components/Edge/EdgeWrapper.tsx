@@ -1,10 +1,11 @@
-import React, { FC, useMemo, useCallback, useContext } from 'react';
+import React, { FC, useMemo, useCallback, useContext, useEffect, useRef } from 'react';
 import type { EdgeWrapperProps } from '@app/types';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { computedEdgeSelector } from '@app/atoms/edges';
 import { InstanceInterface } from '@app/contexts/instance';
 import { isNum } from '@app/utils';
 import { setHovered, setNotHovered } from '@app/atoms/reducers';
+import { BezierEdge, BasicShadow } from '.';
 
 const getMarkerId = (markerId?: string) => {
   if (typeof markerId === 'string') return `url(#${markerId})`;
@@ -14,8 +15,10 @@ const getMarkerId = (markerId?: string) => {
 const EdgeWrapper: FC<EdgeWrapperProps> = ({
   atom,
   nodeAtoms,
-  template: EdgeComponent,
-  shadow: ShadowEdge,
+  templates,
+  updateEdge,
+  // template: EdgeComponent,
+  // shadow: ShadowEdge,
 }) => {
   const { edge, selected, sourceX, sourceY, targetX, targetY, reconnect, hovered } = useRecoilValue(
     computedEdgeSelector({ edge: atom, nodeAtoms }),
@@ -44,7 +47,15 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({
     [edge],
   );
 
-  const { markerEnd, markerStart } = edge;
+  const { markerEnd, markerStart, source, sourceNode, target, targetNode } = edge;
+  const lastEdge = useRef(edge);
+  useEffect(() => {
+    if (lastEdge.current !== edge) {
+      updateEdge(lastEdge.current, edge);
+      lastEdge.current = edge;
+    }
+  }, [source, sourceNode, target, targetNode]);
+
   const markerStartUrl = useMemo(() => getMarkerId(markerStart), [markerStart]);
   const markerEndUrl = useMemo(() => getMarkerId(markerEnd), [markerEnd]);
 
@@ -57,6 +68,10 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({
   ) {
     return null;
   }
+
+  const { type = '' } = edge;
+  const EdgeComponent = templates[type]?.default ?? BezierEdge; //BasicEdge;
+  const ShadowComponent = templates[type]?.shadow ?? BasicShadow;
 
   return (
     <>
@@ -80,7 +95,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({
         onMouseLeave={onHoverOut}
         onContextMenu={onContextMenu}
       >
-        <ShadowEdge sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY={targetY} />
+        <ShadowComponent sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY={targetY} />
       </g>
     </>
   );

@@ -48,7 +48,9 @@ export interface EdgeMouseInterface {
 
 export type EdgeAtom<T extends IObject = {}> = EdgeAtomRaw<T> & AtomForceRender;
 
-export type EdgeAtomsType = IObject<RecoilState<EdgeAtom>>;
+export type EdgeAtomType = RecoilState<EdgeAtom>;
+
+export type EdgeAtomsType = IObject<EdgeAtomType>;
 
 export type ComputedEdgeAtom = EdgeAtom & EdgeBasicProps;
 
@@ -58,13 +60,15 @@ export type EdgeWrapperProps<T extends IObject = {}> = {
   // id: string
   atom: RecoilState<EdgeAtom<T>>;
   nodeAtoms: NodeAtomsType;
-  template: ComponentType<EdgeProps>;
-  shadow: ComponentType<EdgeBasicProps>;
+  templates: EdgeTemplatesType;
+  updateEdge(lastEdge: Edge, nextEdge: Edge): void;
+  // template: ComponentType<EdgeProps>;
+  // shadow: ComponentType<EdgeBasicProps>;
   // onClick?: (evt: React.MouseEvent, edge: Edge) => void
 }; /* & EdgeProps */
 
 export type SelectorInput = {
-  edge: RecoilState<EdgeAtom>;
+  edge: EdgeAtomType;
   nodeAtoms: NodeAtomsType;
 };
 
@@ -76,11 +80,11 @@ export type EdgeComponentPackType = {
 export type EdgeTemplatesType = IObject<EdgeComponentPackType>;
 
 export type EdgeRendererProps = {
-  edges: IObject<Edge>;
+  // edges: IObject<Edge>;
   // connecting: boolean;
   templates: EdgeTemplatesType;
-  getNodeAtoms(): NodeAtomsType;
-  storeUpdater: (atom: RecoilState<EdgeAtom>, updater: UpdaterType<EdgeAtom>) => void;
+  // getNodeAtoms(): NodeAtomsType;
+  // storeUpdater: (atom: RecoilState<EdgeAtom>, updater: UpdaterType<EdgeAtom>) => void;
 };
 
 // export type EdgeParsed = Map<string,>
