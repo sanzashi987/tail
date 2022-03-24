@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Node, HandleElement, HandleMap, HandlesInfo, Rect } from '@types';
+import type { Node, HandleElement, HandleMap, HandlesInfo, Rect } from '@app/types';
 import { defaultRect } from '@app/atoms/nodes';
 
 export const getHandleBounds = (nodeElement: HTMLDivElement, scale: number) => {

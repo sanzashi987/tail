@@ -2,8 +2,11 @@ import React, { FC } from 'react';
 import { edgeInProgressAtom } from '@app/atoms/edges';
 import { EdgeInProgressProps } from '@app/types';
 import { useRecoilValue } from 'recoil';
+import BasicEdge from './BasicEdge';
 
-const EdgeInProgress: FC<EdgeInProgressProps> = ({ template: EdgeComponent }) => {
+const EdgeInProgress: FC<EdgeInProgressProps> = ({
+  template: EdgeComponent = BasicEdge as any,
+}) => {
   const state = useRecoilValue(edgeInProgressAtom);
   const { active, sourceX, sourceY, targetX, targetY } = state;
   // console.log(state);

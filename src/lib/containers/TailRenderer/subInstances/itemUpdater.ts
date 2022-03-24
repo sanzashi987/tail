@@ -1,5 +1,5 @@
 import { RecoilState } from 'recoil';
-import type { AtomUpdater, NodeAtom, Node, Edge, EdgeAtom, UpdaterType } from '@app/types';
+import type { AtomUpdater, NodeAtom, Node, Edge, EdgeAtom, UpdaterType, IObject } from '@app/types';
 import { createNodeAtom } from '@app/atoms/nodes';
 import { createEdgeAtom } from '@app/atoms/edges';
 import EventEmitter from 'events';

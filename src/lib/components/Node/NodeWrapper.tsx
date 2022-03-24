@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useContext,
 } from 'react';
-import type { NodeWrapperProps, coordinates, NodeCom, DraggerData } from '@types';
+import type { NodeWrapperProps, coordinates, NodeCom, DraggerData } from '@app/types';
 import { InstanceInterface } from '@app/contexts/instance';
 import { useRecoilState } from 'recoil';
 import { setHovered, setNotHovered } from '@app/atoms/reducers';

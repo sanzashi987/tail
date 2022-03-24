@@ -10,7 +10,8 @@ import type {
   AtomStateGetterType,
   ConnectMethodType,
   DraggerData,
-} from '@types';
+  IObject,
+} from '@app/types';
 import { edgeInProgressAtom } from '@app/atoms/edges';
 import ItemActives from './itemActives';
 import TailCore from '..';
@@ -126,10 +127,11 @@ export function addReconnectToState(
   const opposite = flipHandle[type];
   const [X, Y] = handleToCoor[opposite];
   const oppositeNode = addHandleNode[opposite];
-  const { [opposite]: storedHandle, [oppositeNode]: storedNode } = atomStateGetter<EdgeAtom>(
-    'edge',
-    prevEdgeId,
-  ).edge;
+  const edgeState = atomStateGetter<EdgeAtom>('edge', prevEdgeId);
+  if (!edgeState) return false;
+  const { [opposite]: storedHandle, [oppositeNode]: storedNode } = edgeState.edge;
+  const nodeState = atomStateGetter<NodeAtom>('node', storedNode);
+  if (!nodeState) return false;
   const {
     handles: {
       [opposite]: {
@@ -137,7 +139,7 @@ export function addReconnectToState(
       },
     },
     node: { top, left },
-  } = atomStateGetter<NodeAtom>('node', storedNode);
+  } = nodeState;
   [next[X], next[Y]] = [x + left, y + top];
   next.nodeId = storedNode;
   next.handleId = storedHandle;
@@ -182,6 +184,8 @@ class EdgeConnects {
       nodeId,
       handleId,
     );
+    const nodeState = this.core.getAtomState<NodeAtom>('node', nodeId);
+    if (!nodeState) return;
     const {
       handles: {
         [newType]: {
@@ -189,17 +193,14 @@ class EdgeConnects {
         },
       },
       node: { left, top },
-    } = this.core.getAtomState<NodeAtom>('node', nodeId);
+    } = nodeState;
     const [absX, absY] = [x + left, y + top];
     let basicState = createBasicConnect(newType, absX, absY, nodeId, handleId);
     if (possibleEdge !== false) {
       // reconnect
-      [newType, basicState] = addReconnectToState(
-        basicState,
-        newType,
-        possibleEdge,
-        this.core.getAtomState,
-      );
+      const res = addReconnectToState(basicState, newType, possibleEdge, this.core.getAtomState);
+      if (!res) return;
+      [newType, basicState] = res;
       this.core.context.set(edgeAtoms[possibleEdge], enableEdgeReconnect);
     }
     this.edgeInProgressUpdater(basicState);
@@ -223,20 +224,21 @@ class EdgeConnects {
       nodeId: storedNode,
       handleId: storedHandle,
     } = this.core.context.get(edgeInProgressAtom);
-    if (to === type && active) {
-      const newPayload = createEdgePayload(to, nodeId, handleId, storedNode, storedHandle);
-      if (reconnect && prevEdgeId) {
-        const toNode = addHandleNode[type];
-        const { [type]: prevHandleId, [toNode]: prevNodeId } = this.core.getAtomState<EdgeAtom>(
-          'edge',
-          prevEdgeId,
-        ).edge;
-        if (prevHandleId !== handleId || prevNodeId !== nodeId) {
-          this.core.props.onEdgeUpdate?.(prevEdgeId, newPayload);
-          this.core.setAtomState('edge', prevEdgeId, disableEdgeReconnect);
+    block: {
+      if (to === type && active) {
+        const newPayload = createEdgePayload(to, nodeId, handleId, storedNode, storedHandle);
+        if (reconnect && prevEdgeId) {
+          const toNode = addHandleNode[type];
+          const edgeState = this.core.getAtomState<EdgeAtom>('edge', prevEdgeId);
+          if (!edgeState) break block;
+          const { [type]: prevHandleId, [toNode]: prevNodeId } = edgeState.edge;
+          if (prevHandleId !== handleId || prevNodeId !== nodeId) {
+            this.core.props.onEdgeUpdate?.(prevEdgeId, newPayload);
+            this.core.setAtomState('edge', prevEdgeId, disableEdgeReconnect);
+          }
+        } else if (!validateExistEdge(newPayload, this.core.edgeRef.current!.edgeTree)) {
+          this.core.props.onEdgeCreate?.(newPayload);
         }
-      } else if (!validateExistEdge(newPayload, this.core.edgeRef.current!.edgeTree)) {
-        this.core.props.onEdgeCreate?.(newPayload);
       }
     }
     this.connectReset();
@@ -244,21 +246,29 @@ class EdgeConnects {
 
   private tryConnect = (e: MouseEvent, { x, y }: DraggerData) => {
     const { reconnect, prevEdgeId, to: type } = this.core.context.get(edgeInProgressAtom);
-    if (reconnect && prevEdgeId) {
-      const { getAtomState: GET, setAtomState: SET } = this.core;
-      const typeNode = addHandleNode[type];
-      const {
-        edge: { [typeNode]: originNode, [type]: originHandle },
-      } = GET<EdgeAtom>('edge', prevEdgeId);
-      const { x: X, y: Y } = GET<NodeAtom>('node', originNode).handles[type][originHandle];
-      const threshold = this.core.props.dropThreshold!;
-      if (Math.abs(x - X) < threshold && Math.abs(y - Y) < threshold) {
-        SET<EdgeAtom>('edge', prevEdgeId, disableEdgeReconnect);
-      } else {
-        this.core.deleteItem([{ type: 'edge', id: prevEdgeId }]);
-        this.itemActives.switchActive('edge', prevEdgeId, false, this.core.activeItems['edge']);
+
+    block: {
+      if (reconnect && prevEdgeId) {
+        const { getAtomState: GET, setAtomState: SET } = this.core;
+        const typeNode = addHandleNode[type];
+        const edgeState = GET<EdgeAtom>('edge', prevEdgeId);
+        if (!edgeState) break block;
+        const {
+          edge: { [typeNode]: originNode, [type]: originHandle },
+        } = edgeState;
+        const nodeState = GET<NodeAtom>('node', originNode);
+        if (!nodeState) break block;
+        const { x: X, y: Y } = nodeState.handles[type][originHandle];
+        const threshold = this.core.props.dropThreshold!;
+        if (Math.abs(x - X) < threshold && Math.abs(y - Y) < threshold) {
+          SET<EdgeAtom>('edge', prevEdgeId, disableEdgeReconnect);
+        } else {
+          this.core.deleteItem([{ type: 'edge', id: prevEdgeId }]);
+          this.itemActives.switchActive('edge', prevEdgeId, false, this.core.activeItems['edge']);
+        }
       }
     }
+
     this.core.context.reset(edgeInProgressAtom);
   };
 

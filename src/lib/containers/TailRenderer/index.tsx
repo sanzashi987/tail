@@ -10,7 +10,9 @@ import type {
   NodeAtom,
   DeletePayload,
   StoreRootInterface,
-} from '@types';
+  SelectModeType,
+  IObject,
+} from '@app/types';
 import { StoreContext } from '@app/contexts/store';
 import { findDeletedItem, getAtom } from './mutation';
 import ItemActives from './subInstances/itemActives';
@@ -31,7 +33,6 @@ class TailCore extends Component<TailCoreProps> {
   };
   static contextType = StoreContext;
   context!: StoreRootInterface;
-  state = { nodesReady: false };
 
   activeItems: SelectedItemCollection = { node: {}, edge: {} };
   viewer = createRef<InfiniteViewer>();
@@ -72,12 +73,40 @@ class TailCore extends Component<TailCoreProps> {
       activateItem: this.ItemActives.activateNext,
       getScale: this.getScale,
     };
+
+    props.getMethods?.({
+      switchMode: this.switchMode,
+      setScale: this.setScale,
+      focusNode: this.focusNode,
+    });
   }
+
+  setScale = (scale: number) => {
+    this.viewer.current?.setScale(scale);
+  };
+
+  switchMode = (mode: SelectModeType) => {
+    this.viewer.current?.switchMode(mode);
+  };
+
+  focusNode = (nodeId: string) => {
+    const atom = this.getAtomState<NodeAtom>('node', nodeId);
+    if (!atom) return;
+    const {
+      node: { left, top },
+      rect: { width, height },
+    } = atom;
+    const centerX = left + (isNaN(width) ? 0 : width) / 2;
+    const centerY = top + (isNaN(height) ? 0 : height) / 2;
+    this.viewer.current?.moveCamera(centerX, centerY);
+  };
 
   render() {
     const {
       nodes,
       edges,
+      edgeTemplates,
+      connectingEdge,
       nodeTemplates,
       nodeTemplatePicker,
       onViewerDrop,
@@ -101,7 +130,11 @@ class TailCore extends Component<TailCoreProps> {
               ref={this.nodeRef}
               templatePicker={nodeTemplatePicker}
             />
-            <EdgeRenderer ref={this.edgeRef}>
+            <EdgeRenderer
+              ref={this.edgeRef}
+              templates={edgeTemplates}
+              connectingEdge={connectingEdge}
+            >
               <MarkerDefs markers={markers} markerTemplates={markerTemplates} />
             </EdgeRenderer>
           </InterfaceProvider>
@@ -120,11 +153,17 @@ class TailCore extends Component<TailCoreProps> {
     return getAtom(id, (pool as unknown) as IObject<RecoilState<T>>);
   };
 
-  getAtomState = <T,>(type: SelectedItemType, id: string) =>
-    this.context.get((this.getAtom(type, id) as unknown) as RecoilState<T>);
+  getAtomState = <T,>(type: SelectedItemType, id: string) => {
+    const atom = this.getAtom(type, id);
+    if (!atom) return atom;
+    return this.context.get((atom as unknown) as RecoilState<T>);
+  };
 
-  setAtomState = <T,>(type: SelectedItemType, id: string, updater: T | ((cur: T) => T)) =>
-    this.context.set((this.getAtom(type, id) as unknown) as RecoilState<T>, updater);
+  setAtomState = <T,>(type: SelectedItemType, id: string, updater: T | ((cur: T) => T)) => {
+    const atom = this.getAtom(type, id);
+    if (!atom) return atom;
+    return this.context.set((atom as unknown) as RecoilState<T>, updater);
+  };
 
   getEdgeAtoms = () => this.differRef.current?.differInterface.edgeUpdater.getItemAtoms() ?? {};
 

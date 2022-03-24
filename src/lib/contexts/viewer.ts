@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { ViewerContextType } from '@types';
+import type { ViewerContextType } from '@app/types';
 import { noop } from '@app/utils/converter';
 
 export const defaultVal: ViewerContextType = {

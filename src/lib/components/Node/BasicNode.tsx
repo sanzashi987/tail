@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import type { NodeProps } from '@types';
+import type { NodeProps } from '@app/types';
 import styles from './BasicNode.module.scss';
 import Handle from '../Handle';
 

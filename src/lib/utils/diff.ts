@@ -1,3 +1,5 @@
+import type { IObject } from '@app/types';
+
 export function diff<T>(
   last: IObject<T>,
   next: IObject<T>,

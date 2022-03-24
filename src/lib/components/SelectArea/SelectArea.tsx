@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import type { SelectAreaProps } from '@types';
+import type { SelectAreaProps } from '@app/types';
 import Style from './SelectArea.module.scss';
 
 const SelectArea: FC<SelectAreaProps> = ({ dragEnd: { x, y }, dragStart, offsetSnap, offset }) => {

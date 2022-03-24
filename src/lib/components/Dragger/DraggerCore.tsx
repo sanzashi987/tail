@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import type { DraggerCoreBasic } from '@types';
+import type { DraggerCoreBasic } from '@app/types';
 import { getCoordinatesFromParent } from './utils/calc';
 import { addUserSelectStyles, removeUserSelectStyles } from './utils/domFns';
 

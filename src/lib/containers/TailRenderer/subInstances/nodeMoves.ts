@@ -1,4 +1,4 @@
-import type { Node, DraggerData, NodeAtom } from '@types';
+import type { Node, DraggerData, NodeAtom, IObject } from '@app/types';
 import TailCore from '..';
 import { createNodeDeltaMove } from '../mutation';
 
@@ -36,7 +36,8 @@ class NodeMoves {
     const updater = createNodeDeltaMove(d.deltaX, d.deltaY);
     const updatePayload: Node[] = [];
     Object.keys(this.node).forEach((e: string) => {
-      updatePayload.push(updater(this.core.getAtomState<NodeAtom>('node', e)).node);
+      const nodeState = this.core.getAtomState<NodeAtom>('node', e);
+      nodeState && updatePayload.push(updater(nodeState).node);
     });
     this.core.props.onNodeUpdate?.(updatePayload);
   };

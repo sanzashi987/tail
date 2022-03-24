@@ -1,9 +1,12 @@
-import type { DeletePayload, EdgeTree, NodeAtom } from '@app/types';
+import type { DeletePayload, EdgeTree, NodeAtom, IObject } from '@app/types';
 import type { RecoilState } from 'recoil';
 
 export function getAtom<T>(id: string, atomPool?: IObject<RecoilState<T>>) {
   const atom = atomPool?.[id];
-  if (!atom) throw Error('fail to fetch atom from the pool');
+  if (!atom) {
+    console.error('fail to fetch atom from the pool', id);
+    return false;
+  }
   return atom;
 }
 

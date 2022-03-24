@@ -1,4 +1,11 @@
-import type { SelectedItemType, EdgeAtom, NodeAtom, coordinates, SelectCallback } from '@app/types';
+import type {
+  SelectedItemType,
+  EdgeAtom,
+  NodeAtom,
+  coordinates,
+  SelectCallback,
+  IObject,
+} from '@app/types';
 import type { RecoilState } from 'recoil';
 import { CtrlOrCmd, isModifierExact } from '@app/utils';
 import { getAtom } from '../mutation';
@@ -32,11 +39,12 @@ function setSelectedHandle(
   setter: (atom: RecoilState<NodeAtom>, updater: NodeAtom | ((cur: NodeAtom) => NodeAtom)) => void,
 ) {
   const atom = getAtom(nodeId, nodePool);
-  setter(atom, (prev) => {
-    const next = immutableSelectedHandles(prev);
-    cb(next, handleId);
-    return next;
-  });
+  atom &&
+    setter(atom, (prev) => {
+      const next = immutableSelectedHandles(prev);
+      cb(next, handleId);
+      return next;
+    });
 }
 
 function sort(a: number, b: number) {
@@ -141,10 +149,12 @@ class ItemActives {
     const [xMin, xMax, yMin, yMax] = [...[startX, endX].sort(sort), ...[startY, endY].sort(sort)];
     const nodeAtoms = this.core.getNodeAtoms();
     Object.keys(nodeAtoms).forEach((key) => {
+      const nodeState = this.core.getAtomState<NodeAtom>('node', key);
+      if (!nodeState) return;
       const {
         rect: { width, height },
         node: { left, top },
-      } = this.core.getAtomState<NodeAtom>('node', key);
+      } = nodeState;
       const [xCurMin, xCurMax, yCurMin, yCurMax] = [left, left + width, top, top + height];
       if (
         isInside(

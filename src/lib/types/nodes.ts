@@ -1,15 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Component, ComponentType } from 'react';
+import type { ComponentType } from 'react';
 import type { RecoilState } from 'recoil';
-import type {
-  HandlesInfo,
-  UpdaterType,
-  coordinates,
-  AtomForceRender,
-  DraggerInterface,
-  DraggerData,
-  Rect,
-} from '.';
+import type { HandlesInfo, coordinates, AtomForceRender, DraggerData, Rect, IObject } from '.';
 
 export type Node<T extends IObject = {}> = {
   id: string;

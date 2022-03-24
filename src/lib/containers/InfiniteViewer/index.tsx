@@ -6,7 +6,7 @@ import {
   InfiniteViewerState,
   SelectModeType,
   UpdaterType,
-} from '@types';
+} from '@app/types';
 import ResizeObserver from 'resize-observer-polyfill';
 import { CoordinateCalc } from '@app/components/Dragger';
 import SelectArea from '@app/components/SelectArea';
@@ -49,6 +49,11 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     };
     this.onContainerResize = debounce(onContainerResize, 200);
   }
+
+  setScale = (scale: number) => {
+    if (scale === this.state.scale) return;
+    this.setState({ scale });
+  };
 
   getScale = () => {
     return this.state.scale;

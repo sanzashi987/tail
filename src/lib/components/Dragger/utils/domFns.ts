@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 // @flow
-import type { coordinates, MouseTouchEvent } from '@types';
+import type { coordinates, MouseTouchEvent } from '@app/types';
 import { findInArray } from '../../../utils';
 
 export function addEvent(el: any, event: string, handler: Function, inputOptions?: Object): void {

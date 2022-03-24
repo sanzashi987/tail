@@ -2,7 +2,7 @@
 import React, { ComponentType } from 'react';
 import type { RecoilState } from 'recoil';
 import { UpdaterType } from './instance';
-import { AtomForceRender, HandleType, NodeAtomsType } from '.';
+import { AtomForceRender, HandleType, NodeAtomsType, IObject } from '.';
 
 export type EdgeBasic = {
   source: string;
@@ -83,6 +83,7 @@ export type EdgeRendererProps = {
   // edges: IObject<Edge>;
   // connecting: boolean;
   templates: EdgeTemplatesType;
+  connectingEdge?: ComponentType<EdgeBasicProps>;
   // getNodeAtoms(): NodeAtomsType;
   // storeUpdater: (atom: RecoilState<EdgeAtom>, updater: UpdaterType<EdgeAtom>) => void;
 };
@@ -133,5 +134,5 @@ export type EdgeInProgressAtomType = {
 export type EdgeInProgressAtomUpdater = (updater: UpdaterType<EdgeInProgressAtomType>) => void;
 
 export type EdgeInProgressProps = {
-  template: ComponentType<EdgeBasicProps>;
+  template?: ComponentType<EdgeBasicProps>;
 };

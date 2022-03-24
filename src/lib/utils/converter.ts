@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { useMemo } from 'react';
+import type { IObject } from '@app/types';
 
-export const useArrayKeysObject = <T extends {} = {}>(arr: T[], key: keyof T) => { //eslint-disable-line
+export const useArrayKeysObject = <T extends {} = {}>(arr: T[], key: keyof T) => {
+  //eslint-disable-line
   const object = useMemo(() => {
     const res: IObject<T> = {};
     arr.forEach((item) => {

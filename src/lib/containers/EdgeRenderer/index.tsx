@@ -1,6 +1,13 @@
 import React, { Component, ReactNode } from 'react';
-import type { EdgeRendererProps, EdgeTree, Edge, ItemDifferInterface, EdgeAtomType } from '@types';
-import { EdgeInProgress, BasicEdge, EdgeWrapper } from '@app/components/Edge';
+import type {
+  EdgeRendererProps,
+  EdgeTree,
+  Edge,
+  ItemDifferInterface,
+  EdgeAtomType,
+  IObject,
+} from '@app/types';
+import { EdgeInProgress, EdgeWrapper } from '@app/components/Edge';
 import { DifferContext } from '@app/contexts/differ';
 import styles from './index.module.scss';
 import { registerChild, removeChild, defaultProps } from './utils';
@@ -56,7 +63,7 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
       <svg className={`tail-edge-container ${styles['edge-container']}`}>
         {this.props.children /*for marker definition */}
         {this.memoEdges}
-        <EdgeInProgress template={BasicEdge as any} />
+        <EdgeInProgress template={this.props.connectingEdge} />
       </svg>
     );
   }

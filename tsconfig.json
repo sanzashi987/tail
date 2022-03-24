@@ -19,21 +19,21 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
+    // "isolatedModules": true,
+    "emitDeclarationOnly": true,
+    // "noEmit": true,
+    "outDir": "dist",
     "declaration": true,
+    "declarationDir": "./dist/esm/",
     "jsx": "react-jsx",
     "paths": {
       "@app/*": [
         "./src/lib/*"
       ],
-      "@types": [
-        "./src/lib/types/index.ts"
-      ]
     },
-    "baseUrl": "."
+  "baseUrl": "."
   },
   "include": [
-    "src"
+    "src/lib"
   ]
 }

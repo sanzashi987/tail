@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { MiniMap, Tail } from '@app/index';
-import { DraggerData, Edge, EdgeBasic, Node } from '@app/types';
+import { DraggerData, Edge, EdgeBasic, Node , IObject } from '@app/types';
+
 
 const nodes: IObject<Node> = {
   id1: {

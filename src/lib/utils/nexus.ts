@@ -1,5 +1,5 @@
 import { useImperativeHandle, forwardRef } from 'react';
-import { RecoilValue, RecoilState, useRecoilCallback } from 'recoil';
+import { RecoilValue, useRecoilCallback } from 'recoil';
 
 const RecoilNexus = forwardRef(function (props, ref) {
   const get = useRecoilCallback<[atom: RecoilValue<any>], any>(

@@ -2,14 +2,15 @@ import React, { FC, Component, ReactNode } from 'react';
 import {
   MinimapProps,
   MinimapState,
-  ViewerContextType,
   Box,
   NodeAtom,
   Node,
   ItemDifferInterface,
   MapContainerProps,
+  IObject,
 } from '@app/types';
-import { ViewerContext, ViewerConsumer, ViewerProvider } from '@app/contexts/viewer';
+
+import { ViewerConsumer } from '@app/contexts/viewer';
 import { DifferContext } from '@app/contexts/differ';
 import { isNotNum } from '@app/utils';
 import type { RecoilState } from 'recoil';

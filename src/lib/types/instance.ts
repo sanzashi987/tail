@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ComponentType } from 'react';
 import { EdgeUpdater, NodeUpdater } from '@app/containers/TailRenderer/subInstances/itemUpdater';
 import type { RecoilValue, RecoilState } from 'recoil';
 import type {
@@ -15,16 +15,27 @@ import type {
   HandleType,
   TemplatePickerType,
   MarkerDefsProps,
+  EdgeBasicProps,
+  SelectModeType,
+  IObject,
 } from '.';
+
+export type CoreMethods = {
+  switchMode(m: SelectModeType): void;
+  setScale(scale: number): void;
+  focusNode(id: string): void;
+};
 
 export type TailCoreOptionalProps = {
   nodeTemplates?: NodeTemplatesType;
   edgeTemplates?: EdgeTemplatesType;
   markerTemplates?: MarkerTemplatesType;
   nodeTemplatePicker?: TemplatePickerType;
+  connectingEdge?: ComponentType<EdgeBasicProps>;
   dropThreshold?: number;
   quickNodeUpdate?: boolean;
   onDelete?(nodes: string[], edges: string[]): void; //come with id array
+  getMethods?: (methods: CoreMethods) => void;
 } & NodeMutation &
   EdgeMutation &
   NodeMouseInterface &
@@ -126,7 +137,7 @@ export type DeleteItem = {
 
 export type DeletePayload = DeleteItem[];
 
-export type AtomStateGetterType = <T>(type: SelectedItemType, id: string) => T;
+export type AtomStateGetterType = <T>(type: SelectedItemType, id: string) => T | false;
 export type AtomStateSetterType = <T>(
   type: SelectedItemType,
   id: string,

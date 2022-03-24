@@ -1,6 +1,7 @@
-import type { Node, TemplateNodeClass } from '@types';
+import type { Node, TemplateNodeClass , IObject } from '@app/types';
 import { BasicNode, BasicFoldedNode } from '../../components/Node';
 
+;
 
 export const defaultProps = {
   templatePicker: (node: Node) => [node.type, node.fold ? 'folded' : 'default'],
