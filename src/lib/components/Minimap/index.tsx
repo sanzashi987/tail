@@ -130,10 +130,21 @@ class Minimap extends Component<MinimapProps, MinimapState> {
   };
 
   updateBox = (box: Box, lastBox?: Box) => {
-    const sortedX = [...this.state.sortedX];
-    const sortedY = [...this.state.sortedY];
-    binaryUpdateBox(sortedX, sortedY, box, lastBox);
-    this.setState({ sortedX, sortedY });
+    this.setState(({ sortedX, sortedY }) => {
+      const sortedNewX = [...sortedX];
+      const sortedNewY = [...sortedY];
+      binaryUpdateBox(sortedNewX, sortedNewY, box, lastBox);
+      return {
+        sortedX: sortedNewX,
+        sortedY: sortedNewY,
+      };
+    });
+
+    // const sortedX = [...this.state.sortedX];
+    // const sortedY = [...this.state.sortedY];
+    // binaryUpdateBox(sortedX, sortedY, box, lastBox);
+    // this.setState({ sortedX, sortedY });
+    // console.log('sorted', sortedX, sortedY);
   };
 
   componentDidMount() {
@@ -148,6 +159,7 @@ class Minimap extends Component<MinimapProps, MinimapState> {
   render() {
     const { width, height, style, viewportFrameColor } = this.props;
     const { sortedX, sortedY } = this.state;
+    // console.log('sorted', sortedX, sortedY);
     return (
       <MapContainer
         width={width!}

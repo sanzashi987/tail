@@ -10,15 +10,18 @@ const MiniNode: FC<MiniNodeProps> = ({ atom, activeColor, nodeColor, updateBox }
     rect: { width, height },
     selected,
   } = useRecoilValue(atom);
-  if (isNotNum(width) || isNotNum(height)) return null;
   const lastBox = useRef<Box>();
   const nodeBox = toBox({ x, y, width, height });
+  // console.log(nodeBox);
+
   useEffect(() => {
     updateBox(nodeBox, lastBox.current);
-    lastBox.current = nodeBox;
+    lastBox.current = { ...nodeBox };
   }, [x, y, nodeBox.x2, nodeBox.y2]);
 
   const fill = selected ? activeColor : nodeColor;
+
+  if (isNotNum(width) || isNotNum(height)) return null;
 
   return (
     <rect

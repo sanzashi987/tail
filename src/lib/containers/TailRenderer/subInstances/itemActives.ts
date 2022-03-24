@@ -1,10 +1,4 @@
-import type {
-  SelectedItemType,
-  EdgeAtom,
-  NodeAtom,
-  coordinates,
-  SelectCallback,
-} from '@app/types';
+import type { SelectedItemType, EdgeAtom, NodeAtom, coordinates, SelectCallback } from '@app/types';
 import type { RecoilState } from 'recoil';
 import { CtrlOrCmd, isModifierExact } from '@app/utils';
 import { getAtom } from '../mutation';
@@ -145,7 +139,8 @@ class ItemActives {
     const endX = (bottomRight.x - offset.x) / scale;
     const endY = (bottomRight.y - offset.y) / scale;
     const [xMin, xMax, yMin, yMax] = [...[startX, endX].sort(sort), ...[startY, endY].sort(sort)];
-    Object.keys(this.core.nodeRef.current!.nodeAtoms).forEach((key) => {
+    const nodeAtoms = this.core.getNodeAtoms();
+    Object.keys(nodeAtoms).forEach((key) => {
       const {
         rect: { width, height },
         node: { left, top },

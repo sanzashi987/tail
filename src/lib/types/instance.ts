@@ -14,6 +14,7 @@ import type {
   ViewerInterface,
   HandleType,
   TemplatePickerType,
+  MarkerDefsProps,
 } from '.';
 
 export type TailCoreOptionalProps = {
@@ -28,7 +29,8 @@ export type TailCoreOptionalProps = {
   EdgeMutation &
   NodeMouseInterface &
   EdgeMouseInterface &
-  ViewerInterface;
+  ViewerInterface &
+  MarkerDefsProps;
 
 export type TailCoreProps = {
   nodes: IObject<Node>;

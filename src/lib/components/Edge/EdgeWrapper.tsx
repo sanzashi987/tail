@@ -12,14 +12,7 @@ const getMarkerId = (markerId?: string) => {
   return undefined;
 };
 
-const EdgeWrapper: FC<EdgeWrapperProps> = ({
-  atom,
-  nodeAtoms,
-  templates,
-  updateEdge,
-  // template: EdgeComponent,
-  // shadow: ShadowEdge,
-}) => {
+const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates, updateEdge }) => {
   const { edge, selected, sourceX, sourceY, targetX, targetY, reconnect, hovered } = useRecoilValue(
     computedEdgeSelector({ edge: atom, nodeAtoms }),
   );

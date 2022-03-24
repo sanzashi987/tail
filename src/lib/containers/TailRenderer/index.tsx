@@ -75,7 +75,15 @@ class TailCore extends Component<TailCoreProps> {
   }
 
   render() {
-    const { nodes, edges, nodeTemplates, nodeTemplatePicker, onViewerDrop } = this.props;
+    const {
+      nodes,
+      edges,
+      nodeTemplates,
+      nodeTemplatePicker,
+      onViewerDrop,
+      markers,
+      markerTemplates,
+    } = this.props;
     const { set } = this.context;
     const { deactivateLast, batchActivateNodes } = this.ItemActives;
     return (
@@ -90,22 +98,12 @@ class TailCore extends Component<TailCoreProps> {
           <InterfaceProvider value={this.contextInterface}>
             <NodeRenderer
               templates={nodeTemplates}
-              // nodes={nodes}
               ref={this.nodeRef}
               templatePicker={nodeTemplatePicker}
-              // mounted={() => this.setState({ nodesReady: true })}
-              // storeUpdater={set}
             />
-            {/* {this.state.nodesReady && ( */}
-            <EdgeRenderer
-              // edges={edges}
-              ref={this.edgeRef}
-              // getNodeAtoms={this.getNodeAtoms}
-              // storeUpdater={set}
-            >
-              <MarkerDefs />
+            <EdgeRenderer ref={this.edgeRef}>
+              <MarkerDefs markers={markers} markerTemplates={markerTemplates} />
             </EdgeRenderer>
-            {/* )} */}
           </InterfaceProvider>
         </InfiniteViewer>
       </ItemDiffer>

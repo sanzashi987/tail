@@ -1,4 +1,4 @@
-import React, { ReactNode, PureComponent } from 'react';
+import React, { ReactNode, Component } from 'react';
 import { BasicClosedMarker, BasicMarker } from '@app/components/Anchor';
 import type { Marker, MarkerDefsProps, MarkerTemplatesType, MarkerTemplateType } from '@app/types';
 
@@ -19,18 +19,12 @@ function findTemplate(
   return passedTemplates?.[type] ?? defaultTemplates[type] ?? null;
 }
 
-class MarkerDefs extends PureComponent<MarkerDefsProps> {
-  // optional approach to load user-developed markers
-  // but this runs as a singleton which will fail to render to tail instance
-  // simultaneously in one app
-  // static supportedMarkers = defaultTemplates
-  // static useMarkers = (templates: MarkerTemplatesType) => {}
-
+class MarkerDefs extends Component<MarkerDefsProps> {
   renderMarker(markers: Marker[]) {
-    const { templates } = this.props;
+    const { markerTemplates } = this.props;
     return markers.reduce<ReactNode[]>((lastRes, marker) => {
       const { type, ...MarkerWrapperProps } = marker;
-      const Marker = findTemplate(type, templates);
+      const Marker = findTemplate(type, markerTemplates);
       if (Marker !== null) {
         lastRes.push(<Marker key={marker.id} {...MarkerWrapperProps} />);
       }

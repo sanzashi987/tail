@@ -174,7 +174,8 @@ class EdgeConnects {
   onHandleMouseDown: ConnectMethodType = (e, type, nodeId, handleId) => {
     //only edge active will try reconnect
     let newType = type;
-    const { edgeTree, edgeAtoms } = this.core.edgeRef.current!;
+    const edgeAtoms = this.core.getEdgeAtoms();
+    const { edgeTree } = this.core.edgeRef.current!;
     const possibleEdge = hasConnectedEdgeActive(
       edgeTree,
       this.core.activeItems['edge'],

@@ -6,7 +6,7 @@ export function binarySearch(sortedArr: number[], val: number) {
 
   while (minIndex < maxIndex) {
     const mid = (minIndex + maxIndex) >>> 1; // right shift avoid decimal
-    if (sortedArr[minIndex] < val) minIndex = mid + 1;
+    if (sortedArr[mid] < val) minIndex = mid + 1;
     else maxIndex = mid;
   }
   return minIndex;

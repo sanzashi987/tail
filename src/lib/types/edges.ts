@@ -111,9 +111,9 @@ export type MarkerTemplatesType = {
 };
 
 export type MarkerDefsProps = {
-  defaultColor?: string;
+  // defaultColor?: string;
   markers?: Marker[];
-  templates?: MarkerTemplatesType;
+  markerTemplates?: MarkerTemplatesType;
 };
 
 type NodeId = string;
