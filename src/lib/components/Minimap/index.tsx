@@ -104,14 +104,15 @@ class Minimap extends Component<MinimapProps, MinimapState> {
   memoNodes: ReactNode;
 
   state: MinimapState = {
-    sortedX: [10, 1712],
-    sortedY: [20, 892],
+    sortedX: [],
+    sortedY: [],
   };
 
   mountNode = (node: Node, atom: RecoilState<NodeAtom>) => {
     const { activeColor, nodeColor } = this.props;
     this.nodeInstances[node.id] = (
       <MiniNode
+        key={node.id}
         atom={atom}
         activeColor={activeColor!}
         nodeColor={nodeColor!}
