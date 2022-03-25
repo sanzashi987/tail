@@ -108,7 +108,8 @@
     "start": "node scripts/start.js",
     "build2": "node scripts/build.js",
     "build": "rollup -c --environment NODE_ENV:production && node node_modules/tsc-alias/dist/bin/index.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "release": "release-it"
   },
   "main": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
