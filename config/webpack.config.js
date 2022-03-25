@@ -192,31 +192,14 @@ module.exports = function (webpackEnv) {
     // Stop compilation early in production
     bail: isEnvProduction,
     devtool: isEnvProduction
-      ?/*  shouldUseSourceMap
+      ? shouldUseSourceMap
         ? 'source-map'
-        :  */false
+        : false
       : isEnvDevelopment && 'cheap-module-source-map',
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
-    entry: isEnvProduction ? paths.appLib : paths.appIndexJs,
-    externals: isEnvProduction ? {
-      'react': 'react',
-      'react-dom': 'react-dom',
-      'recoil': 'recoil',
-      'lodash.debounce': 'lodash.debounce',
-      'resize-observer-polyfill': 'resize-observer-polyfill',
-    } : {},
-
-    experiments: {
-      outputModule: true,
-    },
-    externalsType: 'module',
-
+    entry: paths.appIndexJs,
     output: {
-      // module: true,
-      chunkLoading: false,
-      "library": { type: "module" },
-      environment: { module: true },
       // The build folder.
       path: paths.appBuild,
       // Add /* filename */ comments to generated require()s in the output.
@@ -224,11 +207,11 @@ module.exports = function (webpackEnv) {
       // There will be one main bundle, and one file per asynchronous chunk.
       // In development, it does not produce real files.
       filename: isEnvProduction
-        ? 'esm/index.js'//'static/js/[name].[contenthash:8].js'
+        ? 'static/js/[name].[contenthash:8].js'
         : isEnvDevelopment && 'static/js/bundle.js',
       // There are also additional JS chunk files if you use code splitting.
       chunkFilename: isEnvProduction
-        ? 'esm/[name].[contenthash:8].chunk.js'
+        ? 'static/js/[name].[contenthash:8].chunk.js'
         : isEnvDevelopment && 'static/js/[name].chunk.js',
       assetModuleFilename: 'static/media/[name].[hash][ext]',
       // webpack uses `publicPath` to determine where the app is being served from.
@@ -581,7 +564,7 @@ module.exports = function (webpackEnv) {
     },
     plugins: [
       // Generates an `index.html` file with the <script> injected.
-      isEnvDevelopment && new HtmlWebpackPlugin(
+      new HtmlWebpackPlugin(
         Object.assign(
           {},
           {
@@ -609,9 +592,9 @@ module.exports = function (webpackEnv) {
       // Inlines the webpack runtime script. This script is too small to warrant
       // a network request.
       // https://github.com/facebook/create-react-app/issues/5358
-      // isEnvProduction &&
-      // shouldInlineRuntimeChunk &&
-      // new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/runtime-.+[.]js/]),
+      isEnvProduction &&
+      shouldInlineRuntimeChunk &&
+      new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/runtime-.+[.]js/]),
       // Makes some environment variables available in index.html.
       // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
       // <link rel="icon" href="%PUBLIC_URL%/favicon.ico">
@@ -642,9 +625,8 @@ module.exports = function (webpackEnv) {
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
         // both options are optional
-        // filename: 'static/css/[name].[contenthash:8].css',
-        // chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
-        filename: 'esm/[name].css'
+        filename: 'static/css/[name].[contenthash:8].css',
+        chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
       }),
       // Generate an asset manifest file with the following content:
       // - "files" key: Mapping of all asset filenames to their corresponding
@@ -652,24 +634,24 @@ module.exports = function (webpackEnv) {
       //   `index.html`
       // - "entrypoints" key: Array of files which are included in `index.html`,
       //   can be used to reconstruct the HTML if necessary
-      // new WebpackManifestPlugin({
-      //   fileName: 'asset-manifest.json',
-      //   publicPath: paths.publicUrlOrPath,
-      //   generate: (seed, files, entrypoints) => {
-      //     const manifestFiles = files.reduce((manifest, file) => {
-      //       manifest[file.name] = file.path;
-      //       return manifest;
-      //     }, seed);
-      //     const entrypointFiles = entrypoints.main.filter(
-      //       fileName => !fileName.endsWith('.map')
-      //     );
+      new WebpackManifestPlugin({
+        fileName: 'asset-manifest.json',
+        publicPath: paths.publicUrlOrPath,
+        generate: (seed, files, entrypoints) => {
+          const manifestFiles = files.reduce((manifest, file) => {
+            manifest[file.name] = file.path;
+            return manifest;
+          }, seed);
+          const entrypointFiles = entrypoints.main.filter(
+            fileName => !fileName.endsWith('.map')
+          );
 
-      //     return {
-      //       files: manifestFiles,
-      //       entrypoints: entrypointFiles,
-      //     };
-      //   },
-      // }),
+          return {
+            files: manifestFiles,
+            entrypoints: entrypointFiles,
+          };
+        },
+      }),
       // Moment.js is an extremely popular library that bundles large locale files
       // by default due to how webpack interprets its code. This is a practical
       // solution that requires the user to opt into importing specific locales.

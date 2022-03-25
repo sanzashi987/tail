@@ -3,7 +3,7 @@ $grid-border-colour: rgba(#333, 0.125);
 
 .infinite-wrapper {
   position: relative;
-  height: 100vh;
+  height: 100%;
   width: 100%;
   background-image: linear-gradient($grid-border-colour 1px, transparent 1px),
     linear-gradient(90deg, $grid-border-colour 1px, transparent 1px),

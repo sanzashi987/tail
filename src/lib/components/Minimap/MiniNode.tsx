@@ -12,8 +12,8 @@ const MiniNode: FC<MiniNodeProps> = ({ atom, activeColor, nodeColor, updateBox }
   } = useRecoilValue(atom);
   const lastBox = useRef<Box>();
   const nodeBox = toBox({ x, y, width, height });
-
   useEffect(() => {
+    if (isNotNum(width) || isNotNum(height)) return;
     updateBox(nodeBox, lastBox.current);
     lastBox.current = nodeBox;
   }, [x, y, nodeBox.x2, nodeBox.y2]);

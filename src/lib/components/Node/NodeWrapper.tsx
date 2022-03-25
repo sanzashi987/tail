@@ -92,6 +92,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
     if (last[val]) return last[val];
     return BasicNode;
   }, templates);
+  // console.log('render ==>', node.id);
   return (
     <Dragger
       x={x}

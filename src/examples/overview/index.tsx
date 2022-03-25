@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { DraggerData, Edge, EdgeBasic, Node, IObject } from '@app/types';
+// import { MiniMap, Tail } from '../../../dist/esm/index';
 import { MiniMap, Tail } from '@app/index';
-import { DraggerData, Edge, EdgeBasic, Node , IObject } from '@app/types';
-
+// import '../../../dist/esm/index.css';
 
 const nodes: IObject<Node> = {
   id1: {
@@ -62,25 +63,44 @@ function Overview() {
       [id]: { id, ...edgeState },
     }));
   }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setNodeState((prev) => {
+        return {
+          ...prev,
+          ['id233']: {
+            id: 'id233',
+            left: 510,
+            top: 250,
+            type: 'logical',
+          },
+        };
+      });
+    }, 5000);
+  }, []);
+
   return (
-    <Tail
-      nodes={nodeState}
-      edges={edgeState}
-      onEdgeClick={noop}
-      onNodeClick={noop}
-      onNodeUpdate={noop}
-      onNodeContextMenu={noop}
-      onEdgeCreate={onEdgeCreate}
-      onEdgeUpdate={noop}
-      onEdgeContextMenu={noop}
-      onDelete={noop}
-      nodeTemplates={{}}
-      edgeTemplates={{}}
-      markerTemplates={{}}
-      nodeTemplatePicker={templatePicker}
-    >
-      <MiniMap />
-    </Tail>
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <Tail
+        nodes={nodeState}
+        edges={edgeState}
+        onEdgeClick={noop}
+        onNodeClick={noop}
+        onNodeUpdate={noop}
+        onNodeContextMenu={noop}
+        onEdgeCreate={onEdgeCreate}
+        onEdgeUpdate={noop}
+        onEdgeContextMenu={noop}
+        onDelete={noop}
+        nodeTemplates={{}}
+        edgeTemplates={{}}
+        markerTemplates={{}}
+        nodeTemplatePicker={templatePicker}
+      >
+        <MiniMap />
+      </Tail>
+    </div>
   );
 }
 

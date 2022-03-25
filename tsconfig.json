@@ -1,11 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "esnext",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
+    "noImplicitAny": true,
+    // "strictNullChecks": true,
+    // "strictFunctionTypes": true,
+    // "strictPropertyInitialization": true,
+    // "alwaysStrict": true,
+    // "noImplicitReturns": false,
+    "useDefineForClassFields": false,
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -20,18 +27,19 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     // "isolatedModules": true,
-    "emitDeclarationOnly": true,
+    // "emitDeclarationOnly": true,
     // "noEmit": true,
-    "outDir": "dist",
+    // "outFile": "dist/cjs/index.js",
+    "outDir": "dist/esm",
     "declaration": true,
     "declarationDir": "./dist/esm/",
     "jsx": "react-jsx",
     "paths": {
       "@app/*": [
         "./src/lib/*"
-      ],
+      ]
     },
-  "baseUrl": "."
+    "baseUrl": "."
   },
   "include": [
     "src/lib"

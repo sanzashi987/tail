@@ -3,3 +3,4 @@ build/
 public/
 out/
 node_modules/
+config/
