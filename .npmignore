@@ -1,0 +1,17 @@
+.vscode
+config
+node_modules
+public
+scripts
+scripts
+.eslintignore
+.eslintrc
+.gitignore
+.DS_Store
+.release-it.json
+README.node_modules
+rollup.config.js
+stats.html
+tsconfig.json
+yarn-error.log
+yarn.lock
