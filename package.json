@@ -1,7 +1,15 @@
 {
-  "name": "tail",
+  "name": "tail-js",
   "version": "1.0.0",
-  "private": true,
+  "author": {
+    "name": "cza14h",
+    "email": "ziao.chen1995@gmail.com"
+  },
+  "keywords": [
+    "react",
+    "flow chart"
+  ],
+  "description": "A React & Recoil-based, data driven flow chart editor",
   "repository": {
     "type": "git",
     "url": "https://github.com/cza14h/tail.git"
