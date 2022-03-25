@@ -24,6 +24,7 @@ export type CoreMethods = {
   switchMode(m: SelectModeType): void;
   setScale(scale: number): void;
   focusNode(id: string): void;
+  getActiveItems(): SelectedItemCollection;
 };
 
 export type TailCoreOptionalProps = {

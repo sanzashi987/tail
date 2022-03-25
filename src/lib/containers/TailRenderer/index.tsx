@@ -2,7 +2,6 @@ import React, { Component, createRef } from 'react';
 import { InterfaceProvider } from '@app/contexts/instance';
 import { RecoilState } from 'recoil';
 import type {
-  SelectedItemCollection,
   InterfaceValue,
   TailCoreProps,
   SelectedItemType,
@@ -34,7 +33,6 @@ class TailCore extends Component<TailCoreProps> {
   static contextType = StoreContext;
   context!: StoreRootInterface;
 
-  activeItems: SelectedItemCollection = { node: {}, edge: {} };
   viewer = createRef<InfiniteViewer>();
   edgeRef = createRef<EdgeRenderer>();
   nodeRef = createRef<NodeRenderer>();
@@ -49,8 +47,8 @@ class TailCore extends Component<TailCoreProps> {
     super(props);
     const { onEdgeClick, onNodeClick, onEdgeContextMenu, onNodeContextMenu } = props;
 
-    this.NodeMoves = new NodeMoves(this);
     this.ItemActives = new ItemActives(this);
+    this.NodeMoves = new NodeMoves(this, this.ItemActives);
     this.EdgeConnects = new EdgeConnects(this, this.ItemActives);
 
     const { batchNodeDrag, batchNodeDragEnd, onDragStart } = this.NodeMoves;
@@ -78,6 +76,7 @@ class TailCore extends Component<TailCoreProps> {
       switchMode: this.switchMode,
       setScale: this.setScale,
       focusNode: this.focusNode,
+      getActiveItems: () => this.ItemActives.activeItems,
     });
   }
 

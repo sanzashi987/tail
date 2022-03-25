@@ -5,6 +5,7 @@ import type {
   coordinates,
   SelectCallback,
   IObject,
+  SelectedItemCollection,
 } from '@app/types';
 import type { RecoilState } from 'recoil';
 import { CtrlOrCmd, isModifierExact } from '@app/utils';
@@ -96,6 +97,7 @@ export function switchActive(
 }
 
 class ItemActives {
+  activeItems: SelectedItemCollection = { node: {}, edge: {} };
   constructor(private core: TailCore) {}
 
   activateNext = (e: React.MouseEvent, type: SelectedItemType, id: string, selected: boolean) => {
@@ -104,7 +106,7 @@ class ItemActives {
     if (!hold) {
       this.deactivateLast();
     }
-    this.switchActive(type, id, !selected, this.core.activeItems[type]);
+    this.switchActive(type, id, !selected, this.activeItems[type]);
   };
 
   deactivateLast = () => {
@@ -113,7 +115,7 @@ class ItemActives {
   };
 
   private batchDeactivate(type: SelectedItemType) {
-    const pool = this.core.activeItems[type];
+    const pool = this.activeItems[type];
     Object.keys(pool).forEach((key) => {
       this.switchActive(type, key, false, pool);
     });
@@ -141,7 +143,7 @@ class ItemActives {
   };
 
   batchActivateNodes: SelectCallback = (topleft, bottomRight, offset, scale) => {
-    const pool = this.core.activeItems['node'];
+    const pool = this.activeItems['node'];
     const startX = (topleft.x - offset.x) / scale;
     const startY = (topleft.y - offset.y) / scale;
     const endX = (bottomRight.x - offset.x) / scale;

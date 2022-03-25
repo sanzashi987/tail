@@ -1,9 +1,11 @@
 import type { Node, DraggerData, NodeAtom, IObject } from '@app/types';
-import TailCore from '..';
+import type ItemActives from './itemActives';
+import type TailCore from '..';
+
 import { createNodeDeltaMove } from '../mutation';
 
 class NodeMoves {
-  constructor(private core: TailCore) {}
+  constructor(private core: TailCore, private itemActives: ItemActives) {}
   node: IObject<string> = {};
 
   onDragStart = (e: React.MouseEvent, n: Node, c: DraggerData) => {
@@ -11,10 +13,10 @@ class NodeMoves {
   };
 
   batchNodeDrag = (e: MouseEvent, n: Node, d: DraggerData) => {
-    if (!this.core.activeItems.node[n.id]) {
+    if (!this.itemActives.activeItems.node[n.id]) {
       this.node = { [n.id]: n.id };
     } else {
-      this.node = this.core.activeItems.node;
+      this.node = this.itemActives.activeItems.node;
     }
     if (!this.core.props.quickNodeUpdate) {
       this.batchEmitUpdate(e, n, d);

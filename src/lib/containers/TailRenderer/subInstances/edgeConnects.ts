@@ -13,8 +13,8 @@ import type {
   IObject,
 } from '@app/types';
 import { edgeInProgressAtom } from '@app/atoms/edges';
-import ItemActives from './itemActives';
-import TailCore from '..';
+import type ItemActives from './itemActives';
+import type TailCore from '..';
 
 export function enableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
   return {
@@ -180,7 +180,7 @@ class EdgeConnects {
     const { edgeTree } = this.core.edgeRef.current!;
     const possibleEdge = hasConnectedEdgeActive(
       edgeTree,
-      this.core.activeItems['edge'],
+      this.itemActives.activeItems['edge'],
       nodeId,
       handleId,
     );
@@ -264,7 +264,12 @@ class EdgeConnects {
           SET<EdgeAtom>('edge', prevEdgeId, disableEdgeReconnect);
         } else {
           this.core.deleteItem([{ type: 'edge', id: prevEdgeId }]);
-          this.itemActives.switchActive('edge', prevEdgeId, false, this.core.activeItems['edge']);
+          this.itemActives.switchActive(
+            'edge',
+            prevEdgeId,
+            false,
+            this.itemActives.activeItems['edge'],
+          );
         }
       }
     }
