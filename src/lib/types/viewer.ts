@@ -33,6 +33,8 @@ export type InfiniteViewerProps = {
 
 export type ViewerInterface = {
   onViewerDrop?: ViewerDropCallback;
+  onViewerClick?: (e: React.MouseEvent, offset: coordinates, scale: number) => void;
+  onViewerScale?: (scale: number) => void;
 };
 
 export type SelectAreaProps = {

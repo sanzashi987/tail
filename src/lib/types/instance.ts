@@ -18,6 +18,7 @@ import type {
   EdgeBasicProps,
   SelectModeType,
   IObject,
+  EdgeTree,
 } from '.';
 
 export type CoreMethods = {
@@ -25,6 +26,7 @@ export type CoreMethods = {
   setScale(scale: number): void;
   focusNode(id: string): void;
   getActiveItems(): SelectedItemCollection;
+  getEdgeTree(): EdgeTree;
 };
 
 export type TailCoreOptionalProps = {
@@ -36,7 +38,9 @@ export type TailCoreOptionalProps = {
   dropThreshold?: number;
   quickNodeUpdate?: boolean;
   onDelete?(nodes: string[], edges: string[]): void; //come with id array
-  getMethods?: (methods: CoreMethods) => void;
+  onActivate?(): void;
+  // getMethods?: (methods: CoreMethods) => void;
+  instanceRef: { current: any };
 } & NodeMutation &
   EdgeMutation &
   NodeMouseInterface &

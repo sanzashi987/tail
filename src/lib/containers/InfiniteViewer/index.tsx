@@ -81,6 +81,12 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     this.observer?.disconnect();
   }
 
+  componentDidUpdate(lp: InfiniteViewerProps, ls: InfiniteViewerState) {
+    if (ls.scale !== this.state.scale) {
+      this.props.onViewerScale?.(this.state.scale);
+    }
+  }
+
   private isSelfEvent(event: React.UIEvent) {
     return Array.from(this.container.current?.children ?? []).includes(event.target as any);
   }
@@ -169,6 +175,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     if (this.isSelfEvent(e)) {
       e.stopPropagation();
       this.props.onClick?.(e);
+      this.props.onViewerClick?.(e, this.state.offset, this.state.scale);
     }
   };
 

@@ -72,12 +72,13 @@ class TailCore extends Component<TailCoreProps> {
       getScale: this.getScale,
     };
 
-    props.getMethods?.({
+    props.instanceRef.current = {
       switchMode: this.switchMode,
       setScale: this.setScale,
       focusNode: this.focusNode,
       getActiveItems: () => this.ItemActives.activeItems,
-    });
+      getEdgeTree: () => this.edgeRef.current?.edgeTree,
+    };
   }
 
   setScale = (scale: number) => {
@@ -109,6 +110,7 @@ class TailCore extends Component<TailCoreProps> {
       nodeTemplates,
       nodeTemplatePicker,
       onViewerDrop,
+      onViewerClick,
       markers,
       markerTemplates,
     } = this.props;
@@ -121,7 +123,9 @@ class TailCore extends Component<TailCoreProps> {
           onClick={deactivateLast}
           onSelectEnd={batchActivateNodes}
           onViewerDrop={onViewerDrop}
+          onViewerClick={onViewerClick}
           outerChildren={this.props.children}
+          onViewerScale={this.props.onViewerScale}
         >
           <InterfaceProvider value={this.contextInterface}>
             <NodeRenderer

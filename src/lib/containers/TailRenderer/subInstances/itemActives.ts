@@ -71,30 +71,30 @@ function isInside(
   return true;
 }
 
-export function switchActive(
-  _this: TailCore,
-  type: SelectedItemType,
-  id: string,
-  active: boolean,
-  activePool: IObject<string>,
-) {
-  active ? (activePool[id] = id) : delete activePool[id];
-  const atom = _this.getAtom(type, id);
-  const { set, get } = _this.context;
-  set(atom as RecoilState<NodeAtom | EdgeAtom>, (prev) => {
-    const next = { ...prev };
-    next.selected = active;
-    return next;
-  });
-  if (type !== 'edge') return;
-  const cb = active ? activateHandle : deactivateHandle;
-  const {
-    edge: { sourceNode, target, targetNode, source },
-  } = get(atom as RecoilState<EdgeAtom>)!;
-  const pool = _this.getNodeAtoms();
-  setSelectedHandle(sourceNode, source, pool, cb, set);
-  setSelectedHandle(targetNode, target, pool, cb, set);
-}
+// export function switchActive(
+//   _this: TailCore,
+//   type: SelectedItemType,
+//   id: string,
+//   active: boolean,
+//   activePool: IObject<string>,
+// ) {
+//   active ? (activePool[id] = id) : delete activePool[id];
+//   const atom = _this.getAtom(type, id);
+//   const { set, get } = _this.context;
+//   set(atom as RecoilState<NodeAtom | EdgeAtom>, (prev) => {
+//     const next = { ...prev };
+//     next.selected = active;
+//     return next;
+//   });
+//   if (type !== 'edge') return;
+//   const cb = active ? activateHandle : deactivateHandle;
+//   const {
+//     edge: { sourceNode, target, targetNode, source },
+//   } = get(atom as RecoilState<EdgeAtom>)!;
+//   const pool = _this.getNodeAtoms();
+//   setSelectedHandle(sourceNode, source, pool, cb, set);
+//   setSelectedHandle(targetNode, target, pool, cb, set);
+// }
 
 class ItemActives {
   activeItems: SelectedItemCollection = { node: {}, edge: {} };
