@@ -77,6 +77,7 @@ class TailCore extends Component<TailCoreProps> {
       setScale: this.setScale,
       focusNode: this.focusNode,
       getActiveItems: () => this.ItemActives.activeItems,
+      getEdgeTree: () => this.edgeRef.current?.edgeTree,
     };
   }
 

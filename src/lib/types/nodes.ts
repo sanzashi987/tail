@@ -21,9 +21,9 @@ export type NodeTemplatesType = IObject<TemplateNodeClass>;
 
 export type NodeCom<T extends IObject = {}> = ComponentType<NodeProps<T>>;
 
-export type TemplateNodeClass = IObject<NodeCom>;
+export type TemplateNodeClass = IObject<NodeCom<any>>;
 
-export type TemplatePickerType = (node: Node) => [string, string];
+export type TemplatePickerType = (node: Node<any>) => [string, string];
 
 export type NodeRendererProps = {
   // nodes: IObject<Node>;
