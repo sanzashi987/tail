@@ -6,6 +6,7 @@ import { TailCoreProps } from './types';
 export const Tail: FC<TailCoreProps> = (props) => {
   return h(StoreRoot, {}, [h(TailCore, { ...props, key: 'TailCore' })]);
 };
+export { default as Background } from './components/Background';
 export { default as MiniMap } from './components/_Minimap';
 export { drawBezier } from './components/Edge/drawBezier';
 export * from './types';

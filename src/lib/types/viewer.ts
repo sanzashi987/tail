@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import type { coordinates, UpdaterType } from '.';
 
 export type SelectModeType = 'single' | 'select';
@@ -51,3 +51,8 @@ export type ViewerContextType = {
   scale: number;
   setOffset: (offset: UpdaterType<coordinates>) => void;
 };
+
+
+export type BackgroundProps = {
+  style?: CSSProperties
+}

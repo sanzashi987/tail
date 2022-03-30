@@ -1,0 +1,16 @@
+$grid-border-colour: rgba(#333, 0.125);
+
+.tail-editor-background {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  z-index: -1;
+  background-image: linear-gradient($grid-border-colour 1px, transparent 1px),
+    linear-gradient(90deg, $grid-border-colour 1px, transparent 1px),
+    linear-gradient($grid-border-colour 1px, transparent 1px),
+    linear-gradient(90deg, $grid-border-colour 1px, transparent 1px);
+  // background-size: var(--bgsize);
+  // // background-position: 1px 1px, 1px 1px, 1px 1px, 1px 1px;
+  // background-position: var(--bgpos);
+}

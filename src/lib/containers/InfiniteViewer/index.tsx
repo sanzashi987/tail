@@ -14,7 +14,7 @@ import { createMemo } from '@app/utils';
 import debounce from 'lodash.debounce';
 import { ViewerProvider } from '@app/contexts/viewer';
 import styles from './index.module.scss';
-import { getCSSVar, captureTrue, commonDragOpt, getViewerContext } from './utils';
+import { captureTrue, commonDragOpt, getViewerContext } from './utils';
 
 class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState> {
   private observer: ResizeObserver | undefined;
@@ -26,7 +26,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
   private blockClick = false;
   private onContainerResize;
   private memoContext: typeof getViewerContext;
-  private memoCSSVar: typeof getCSSVar;
+  // private memoCSSVar: typeof getCSSVar;
   state: InfiniteViewerState = {
     scale: 1,
     offset: { x: 0, y: 0 },
@@ -41,7 +41,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
   constructor(props: InfiniteViewerProps) {
     super(props);
     this.memoContext = createMemo(getViewerContext);
-    this.memoCSSVar = createMemo(getCSSVar);
+    // this.memoCSSVar = createMemo(getCSSVar);
     const onContainerResize = (entries: ResizeObserverEntry[]) => {
       const { width, height } = entries[0].contentRect;
       this.props.onContainerResize?.(width, height);
@@ -221,7 +221,8 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
 
   render() {
     const { scale, offset, selecting, dragEnd, dragStart, viewerHeight, viewerWidth } = this.state;
-    const cssvar = this.memoCSSVar(offset, scale);
+    const { x, y } = offset;
+    // const cssvar = this.memoCSSVar(offset, scale);
     const contextVal = this.memoContext(offset, scale, viewerHeight, viewerWidth, this.setOffset);
     return (
       <div
@@ -231,10 +232,12 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
         onMouseDown={this.onMouseDown}
         onClick={this.onClick}
         onDrop={this.onDrop}
-        style={cssvar}
       >
         <ViewerProvider value={contextVal}>
-          <div ref={this.container} className="scroller">
+          <div ref={this.container} className="scroller"
+            // transform: translate(var(--x), var(--y)) scale(var(--scale));
+            style={{ transform: ` translate(${x}px,${y}px) scale(${scale})` }}
+          >
             {this.props.children}
           </div>
           {this.props.outerChildren}

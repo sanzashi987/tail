@@ -72,12 +72,14 @@ class TailCore extends Component<TailCoreProps> {
       getScale: this.getScale,
     };
 
-    props.instanceRef.current = {
-      switchMode: this.switchMode,
-      setScale: this.setScale,
-      focusNode: this.focusNode,
-      getActiveItems: () => this.ItemActives.activeItems,
-      getEdgeTree: () => this.edgeRef.current?.edgeTree,
+    if (props.instanceRef && props.instanceRef.current) {
+      props.instanceRef.current = {
+        switchMode: this.switchMode,
+        setScale: this.setScale,
+        focusNode: this.focusNode,
+        getActiveItems: () => this.ItemActives.activeItems,
+        getEdgeTree: () => this.edgeRef.current?.edgeTree,
+      };
     };
   }
 

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { DraggerData, Edge, EdgeBasic, Node, IObject } from '@app/types';
 // import { MiniMap, Tail } from '../../../dist/esm/index';
-import { MiniMap, Tail } from '@app/index';
+import { MiniMap, Tail, Background } from '@app/index';
 // import '../../../dist/esm/index.css';
 
 const nodes: IObject<Node> = {
@@ -98,6 +98,7 @@ function Overview() {
         markerTemplates={{}}
         nodeTemplatePicker={templatePicker}
       >
+        <Background />
         <MiniMap />
       </Tail>
     </div>

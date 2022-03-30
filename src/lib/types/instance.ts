@@ -40,7 +40,7 @@ export type TailCoreOptionalProps = {
   onDelete?(nodes: string[], edges: string[]): void; //come with id array
   onActivate?(): void;
   // getMethods?: (methods: CoreMethods) => void;
-  instanceRef: { current: any };
+  instanceRef?: { current: any };
 } & NodeMutation &
   EdgeMutation &
   NodeMouseInterface &
