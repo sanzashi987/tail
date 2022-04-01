@@ -41,8 +41,8 @@ export const getHandleBoundsByHandleType = (
     lastRes[handleId!] = {
       id: handleId!,
       // position: handlePosition,
-      x: (bounds.left - parentBounds.left + dimensions.width / 2) / k,
-      y: (bounds.top - parentBounds.top + dimensions.height / 2) / k,
+      x: (bounds.left - parentBounds.left + bounds.width / 2) / k,
+      y: (bounds.top - parentBounds.top + bounds.height / 2) / k,
       ...dimensions,
     };
     return lastRes;
@@ -54,10 +54,13 @@ const EmptyHandles = { source: {}, target: {} };
 export const getNodeInfo = (
   ref: React.RefObject<HTMLDivElement | undefined>,
   node: Node,
+  scale: number,
 ): [Rect, HandlesInfo] => {
   if (!ref.current) {
     console.warn('fail to retrieve the DOM instance of', node);
     return [defaultRect, EmptyHandles];
   }
-  return [ref.current.getBoundingClientRect(), getHandleBounds(ref.current, 1)];
+  const rect = ref.current.getBoundingClientRect();
+  [rect.height, rect.width] = [Math.round(rect.height / scale), Math.round(rect.width / scale)];
+  return [rect, getHandleBounds(ref.current, scale)];
 };

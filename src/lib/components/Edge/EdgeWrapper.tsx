@@ -5,7 +5,7 @@ import { computedEdgeSelector } from '@app/atoms/edges';
 import { InstanceInterface } from '@app/contexts/instance';
 import { isNum } from '@app/utils';
 import { setHovered, setNotHovered } from '@app/atoms/reducers';
-import { BezierEdge, BasicShadow } from '.';
+import { BasicEdge, BasicShadow } from '.';
 
 const getMarkerId = (markerId?: string) => {
   if (typeof markerId === 'string') return `url(#${markerId})`;
@@ -52,46 +52,55 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates, updateE
   const markerStartUrl = useMemo(() => getMarkerId(markerStart), [markerStart]);
   const markerEndUrl = useMemo(() => getMarkerId(markerEnd), [markerEnd]);
 
-  if (
-    [sourceX, sourceY, targetX, targetY].reduce(
-      (last, val) => (isNum(val) ? last || false : true),
-      false,
-    ) ||
-    reconnect
-  ) {
-    return null;
-  }
-
   const { type = '' } = edge;
-  const EdgeComponent = templates[type]?.default ?? BezierEdge; //BasicEdge;
+  const EdgeComponent = templates[type]?.default ?? BasicEdge; //;BezierEdge
   const ShadowComponent = templates[type]?.shadow ?? BasicShadow;
 
-  return (
-    <>
-      <g className="tail-edge__wrapper">
-        <EdgeComponent
-          edge={edge}
-          hovered={hovered}
-          selected={selected}
-          sourceX={sourceX}
-          sourceY={sourceY}
-          targetX={targetX}
-          targetY={targetY}
-          markerEnd={markerEndUrl}
-          markerStart={markerStartUrl}
-        />
-      </g>
-      <g
-        className="tail-edge__event-enhancer"
-        onClick={onClick}
-        onMouseOver={onHoverIn}
-        onMouseLeave={onHoverOut}
-        onContextMenu={onContextMenu}
-      >
-        <ShadowComponent sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY={targetY} />
-      </g>
-    </>
-  );
+  const memoVNode = useMemo(() => {
+    if (
+      [sourceX, sourceY, targetX, targetY].reduce(
+        (last, val) => (isNum(val) ? last || false : true),
+        false,
+      ) ||
+      reconnect
+    ) {
+      return null;
+    }
+
+    return (
+      <>
+        <g className="tail-edge__wrapper">
+          <EdgeComponent
+            edge={edge}
+            hovered={hovered}
+            selected={selected}
+            sourceX={sourceX}
+            sourceY={sourceY}
+            targetX={targetX}
+            targetY={targetY}
+            markerEnd={markerEndUrl}
+            markerStart={markerStartUrl}
+          />
+        </g>
+        <g
+          className="tail-edge__event-enhancer"
+          onClick={onClick}
+          onMouseOver={onHoverIn}
+          onMouseLeave={onHoverOut}
+          onContextMenu={onContextMenu}
+        >
+          <ShadowComponent
+            sourceX={sourceX}
+            sourceY={sourceY}
+            targetX={targetX}
+            targetY={targetY}
+          />
+        </g>
+      </>
+    );
+  }, [edge, hovered, selected, sourceX, sourceY, targetX, targetY, markerEndUrl, markerStartUrl]);
+
+  return memoVNode;
 };
 
 export default EdgeWrapper;
