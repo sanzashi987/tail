@@ -98,6 +98,7 @@ function isInside(
 
 class ItemActives {
   activeItems: SelectedItemCollection = { node: {}, edge: {} };
+  private isQueuedEmit = false;
   constructor(private core: TailCore) {}
 
   activateNext = (e: React.MouseEvent, type: SelectedItemType, id: string, selected: boolean) => {
@@ -140,6 +141,13 @@ class ItemActives {
     const pool = _this.getNodeAtoms();
     setSelectedHandle(sourceNode, source, pool, cb, set);
     setSelectedHandle(targetNode, target, pool, cb, set);
+    if (!this.isQueuedEmit) {
+      this.isQueuedEmit = true;
+      Promise.resolve().then(() => {
+        this.core.props.onActivate?.(this.activeItems);
+        this.isQueuedEmit = false;
+      });
+    }
   };
 
   batchActivateNodes: SelectCallback = (topleft, bottomRight, offset, scale) => {

@@ -38,7 +38,7 @@ export type TailCoreOptionalProps = {
   dropThreshold?: number;
   quickNodeUpdate?: boolean;
   onDelete?(nodes: string[], edges: string[]): void; //come with id array
-  onActivate?(): void;
+  onActivate?(items: SelectedItemCollection): void;
   // getMethods?: (methods: CoreMethods) => void;
   instanceRef?: { current: any };
 } & NodeMutation &

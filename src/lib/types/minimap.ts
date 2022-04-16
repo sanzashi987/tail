@@ -22,6 +22,10 @@ export type MapContainerProps = MapStyleProps & {
   sortedY: number[];
 };
 
+export type MapContainerState = {
+  lockBoundary: boolean;
+};
+
 export type MinimapState = {
   sortedX: number[];
   sortedY: number[];
@@ -33,3 +37,11 @@ export type MiniNodeProps = {
   nodeColor: string;
   updateBox(box: Box, lastBox?: Box): void;
 };
+
+export type MapBoundary = {
+  left: number;
+  top: number;
+  maxRatio: number;
+  vh: number;
+  vw: number;
+} | null;

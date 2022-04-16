@@ -14,12 +14,12 @@ const noop = () => defaultState;
 
 type cb = (e: MouseEvent, d: DraggerData) => void;
 type StartPayload = {
-  x: number;
-  y: number;
-  parent: Element;
+  x?: number;
+  y?: number;
+  parent?: Element;
   movecb: cb;
   endcb: cb;
-  getScale(): number;
+  getScale?: () => number;
   moveOpt?: AddEventListenerOptions;
   endOpt?: AddEventListenerOptions;
 };
@@ -34,7 +34,16 @@ class CoordinateCalc {
 
   start = (
     e: MouseEventCollection,
-    { x, y, parent, movecb, endcb, getScale, endOpt, moveOpt }: StartPayload,
+    {
+      x = 0,
+      y = 0,
+      parent = document.body,
+      movecb,
+      endcb,
+      getScale = () => 1,
+      endOpt,
+      moveOpt,
+    }: StartPayload,
   ) => {
     e.stopPropagation();
     const cor = getCoordinatesFromParent(e, parent, getScale());

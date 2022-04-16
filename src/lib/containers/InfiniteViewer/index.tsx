@@ -87,8 +87,12 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     }
   }
 
-  private isSelfEvent(event: React.UIEvent) {
-    return Array.from(this.container.current?.children ?? []).includes(event.target as any);
+  private isBlankClicked(event: React.UIEvent) {
+    // console.log(event.target === this.ref.current);
+    return (
+      event.target === this.ref.current ||
+      Array.from(this.container.current?.children ?? []).includes(event.target as any)
+    );
   }
 
   private onWheeling = (e: React.WheelEvent) => {
@@ -172,7 +176,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
       this.blockClick = false;
       return;
     }
-    if (this.isSelfEvent(e)) {
+    if (this.isBlankClicked(e)) {
       e.stopPropagation();
       this.props.onClick?.(e);
       this.props.onViewerClick?.(e, this.state.offset, this.state.scale);
@@ -234,7 +238,9 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
         onDrop={this.onDrop}
       >
         <ViewerProvider value={contextVal}>
-          <div ref={this.container} className="scroller"
+          <div
+            ref={this.container}
+            className="scroller"
             // transform: translate(var(--x), var(--y)) scale(var(--scale));
             style={{ transform: ` translate(${x}px,${y}px) scale(${scale})` }}
           >

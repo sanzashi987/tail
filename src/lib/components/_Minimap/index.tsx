@@ -1,4 +1,4 @@
-import React, { FC, Component, ReactNode } from 'react';
+import React, { FC, Component, ReactNode, useContext, useRef, createRef } from 'react';
 import {
   MinimapProps,
   MinimapState,
@@ -8,86 +8,152 @@ import {
   ItemDifferInterface,
   MapContainerProps,
   IObject,
+  ViewerContextType,
+  MapBoundary,
+  DraggerData,
+  MapContainerState,
 } from '@app/types';
 
-import { ViewerConsumer } from '@app/contexts/viewer';
+import { ViewerContext } from '@app/contexts/viewer';
 import { DifferContext } from '@app/contexts/differ';
 import { isNotNum } from '@app/utils';
 import type { RecoilState } from 'recoil';
 import styles from './index.module.scss';
 import MiniNode from './MiniNode';
 import { binaryUpdateBox, getLargeBox, toBox, toRect } from './utils';
+import { CoordinateCalc } from '../Dragger';
 
 const { 'minimap-wrapper': c } = styles;
+class MapContainer extends Component<MapContainerProps, MapContainerState> {
+  static contextType = ViewerContext;
+  context!: ViewerContextType;
+  state = { lockBoundary: false };
 
-const MapContainer: FC<MapContainerProps> = ({
-  width,
-  height,
-  style,
-  viewportFrameColor,
-  sortedX,
-  sortedY,
-  children,
-}) => {
-  return (
-    <ViewerConsumer>
-      {({ viewerHeight, viewerWidth, offset: { x, y }, scale }) => {
-        if (isNotNum(viewerWidth) || isNotNum(viewerHeight)) return null;
-        const viewerRect = {
-          x: -x / scale,
-          y: -y / scale,
-          width: viewerWidth / scale,
-          height: viewerHeight / scale,
-        };
-        const viewerBox = toBox(viewerRect);
-        const boundingBox =
-          sortedX.length === 0 || sortedY.length === 0
-            ? viewerBox
-            : getLargeBox(viewerBox, {
-                x: sortedX[0],
-                y: sortedY[0],
-                x2: sortedX[sortedX.length - 1],
-                y2: sortedY[sortedY.length - 1],
-              });
-        const { x: boundingX, y: boundingY, width: boundingWidth, height: boundingHeight } = toRect(
-          boundingBox,
-        );
-        const maxRatio = Math.max(boundingWidth / width!, boundingHeight / height!);
+  dragger = new CoordinateCalc();
+  containerRef = createRef<SVGSVGElement>();
+  boundarySnap: MapBoundary = null;
 
-        const offset = 5 * maxRatio;
-        let [vw, vh] = [width! * maxRatio, height! * maxRatio];
-        const left = boundingX - (vw - boundingWidth) / 2 - offset;
-        const top = boundingY - (vh - boundingHeight) / 2 - offset;
-        [vw, vh] = [vw + offset * 2, vh + offset * 2];
-        return (
-          <svg
-            width={width}
-            height={height}
-            className={'tail-minimap__container ' + c}
-            style={style}
-            viewBox={`${left} ${top} ${vw} ${vh}`}
-          >
-            {children}
-            <path
-              className="tail-minimap__viewport"
-              fill="none"
-              strokeWidth={3 / scale}
-              stroke={viewportFrameColor}
-              d={`
-          M${left - offset},${top - offset}h${vw + offset * 2}v${vh + offset * 2}h${
-                -vw - offset * 2
-              }z
+  calculateBoundary() {
+    const { viewerHeight, viewerWidth } = this.context;
+    if (isNotNum(viewerHeight) || isNotNum(viewerWidth)) return null;
+    const { sortedX, sortedY, width, height } = this.props;
+    const viewerRect = this.getViewerRect();
+    const viewerBox = toBox(viewerRect);
+    const boundaryBox =
+      sortedX.length === 0 || sortedY.length === 0
+        ? viewerBox
+        : getLargeBox(viewerBox, {
+            x: sortedX[0],
+            y: sortedY[0],
+            x2: sortedX[sortedX.length - 1],
+            y2: sortedY[sortedY.length - 1],
+          });
+    const { x: boundaryX, y: boundaryY, width: boundaryWidth, height: boundaryHeight } = toRect(
+      boundaryBox,
+    );
+    const maxRatio = Math.max(boundaryWidth / width!, boundaryHeight / height!);
+    const [vw, vh] = [width! * maxRatio, height! * maxRatio];
+    const left = boundaryX - (vw - boundaryWidth) / 2;
+    const top = boundaryY - (vh - boundaryHeight) / 2;
+    return {
+      left,
+      top,
+      vw,
+      vh,
+      maxRatio,
+    };
+  }
+
+  getViewerRect() {
+    const {
+      viewerHeight,
+      viewerWidth,
+      offset: { x, y },
+      scale,
+    } = this.context;
+    return {
+      x: -x / scale,
+      y: -y / scale,
+      width: viewerWidth / scale,
+      height: viewerHeight / scale,
+    };
+  }
+
+  dragStart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const mapBoundary = this.calculateBoundary();
+    if (!mapBoundary) return;
+    this.boundarySnap = mapBoundary;
+    const { scale } = this.context;
+    const { x, x2, y, y2 } = toBox(this.getViewerRect());
+    const [centerX, centerY] = [(x + x2) / 2, (y + y2) / 2];
+    const { left, top, maxRatio } = mapBoundary;
+    const { clientX, clientY } = e;
+    const rect = this.containerRef.current!.getBoundingClientRect();
+    const affineX = (clientX - rect.left) * maxRatio + left;
+    const affineY = (clientY - rect.top) * maxRatio + top;
+    this.context.setOffset((prev) => {
+      return {
+        x: prev.x + (centerX - affineX) * scale,
+        y: prev.y + (centerY - affineY) * scale,
+      };
+    });
+
+    this.setState({ lockBoundary: true });
+    this.dragger.start(e, {
+      movecb: this.drag,
+      endcb: this.dragEnd,
+    });
+  };
+
+  drag = (e: MouseEvent, { deltaX, deltaY }: DraggerData) => {
+    const { scale } = this.context;
+    const { maxRatio } = this.boundarySnap!;
+    this.context.setOffset((prev) => {
+      let { x, y } = prev;
+      x -= deltaX * maxRatio * scale;
+      y -= deltaY * maxRatio * scale;
+      return { x, y };
+    });
+  };
+
+  dragEnd = (e: MouseEvent, d: DraggerData) => {
+    this.drag(e, d);
+    this.setState({ lockBoundary: false });
+  };
+
+  render() {
+    const mapBoundary = this.state.lockBoundary ? this.boundarySnap : this.calculateBoundary();
+    if (!mapBoundary) return null;
+    const viewerRect = this.getViewerRect();
+    const { style, viewportFrameColor, width, height } = this.props;
+    const { left, top, vh, vw, maxRatio } = mapBoundary;
+    return (
+      <svg
+        ref={this.containerRef}
+        width={width}
+        height={height}
+        className={'tail-minimap__container ' + c}
+        style={style}
+        onMouseDown={this.dragStart}
+        viewBox={`${left} ${top} ${vw} ${vh}`}
+      >
+        {this.props.children}
+        <path
+          className="tail-minimap__viewport"
+          fill="none"
+          strokeWidth={1 * maxRatio}
+          stroke={viewportFrameColor}
+          d={`
           M${viewerRect.x},${viewerRect.y}h${viewerRect.width}v${
-                viewerRect.height
-              }h${-viewerRect.width}z
+            viewerRect.height
+          }h${-viewerRect.width}z
         `}
-            ></path>
-          </svg>
-        );
-      }}
-    </ViewerConsumer>
-  );
-};
+        ></path>
+      </svg>
+    );
+  }
+}
 
 class Minimap extends Component<MinimapProps, MinimapState> {
   static contextType = DifferContext;

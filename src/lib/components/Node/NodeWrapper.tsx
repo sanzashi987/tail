@@ -75,7 +75,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   const updateNodeHandles = useCallback(() => {
     const scale = rootInterface.getScale();
     const [rect, handles] = getNodeInfo(ref, node, scale);
-    console.log(rect);
+    // console.log(rect);
     setNodeInternal((prev) => {
       return {
         ...prev,
