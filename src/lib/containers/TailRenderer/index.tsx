@@ -184,6 +184,7 @@ const Tail = forwardRef<CoreMethods, TailCoreProps>((props, ref) => {
         },
       getEdgeTree: () => coreRef.current?.edgeRef.current?.edgeTree ?? new Map(),
       moveViewCenter: (x, y) => coreRef.current?.viewer.current?.moveCamera(x, y),
+      setActiveItems: (i) => coreRef.current?.ItemActives.loadActiveItems(i),
     }),
     [],
   );

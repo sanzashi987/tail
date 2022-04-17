@@ -28,6 +28,7 @@ export type CoreMethods = {
   getActiveItems(): SelectedItemCollection;
   getEdgeTree(): EdgeTree;
   moveViewCenter(x: number, y: number): void;
+  setActiveItems(items: SelectedItemCollection): void;
 };
 
 export type TailCoreOptionalProps = {

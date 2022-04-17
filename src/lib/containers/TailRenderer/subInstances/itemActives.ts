@@ -117,16 +117,23 @@ class ItemActives {
   };
 
   deactivateLast = () => {
-    this.batchDeactivate('node');
-    this.batchDeactivate('edge');
+    this.batchSwtich('node', false);
+    this.batchSwtich('edge', false);
   };
 
-  private batchDeactivate(type: SelectedItemType) {
+  private batchSwtich(type: SelectedItemType, active: boolean) {
     const pool = this.activeItems[type];
     Object.keys(pool).forEach((key) => {
-      this.switchActive(type, key, false, pool);
+      this.switchActive(type, key, active, pool);
     });
   }
+
+  loadActiveItems = (items: SelectedItemCollection) => {
+    this.deactivateLast();
+    this.activeItems = items;
+    this.batchSwtich('node', true);
+    this.batchSwtich('edge', true);
+  };
 
   switchActive = (
     type: SelectedItemType,
@@ -134,9 +141,10 @@ class ItemActives {
     active: boolean,
     activePool: IObject<string>,
   ) => {
-    active ? (activePool[id] = id) : delete activePool[id];
     const _this = this.core;
     const atom = _this.getAtom(type, id);
+    if (!atom) return;
+    active ? (activePool[id] = id) : delete activePool[id];
     const { set, get } = _this.context;
     set(atom as RecoilState<NodeAtom | EdgeAtom>, (prev) => ({ ...prev, selected: active }));
     if (type === 'edge') {
