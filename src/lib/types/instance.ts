@@ -27,6 +27,7 @@ export type CoreMethods = {
   focusNode(id: string): void;
   getActiveItems(): SelectedItemCollection;
   getEdgeTree(): EdgeTree;
+  moveViewCenter(x: number, y: number): void;
 };
 
 export type TailCoreOptionalProps = {
@@ -40,7 +41,7 @@ export type TailCoreOptionalProps = {
   onDelete?(nodes: string[], edges: string[]): void; //come with id array
   onActivate?(items: SelectedItemCollection): void;
   // getMethods?: (methods: CoreMethods) => void;
-  instanceRef?: { current: any };
+  // instanceRef?: { current: any };
 } & NodeMutation &
   EdgeMutation &
   NodeMouseInterface &
@@ -89,8 +90,16 @@ export type HandlesInfo = {
 //   handles: HandlesInfo;
 // };
 // export type NodeInternals = Map<string, NodeInternalInfo>;
+
+export type ActiveNextType = (
+  e: React.MouseEvent | null,
+  type: SelectedItemType,
+  id: string,
+  selected: boolean,
+  force?: boolean,
+) => void;
 export interface GeneralMethods {
-  activateItem(e: React.MouseEvent, type: SelectedItemType, id: string, selected: boolean): void;
+  activateItem: ActiveNextType;
   getScale(): number;
 }
 export type ConnectMethodType = (

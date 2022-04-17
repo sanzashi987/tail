@@ -1,4 +1,4 @@
-import React, { Component, createRef } from 'react';
+import React, { Component, createRef, forwardRef, useImperativeHandle, useRef } from 'react';
 import { InterfaceProvider } from '@app/contexts/instance';
 import { RecoilState } from 'recoil';
 import type {
@@ -11,6 +11,7 @@ import type {
   StoreRootInterface,
   SelectModeType,
   IObject,
+  CoreMethods,
 } from '@app/types';
 import { StoreContext } from '@app/contexts/store';
 import { findDeletedItem, getAtom } from './mutation';
@@ -22,6 +23,7 @@ import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
 import InfiniteViewer from '../InfiniteViewer';
 import MarkerDefs from '../MarkerDefs';
+import StoreRoot from '../../containers/StoreRoot';
 import '@app/styles/index.scss';
 
 class TailCore extends Component<TailCoreProps> {
@@ -70,16 +72,6 @@ class TailCore extends Component<TailCoreProps> {
       },
       activateItem: this.ItemActives.activateNext,
       getScale: this.getScale,
-    };
-
-    if (props.instanceRef && props.instanceRef.current) {
-      props.instanceRef.current = {
-        switchMode: this.switchMode,
-        setScale: this.setScale,
-        focusNode: this.focusNode,
-        getActiveItems: () => this.ItemActives.activeItems,
-        getEdgeTree: () => this.edgeRef.current?.edgeTree,
-      };
     };
   }
 
@@ -177,4 +169,32 @@ class TailCore extends Component<TailCoreProps> {
   getScale = () => this.viewer.current?.getScale() || 1;
 }
 
+const Tail = forwardRef<CoreMethods, TailCoreProps>((props, ref) => {
+  const coreRef = useRef<TailCore>(null);
+  useImperativeHandle(
+    ref,
+    () => ({
+      setScale: (s) => coreRef.current?.setScale(s),
+      switchMode: (t) => coreRef.current?.switchMode(t),
+      focusNode: (i) => coreRef.current?.focusNode(i),
+      getActiveItems: () =>
+        coreRef.current?.ItemActives.activeItems ?? {
+          node: {},
+          edge: {},
+        },
+      getEdgeTree: () => coreRef.current?.edgeRef.current?.edgeTree ?? new Map(),
+      moveViewCenter: (x, y) => coreRef.current?.viewer.current?.moveCamera(x, y),
+    }),
+    [],
+  );
+  return (
+    <StoreRoot>
+      <TailCore ref={coreRef} {...props} />
+    </StoreRoot>
+  );
+});
+
+Tail.displayName = 'Tail';
+
+export { Tail };
 export default TailCore;

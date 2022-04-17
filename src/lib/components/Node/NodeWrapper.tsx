@@ -88,6 +88,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   // built-in life cycle
   useEffect(() => {
     updateNodeHandles();
+    return () => rootInterface.activateItem(null, 'node', node.id, false, true);
   }, []);
 
   const NodeComponent: NodeCom = templatePicker(node).reduce<any>((last, val) => {
