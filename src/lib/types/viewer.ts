@@ -1,7 +1,10 @@
 import React, { CSSProperties } from 'react';
 import type { coordinates, UpdaterType } from '.';
 
-export type SelectModeType = 'single' | 'select';
+export enum SelectModeType {
+  single = 'single',
+  select = 'select',
+}
 
 export type InfiniteViewerState = {
   scale: number;
@@ -52,7 +55,6 @@ export type ViewerContextType = {
   setOffset: (offset: UpdaterType<coordinates>) => void;
 };
 
-
 export type BackgroundProps = {
-  style?: CSSProperties
-}
+  style?: CSSProperties;
+};

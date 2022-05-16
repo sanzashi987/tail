@@ -1,6 +1,6 @@
 import React from 'react';
 
-type EventCollection = MouseEvent | React.MouseEvent
+type EventCollection = MouseEvent | React.MouseEvent;
 
 type OS = 'win' | 'mac' | 'linux' | 'unix' | undefined;
 export const getOS = (): OS => {
@@ -14,17 +14,19 @@ export const getOS = (): OS => {
 
 export const isMac = getOS() === 'mac';
 
-
-
-
 export function isModifierExact(e: EventCollection) {
-  return [e.ctrlKey, e.metaKey, e.altKey, e.shiftKey].reduce((val, key) => {
-    if (key) ++val;
-    return val;
-  }, 0) === 1;
-
+  return (
+    [e.ctrlKey, e.metaKey, e.altKey, e.shiftKey].reduce((val, key) => {
+      if (key) ++val;
+      return val;
+    }, 0) === 1
+  );
 }
 
 export function CtrlOrCmd(e: EventCollection) {
   return getOS() ? e.metaKey : e.ctrlKey;
+}
+
+export function preventDefault(e: Event | React.UIEvent) {
+  e.preventDefault();
 }

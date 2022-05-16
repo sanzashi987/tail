@@ -10,7 +10,7 @@ import {
 import ResizeObserver from 'resize-observer-polyfill';
 import { CoordinateCalc } from '@app/components/Dragger';
 import SelectArea from '@app/components/SelectArea';
-import { createMemo } from '@app/utils';
+import { createMemo, preventDefault } from '@app/utils';
 import debounce from 'lodash.debounce';
 import { ViewerProvider } from '@app/contexts/viewer';
 import styles from './index.module.scss';
@@ -30,7 +30,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
   state: InfiniteViewerState = {
     scale: 1,
     offset: { x: 0, y: 0 },
-    selectMode: /*  'select', // */ 'single',
+    selectMode: SelectModeType.single,
     selecting: false,
     dragStart: { x: 0, y: 0 },
     dragEnd: { x: 0, y: 0 },
@@ -216,7 +216,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     this.props.onViewerDrop?.(e, offset, scale);
   };
 
-  private setOffset = (offsetUpdater: UpdaterType<coordinates>) => {
+  setOffset = (offsetUpdater: UpdaterType<coordinates>) => {
     this.setState((prev) => ({
       ...prev,
       offset: typeof offsetUpdater === 'function' ? offsetUpdater(prev.offset) : offsetUpdater,
@@ -236,6 +236,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
         onMouseDown={this.onMouseDown}
         onClick={this.onClick}
         onDrop={this.onDrop}
+        onDragOver={preventDefault}
       >
         <ViewerProvider value={contextVal}>
           <div

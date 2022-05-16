@@ -6,6 +6,7 @@ import type {
   SelectCallback,
   IObject,
   SelectedItemCollection,
+  ActiveNextType,
 } from '@app/types';
 import type { RecoilState } from 'recoil';
 import { CtrlOrCmd, isModifierExact } from '@app/utils';
@@ -101,7 +102,12 @@ class ItemActives {
   private isQueuedEmit = false;
   constructor(private core: TailCore) {}
 
-  activateNext = (e: React.MouseEvent, type: SelectedItemType, id: string, selected: boolean) => {
+  activateNext: ActiveNextType = (e, type, id, selected, force) => {
+    /**
+     *  the `force` & `null` Event obj shall come in pair, and in such case the `selected` variable
+     *  directly indicates the active state the component want to be
+     */
+    if (force || e === null) return this.switchActive(type, id, selected, this.activeItems[type]);
     const hold = isModifierExact(e) && CtrlOrCmd(e);
     if (!hold && selected) return;
     if (!hold) {
@@ -111,16 +117,23 @@ class ItemActives {
   };
 
   deactivateLast = () => {
-    this.batchDeactivate('node');
-    this.batchDeactivate('edge');
+    this.batchSwtich('node', false);
+    this.batchSwtich('edge', false);
   };
 
-  private batchDeactivate(type: SelectedItemType) {
+  private batchSwtich(type: SelectedItemType, active: boolean) {
     const pool = this.activeItems[type];
     Object.keys(pool).forEach((key) => {
-      this.switchActive(type, key, false, pool);
+      this.switchActive(type, key, active, pool);
     });
   }
+
+  loadActiveItems = (items: SelectedItemCollection) => {
+    this.deactivateLast();
+    this.activeItems = items;
+    this.batchSwtich('node', true);
+    this.batchSwtich('edge', true);
+  };
 
   switchActive = (
     type: SelectedItemType,
@@ -128,19 +141,21 @@ class ItemActives {
     active: boolean,
     activePool: IObject<string>,
   ) => {
-    active ? (activePool[id] = id) : delete activePool[id];
     const _this = this.core;
     const atom = _this.getAtom(type, id);
+    if (!atom) return;
+    active ? (activePool[id] = id) : delete activePool[id];
     const { set, get } = _this.context;
     set(atom as RecoilState<NodeAtom | EdgeAtom>, (prev) => ({ ...prev, selected: active }));
-    if (type !== 'edge') return;
-    const cb = active ? activateHandle : deactivateHandle;
-    const {
-      edge: { sourceNode, target, targetNode, source },
-    } = get(atom as RecoilState<EdgeAtom>);
-    const pool = _this.getNodeAtoms();
-    setSelectedHandle(sourceNode, source, pool, cb, set);
-    setSelectedHandle(targetNode, target, pool, cb, set);
+    if (type === 'edge') {
+      const cb = active ? activateHandle : deactivateHandle;
+      const {
+        edge: { sourceNode, target, targetNode, source },
+      } = get(atom as RecoilState<EdgeAtom>);
+      const pool = _this.getNodeAtoms();
+      setSelectedHandle(sourceNode, source, pool, cb, set);
+      setSelectedHandle(targetNode, target, pool, cb, set);
+    }
     if (!this.isQueuedEmit) {
       this.isQueuedEmit = true;
       Promise.resolve().then(() => {
