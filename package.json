@@ -45,6 +45,7 @@
     "css-loader": "^6.5.1",
     "css-minimizer-webpack-plugin": "^3.2.0",
     "dotenv": "^10.0.0",
+    "dotenv-cli": "^5.1.0",
     "dotenv-expand": "^5.1.0",
     "eslint": "7.11.0",
     "eslint-config-prettier": "^6.7.0",
@@ -117,7 +118,7 @@
     "build2": "node scripts/build.js",
     "build": "rollup -c --environment NODE_ENV:production && node node_modules/tsc-alias/dist/bin/index.js",
     "test": "node scripts/test.js",
-    "release": "release-it"
+    "release": "dotenv release-it"
   },
   "main": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
