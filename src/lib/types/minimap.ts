@@ -15,6 +15,7 @@ export type MapStyleProps = {
   width: number;
   style: CSSProperties;
   viewportFrameColor: string;
+  realtimeBoundary?:boolean
 };
 
 export type MapContainerProps = MapStyleProps & {

@@ -30,7 +30,10 @@ class Dragger extends DraggerCore<DraggerProps, DraggerIterState> {
   };
 
   onDrag = (e: MouseEvent) => {
-    if (!this.dragging) return this.onDragEnd(e);
+    if (!this.dragging) {
+      this.onDragEnd(e);
+      return;
+    }
     e.stopPropagation();
     const coordinates = this.processDrag(this._onMouseMove(e));
     this.props.onDrag(e, coordinates);
@@ -39,7 +42,7 @@ class Dragger extends DraggerCore<DraggerProps, DraggerIterState> {
   onDragEnd = (e: MouseEvent) => {
     e.stopPropagation();
     const coordinates = this._onMouseUp(e);
-    if (!this.dragging) return coordinates;
+    // if (!this.dragging) return coordinates;
     const data = this.processDrag(coordinates);
     this.props.onDragEnd(e, data);
   };

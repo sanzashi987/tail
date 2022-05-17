@@ -1,4 +1,4 @@
-import React, { FC, Component, ReactNode, useContext, useRef, createRef } from 'react';
+import React, { FC, Component, ReactNode, createRef } from 'react';
 import {
   MinimapProps,
   MinimapState,
@@ -32,6 +32,11 @@ class MapContainer extends Component<MapContainerProps, MapContainerState> {
   dragger = new CoordinateCalc();
   containerRef = createRef<SVGSVGElement>();
   boundarySnap: MapBoundary = null;
+
+  lockBoundary = (lock: boolean) => {
+    if (this.props.realtimeBoundary) return;
+    this.setState({ lockBoundary: lock });
+  };
 
   calculateBoundary() {
     const { viewerHeight, viewerWidth } = this.context;
@@ -98,8 +103,8 @@ class MapContainer extends Component<MapContainerProps, MapContainerState> {
         y: prev.y + (centerY - affineY) * scale,
       };
     });
-
-    this.setState({ lockBoundary: true });
+    this.lockBoundary(true);
+    // this.setState({ lockBoundary: true });
     this.dragger.start(e, {
       movecb: this.drag,
       endcb: this.dragEnd,
@@ -119,7 +124,8 @@ class MapContainer extends Component<MapContainerProps, MapContainerState> {
 
   dragEnd = (e: MouseEvent, d: DraggerData) => {
     this.drag(e, d);
-    this.setState({ lockBoundary: false });
+    this.lockBoundary(false);
+    // this.setState({ lockBoundary: false });
   };
 
   render() {
@@ -224,7 +230,7 @@ class Minimap extends Component<MinimapProps, MinimapState> {
   }
 
   render() {
-    const { width, height, style, viewportFrameColor } = this.props;
+    const { width, height, style, viewportFrameColor, realtimeBoundary } = this.props;
     const { sortedX, sortedY } = this.state;
     // console.log('sorted', sortedX, sortedY);
     return (
@@ -235,6 +241,7 @@ class Minimap extends Component<MinimapProps, MinimapState> {
         viewportFrameColor={viewportFrameColor!}
         sortedX={sortedX}
         sortedY={sortedY}
+        realtimeBoundary={realtimeBoundary}
       >
         {this.memoNodes}
       </MapContainer>
