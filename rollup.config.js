@@ -26,6 +26,7 @@ export const baseConfig = ({ outputDir = 'dist/esm', injectCSS = true } = {}) =>
     'recoil',
     'lodash.debounce',
     'resize-observer-polyfill',
+    'eventemitter3',
     (id) => id.includes('@babel/runtime'),
   ],
   onwarn(warning, rollupWarn) {
