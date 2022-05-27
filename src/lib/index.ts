@@ -8,5 +8,6 @@ export * from './contexts/store';
 export * from './contexts/viewer';
 export { default as Handle } from './components/Handle';
 export { Tail as default } from './containers/TailRenderer';
+export { wrapAnchor } from './components/Anchor';
 
 //  { Tail };
