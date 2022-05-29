@@ -169,7 +169,7 @@ class TailCore extends Component<TailCoreProps> {
   getScale = () => this.viewer.current?.getScale() || 1;
 }
 
-const Tail = forwardRef<CoreMethods, TailCoreProps>((props, ref) => {
+const Tail = forwardRef<CoreMethods, TailCoreProps>(({ children, ...otherprops }, ref) => {
   const coreRef = useRef<TailCore>(null);
   useImperativeHandle(
     ref,
@@ -190,7 +190,9 @@ const Tail = forwardRef<CoreMethods, TailCoreProps>((props, ref) => {
   );
   return (
     <StoreRoot>
-      <TailCore ref={coreRef} {...props} />
+      <TailCore ref={coreRef} {...otherprops}>
+        {children}
+      </TailCore>
     </StoreRoot>
   );
 });

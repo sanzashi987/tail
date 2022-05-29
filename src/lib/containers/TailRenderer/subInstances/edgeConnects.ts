@@ -19,6 +19,7 @@ import type TailCore from '..';
 export function enableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
   return {
     ...prev,
+    hovered: false,
     reconnect: true,
   };
 }
@@ -178,12 +179,10 @@ class EdgeConnects {
     let newType = type;
     const edgeAtoms = this.core.getEdgeAtoms();
     const { edgeTree } = this.core.edgeRef.current!;
-    const possibleEdge = hasConnectedEdgeActive(
-      edgeTree,
-      this.itemActives.activeItems['edge'],
-      nodeId,
-      handleId,
-    );
+    const onlyEdge = Object.keys(this.itemActives.activeItems.edge).length === 1;
+    const possibleEdge =
+      onlyEdge &&
+      hasConnectedEdgeActive(edgeTree, this.itemActives.activeItems['edge'], nodeId, handleId);
     const nodeState = this.core.getAtomState<NodeAtom>('node', nodeId);
     if (!nodeState) return;
     const {
@@ -263,13 +262,13 @@ class EdgeConnects {
         if (Math.abs(x - X) < threshold && Math.abs(y - Y) < threshold) {
           SET<EdgeAtom>('edge', prevEdgeId, disableEdgeReconnect);
         } else {
-          this.core.deleteItem([{ type: 'edge', id: prevEdgeId }]);
           this.itemActives.switchActive(
             'edge',
             prevEdgeId,
             false,
             this.itemActives.activeItems['edge'],
           );
+          this.core.deleteItem([{ type: 'edge', id: prevEdgeId }]);
         }
       }
     }
