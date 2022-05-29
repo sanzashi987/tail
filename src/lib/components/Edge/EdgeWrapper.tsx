@@ -49,6 +49,10 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates, updateE
     }
   }, [source, sourceNode, target, targetNode]);
 
+  useEffect(() => {
+    return () => rootInterface.activateItem(null, 'edge', edge.id, false, true);
+  }, []);
+
   const markerStartUrl = useMemo(() => getMarkerId(markerStart), [markerStart]);
   const markerEndUrl = useMemo(() => getMarkerId(markerEnd), [markerEnd]);
 

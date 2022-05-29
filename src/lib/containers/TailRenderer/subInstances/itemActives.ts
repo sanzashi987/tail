@@ -118,7 +118,7 @@ class ItemActives {
   ) => {
     const _this = this.core;
     const atom = _this.getAtom(type, id);
-    if (!atom) return;
+    if (!atom || (active && !!activePool[id]) || (!active && !activePool[id])) return;
     active ? (activePool[id] = id) : delete activePool[id];
     const { set, get } = _this.context;
     set(atom as RecoilState<NodeAtom | EdgeAtom>, (prev) => ({ ...prev, selected: active }));

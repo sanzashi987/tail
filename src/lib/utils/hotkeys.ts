@@ -24,7 +24,7 @@ export function isModifierExact(e: EventCollection) {
 }
 
 export function CtrlOrCmd(e: EventCollection) {
-  return getOS() ? e.metaKey : e.ctrlKey;
+  return isMac ? e.metaKey : e.ctrlKey;
 }
 
 export function preventDefault(e: Event | React.UIEvent) {
