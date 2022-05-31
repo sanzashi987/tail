@@ -10,7 +10,7 @@ export const defaultRect = {
 
 export function createNodeAtom<T>(node: Node<T>) {
   return atom<NodeAtom<T>>({
-    key: `${node.id}__node`,
+    key: `${node.id}__node-${Date.now().toString(36)}`,
     default: {
       node,
       hovered: false,
@@ -25,4 +25,3 @@ export function createNodeAtom<T>(node: Node<T>) {
     },
   });
 }
-

@@ -20,7 +20,7 @@ import { isNotNum } from '@app/utils';
 import type { RecoilState } from 'recoil';
 import styles from './index.module.scss';
 import MiniNode from './MiniNode';
-import { binaryUpdateBox, getLargeBox, toBox, toRect } from './utils';
+import { binaryRemoveBox, binaryUpdateBox, getLargeBox, toBox, toRect } from './utils';
 import { CoordinateCalc } from '../Dragger';
 
 const { 'minimap-wrapper': c } = styles;
@@ -108,6 +108,9 @@ class MapContainer extends Component<MapContainerProps, MapContainerState> {
     this.dragger.start(e, {
       movecb: this.drag,
       endcb: this.dragEnd,
+      endOpt: {
+        capture: true,
+      },
     });
   };
 
@@ -190,6 +193,7 @@ class Minimap extends Component<MinimapProps, MinimapState> {
         activeColor={activeColor!}
         nodeColor={nodeColor!}
         updateBox={this.updateBox}
+        removeBox={this.removeBox}
       />
     );
   };
@@ -200,6 +204,18 @@ class Minimap extends Component<MinimapProps, MinimapState> {
   updateMemoNodes = () => {
     this.memoNodes = Object.keys(this.nodeInstances).map((k) => this.nodeInstances[k]);
     this.forceUpdate();
+  };
+
+  removeBox = (box: Box) => {
+    this.setState(({ sortedX, sortedY }) => {
+      const sortedNewX = [...sortedX];
+      const sortedNewY = [...sortedY];
+      binaryRemoveBox(sortedNewX, sortedNewY, box);
+      return {
+        sortedX: sortedNewX,
+        sortedY: sortedNewY,
+      };
+    });
   };
 
   updateBox = (box: Box, lastBox?: Box) => {

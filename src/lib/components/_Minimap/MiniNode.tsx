@@ -4,7 +4,7 @@ import { useRecoilValue } from 'recoil';
 import { isNotNum } from '@app/utils';
 import { toBox } from './utils';
 
-const MiniNode: FC<MiniNodeProps> = ({ atom, activeColor, nodeColor, updateBox }) => {
+const MiniNode: FC<MiniNodeProps> = ({ atom, activeColor, nodeColor, updateBox, removeBox }) => {
   const {
     node: { left: x, top: y },
     rect: { width, height },
@@ -17,6 +17,10 @@ const MiniNode: FC<MiniNodeProps> = ({ atom, activeColor, nodeColor, updateBox }
     updateBox(nodeBox, lastBox.current);
     lastBox.current = nodeBox;
   }, [x, y, nodeBox.x2, nodeBox.y2]);
+
+  useEffect(() => {
+    return () => lastBox.current && removeBox(lastBox.current);
+  }, []);
 
   const fill = selected ? activeColor : nodeColor;
   const Node = useMemo(() => {

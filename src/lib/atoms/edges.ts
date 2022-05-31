@@ -3,7 +3,7 @@ import { atom, selectorFamily } from 'recoil';
 
 export function createEdgeAtom(edge: Edge) {
   return atom<EdgeAtom>({
-    key: `${edge.id}__edge`,
+    key: `${edge.id}__edge-${Date.now().toString(36)}`,
     default: {
       edge,
       selected: false,

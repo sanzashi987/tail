@@ -37,6 +37,13 @@ export function binaryUpdateBox(sortedX: number[], sortedY: number[], box: Box, 
   binaryUpdate(sortedY, box.y2, lastBox?.y2);
 }
 
+export function binaryRemoveBox(sortedX: number[], sortedY: number[], box: Box) {
+  binaryDelete(sortedX, box.x);
+  binaryDelete(sortedX, box.x2);
+  binaryDelete(sortedY, box.y);
+  binaryDelete(sortedY, box.y2);
+}
+
 export function toBox(rect: Rect): Box {
   const { x, y, width, height } = rect;
   return {

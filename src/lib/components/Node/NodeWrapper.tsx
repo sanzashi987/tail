@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useContext,
 } from 'react';
-import type { NodeWrapperProps, coordinates, NodeCom, DraggerData } from '@app/types';
+import type { NodeWrapperProps, NodeCom, DraggerData } from '@app/types';
 import { InstanceInterface } from '@app/contexts/instance';
 import { useRecoilState } from 'recoil';
 import { setHovered, setNotHovered } from '@app/atoms/reducers';
@@ -15,6 +15,8 @@ import Dragger from './Dragger';
 import { getNodeInfo } from './utils';
 import styles from './Wrapper.module.scss';
 import { BasicNode } from '.';
+
+const wrapperClassname = `tail-node__wrapper ${styles.wrapper}`;
 
 const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) => {
   const [{ node, selected, selectedHandles, hovered }, setNodeInternal] = useRecoilState(atom);
@@ -107,7 +109,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
       nodeRef={ref}
     >
       <div
-        className={`tail-node__wrapper ${styles.wrapper}`}
+        className={wrapperClassname}
         style={style}
         ref={ref}
         onMouseOver={onHoverIn}

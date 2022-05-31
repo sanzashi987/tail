@@ -15,7 +15,7 @@ export type MapStyleProps = {
   width: number;
   style: CSSProperties;
   viewportFrameColor: string;
-  realtimeBoundary?:boolean
+  realtimeBoundary?: boolean;
 };
 
 export type MapContainerProps = MapStyleProps & {
@@ -37,6 +37,7 @@ export type MiniNodeProps = {
   activeColor: string;
   nodeColor: string;
   updateBox(box: Box, lastBox?: Box): void;
+  removeBox(box: Box): void;
 };
 
 export type MapBoundary = {
