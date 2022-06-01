@@ -1,8 +1,14 @@
 import React, { Component, ReactNode } from 'react';
-import type { Node, NodeRendererProps, ItemDifferInterface, NodeAtomType, IObject } from '@app/types';
+import type {
+  Node,
+  NodeRendererProps,
+  ItemDifferInterface,
+  NodeAtomType,
+  IObject,
+} from '@app/types';
 import { NodeWrapper } from '@app/components/Node';
 import { DifferContext } from '@app/contexts/differ';
-import { createMemoTemplates, defaultProps } from './utils';
+import { defaultProps } from './utils';
 
 class NodeRenderer extends Component<NodeRendererProps> {
   // memoTemplates: ReturnType<typeof createMemoTemplates>;

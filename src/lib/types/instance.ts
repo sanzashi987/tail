@@ -1,6 +1,7 @@
 import React, { ComponentType } from 'react';
 import { EdgeUpdater, NodeUpdater } from '@app/containers/TailRenderer/subInstances/itemUpdater';
 import type { RecoilValue, RecoilState } from 'recoil';
+import { JotaiImmerAtom } from './jotai';
 import type {
   NodeMouseInterface,
   EdgeBasic,
@@ -85,13 +86,6 @@ export type HandlesInfo = {
   target: HandleMap;
 };
 
-// export type NodeInternalInfo = {
-//   //
-//   folded: boolean;
-//   handles: HandlesInfo;
-// };
-// export type NodeInternals = Map<string, NodeInternalInfo>;
-
 export type ActiveNextType = (
   e: React.MouseEvent | null,
   type: SelectedItemType,
@@ -139,12 +133,6 @@ export type AtomForceRender = {
   forceRender: number;
 };
 
-// export type PoolType<T> = T extends 'edge'
-//   ? RecoilState<EdgeAtom>
-//   : T extends 'node'
-//   ? RecoilState<NodeAtom>
-//   : never;
-
 export type DeleteItem = {
   type: SelectedItemType;
   id: string;
@@ -159,7 +147,7 @@ export type AtomStateSetterType = <T>(
   updater: T | ((c: T) => T),
 ) => T;
 
-export type AtomUpdater<T> = (atom: RecoilState<T>, updater: UpdaterType<T>) => void;
+export type AtomUpdater<T> = (atom: JotaiImmerAtom<T>, updater: UpdaterType<T>) => void;
 
 export type ItemDifferProps = {
   nodes: IObject<Node>;

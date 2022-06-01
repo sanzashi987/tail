@@ -1,23 +1,39 @@
 import React, { FC, useMemo, useContext, useEffect, useRef } from 'react';
-import type { EdgeWrapperProps } from '@app/types';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { computedEdgeSelector } from '@app/atoms/edges';
+import { useAtom } from 'jotai';
 import { InstanceInterface } from '@app/contexts/instance';
-import { isNum } from '@app/utils';
+import { isNotNum } from '@app/utils';
 import { setHovered, setNotHovered } from '@app/atoms/reducers';
-import { BasicEdge, BasicShadow } from '.';
-
-const getMarkerId = (markerId?: string) => {
-  if (typeof markerId === 'string') return `url(#${markerId})`;
-  return undefined;
-};
+import { DummyNodeAtom } from '@app/atoms/nodes';
+import type { EdgeWrapperProps } from '@app/types';
+import { defaultEdgePair, emptyHandle } from './helpers';
 
 const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates, updateEdge }) => {
-  const { edge, selected, sourceX, sourceY, targetX, targetY, reconnect, hovered } = useRecoilValue(
-    computedEdgeSelector({ edge: atom, nodeAtoms }),
-  );
-  const setEdge = useSetRecoilState(atom);
   const rootInterface = useContext(InstanceInterface)!;
+  const [{ edge, selected, reconnect, hovered }, setEdge] = useAtom(atom);
+  const { markerEnd, markerStart, source, sourceNode, target, targetNode, type = '' } = edge;
+  const { [sourceNode]: sourceAtom, [targetNode]: targetAtom } = nodeAtoms;
+  const [sourceNodeState] = useAtom(sourceAtom ?? DummyNodeAtom);
+  const [targetNodeState] = useAtom(targetAtom ?? DummyNodeAtom);
+
+  const { sourceX, sourceY, targetX, targetY } = useMemo(() => {
+    const {
+      handles: { source: sourceHandles },
+      node: { left: sourceLeft, top: sourceTop },
+    } = sourceNodeState;
+    const {
+      handles: { target: targetHandles },
+      node: { left: targetLeft, top: targetTop },
+    } = targetNodeState;
+    const { x: sourceX, y: sourceY } = sourceHandles[source] ?? emptyHandle;
+    const { x: targetX, y: targetY } = targetHandles[target] ?? emptyHandle;
+
+    return {
+      sourceX: sourceX + sourceLeft,
+      sourceY: sourceY + sourceTop,
+      targetX: targetX + targetLeft,
+      targetY: targetY + targetTop,
+    };
+  }, [sourceNodeState, targetNodeState, source, target]);
 
   const onClick = (e: React.MouseEvent) => {
     rootInterface.activateItem(e, 'edge', edge.id, selected);
@@ -34,7 +50,6 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates, updateE
     rootInterface.edge.onEdgeContextMenu?.(e, edge);
   };
 
-  const { markerEnd, markerStart, source, sourceNode, target, targetNode } = edge;
   const lastEdge = useRef(edge);
   useEffect(() => {
     if (lastEdge.current !== edge) {
@@ -47,24 +62,16 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates, updateE
     return () => rootInterface.activateItem(null, 'edge', edge.id, false, true);
   }, []);
 
-  const markerStartUrl = useMemo(() => getMarkerId(markerStart), [markerStart]);
-  const markerEndUrl = useMemo(() => getMarkerId(markerEnd), [markerEnd]);
+  // const markerStartUrl = useMemo(() => getMarkerId(markerStart), [markerStart]);
+  // const markerEndUrl = useMemo(() => getMarkerId(markerEnd), [markerEnd]);
 
-  const { type = '' } = edge;
-  const EdgeComponent = templates[type]?.default ?? BasicEdge; //;BezierEdge
-  const ShadowComponent = templates[type]?.shadow ?? BasicShadow;
+  const [EdgeComponent, ShadowComponent] = useMemo(() => {
+    const { default: d, shadow } = templates[type] ?? defaultEdgePair;
+    return [d, shadow];
+  }, [templates, type]);
 
   const memoVNode = useMemo(() => {
-    if (
-      [sourceX, sourceY, targetX, targetY].reduce(
-        (last, val) => (isNum(val) ? last || false : true),
-        false,
-      ) ||
-      reconnect
-    ) {
-      return null;
-    }
-
+    if ([sourceX, sourceY, targetX, targetY].some(isNotNum) || reconnect) return null;
     return (
       <>
         <g className="tail-edge__wrapper">
@@ -76,8 +83,8 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates, updateE
             sourceY={sourceY}
             targetX={targetX}
             targetY={targetY}
-            markerEnd={markerEndUrl}
-            markerStart={markerStartUrl}
+            markerEnd={markerEnd}
+            markerStart={markerStart}
           />
         </g>
         <g
@@ -96,7 +103,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates, updateE
         </g>
       </>
     );
-  }, [edge, hovered, selected, sourceX, sourceY, targetX, targetY, markerEndUrl, markerStartUrl]);
+  }, [edge, hovered, selected, sourceX, sourceY, targetX, targetY, markerEnd, markerStart]);
 
   return memoVNode;
 };

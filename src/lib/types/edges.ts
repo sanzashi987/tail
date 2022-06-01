@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import React, { ComponentType } from 'react';
-import type { RecoilState } from 'recoil';
 import { UpdaterType } from './instance';
+import { JotaiImmerAtom } from './jotai';
 import { AtomForceRender, HandleType, NodeAtomsType, IObject } from '.';
 
 export type EdgeBasic = {
@@ -25,8 +25,6 @@ export type EdgeBasicProps = {
   sourceY: number;
   targetX: number;
   targetY: number;
-  // markerStart?: string
-  // markerEnd?: string
 };
 
 export type EdgeAtomRaw<T extends IObject = {}> = {
@@ -47,8 +45,7 @@ export interface EdgeMouseInterface {
 }
 
 export type EdgeAtom<T extends IObject = {}> = EdgeAtomRaw<T> & AtomForceRender;
-
-export type EdgeAtomType = RecoilState<EdgeAtom>;
+export type EdgeAtomType = JotaiImmerAtom<EdgeAtom>;
 
 export type EdgeAtomsType = IObject<EdgeAtomType>;
 
@@ -57,15 +54,11 @@ export type ComputedEdgeAtom = EdgeAtom & EdgeBasicProps;
 export type EdgeProps = Omit<EdgeAtomRaw, 'reconnect'> & EdgeBasicProps & EdgePropsFromWrapper;
 
 export type EdgeWrapperProps<T extends IObject = {}> = {
-  // id: string
-  atom: RecoilState<EdgeAtom<T>>;
+  atom: JotaiImmerAtom<EdgeAtom<T>>;
   nodeAtoms: NodeAtomsType;
   templates: EdgeTemplatesType;
   updateEdge(lastEdge: Edge, nextEdge: Edge): void;
-  // template: ComponentType<EdgeProps>;
-  // shadow: ComponentType<EdgeBasicProps>;
-  // onClick?: (evt: React.MouseEvent, edge: Edge) => void
-}; /* & EdgeProps */
+};
 
 export type SelectorInput = {
   edge: EdgeAtomType;
@@ -80,15 +73,10 @@ export type EdgeComponentPackType = {
 export type EdgeTemplatesType = IObject<EdgeComponentPackType>;
 
 export type EdgeRendererProps = {
-  // edges: IObject<Edge>;
-  // connecting: boolean;
   templates: EdgeTemplatesType;
   connectingEdge?: ComponentType<EdgeBasicProps>;
-  // getNodeAtoms(): NodeAtomsType;
-  // storeUpdater: (atom: RecoilState<EdgeAtom>, updater: UpdaterType<EdgeAtom>) => void;
 };
 
-// export type EdgeParsed = Map<string,>
 export type AnchorProps = {
   color?: string;
   strokeWidth?: number;

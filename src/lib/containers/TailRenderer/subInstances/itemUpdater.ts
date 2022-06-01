@@ -1,11 +1,11 @@
-import { RecoilState } from 'recoil';
 import type { AtomUpdater, NodeAtom, Node, Edge, EdgeAtom, UpdaterType, IObject } from '@app/types';
 import { createNodeAtom } from '@app/atoms/nodes';
 import { createEdgeAtom } from '@app/atoms/edges';
 import EventEmitter from 'eventemitter3';
+import { JotaiImmerAtom } from '@app/types/jotai';
 
 abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
-  protected itemAtoms: IObject<RecoilState<A>> = {};
+  protected itemAtoms: IObject<JotaiImmerAtom<A>> = {};
   protected lastItems: IObject<T> = {};
   constructor(protected updater: AtomUpdater<A>, items: IObject<T>) {
     super();
@@ -70,7 +70,7 @@ abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
     this.emit('update');
   }
 
-  abstract createAtom(item: T): RecoilState<A>;
+  abstract createAtom(item: T): JotaiImmerAtom<A>;
   abstract createAtomUpdater(item: T): UpdaterType<A>;
 
   getItemAtoms() {

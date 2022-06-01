@@ -1,4 +1,4 @@
-import React, { FC, Component, ReactNode, createRef } from 'react';
+import React, { Component, ReactNode, createRef } from 'react';
 import {
   MinimapProps,
   MinimapState,
@@ -17,7 +17,7 @@ import {
 import { ViewerContext } from '@app/contexts/viewer';
 import { DifferContext } from '@app/contexts/differ';
 import { isNotNum } from '@app/utils';
-import type { RecoilState } from 'recoil';
+import { JotaiImmerAtom } from '@app/types/jotai';
 import styles from './index.module.scss';
 import MiniNode from './MiniNode';
 import { binaryRemoveBox, binaryUpdateBox, getLargeBox, toBox, toRect } from './utils';
@@ -184,7 +184,7 @@ class Minimap extends Component<MinimapProps, MinimapState> {
     sortedY: [],
   };
 
-  mountNode = (node: Node, atom: RecoilState<NodeAtom>) => {
+  mountNode = (node: Node, atom: JotaiImmerAtom<NodeAtom>) => {
     const { activeColor, nodeColor } = this.props;
     this.nodeInstances[node.id] = (
       <MiniNode

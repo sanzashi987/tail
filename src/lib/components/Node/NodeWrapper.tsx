@@ -9,8 +9,8 @@ import React, {
 } from 'react';
 import type { NodeWrapperProps, NodeCom, DraggerData } from '@app/types';
 import { InstanceInterface } from '@app/contexts/instance';
-import { useRecoilState } from 'recoil';
 import { setHovered, setNotHovered } from '@app/atoms/reducers';
+import { useAtom } from 'jotai';
 import Dragger from './Dragger';
 import { getNodeInfo } from './utils';
 import styles from './Wrapper.module.scss';
@@ -19,7 +19,7 @@ import { BasicNode } from '.';
 const wrapperClassname = `tail-node__wrapper ${styles.wrapper}`;
 
 const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) => {
-  const [{ node, selected, selectedHandles, hovered }, setNodeInternal] = useRecoilState(atom);
+  const [{ node, selected, selectedHandles, hovered }, setNodeInternal] = useAtom(atom);
   const ref = useRef<HTMLDivElement>(null);
   const rootInterface = useContext(InstanceInterface)!;
   const { left: x, top: y } = node;

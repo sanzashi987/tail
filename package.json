@@ -107,8 +107,9 @@
   },
   "dependencies": {
     "eventemitter3": "^4.0.7",
-    "recoil": "^0.6.1",
+    "jotai": "^1.7.0",
     "lodash.debounce": "^4.0.8",
+    "recoil": "^0.6.1",
     "resize-observer-polyfill": "^1.5.1"
   },
   "peerDependencies": {

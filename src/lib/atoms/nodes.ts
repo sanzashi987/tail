@@ -1,5 +1,6 @@
 import type { Node, NodeAtom } from '@app/types';
-import { atom } from 'recoil';
+import { JotaiImmerAtom } from '@app/types/jotai';
+import { atomWithImmer } from 'jotai/immer';
 
 export const defaultRect = {
   x: NaN,
@@ -8,20 +9,31 @@ export const defaultRect = {
   height: NaN,
 };
 
+const createDefaultNodeDescriber = () => ({
+  hovered: false,
+  selected: false,
+  selectedHandles: {},
+  handles: {
+    source: {},
+    target: {},
+  },
+  rect: defaultRect,
+  forceRender: 0,
+});
+
 export function createNodeAtom<T>(node: Node<T>) {
-  return atom<NodeAtom<T>>({
-    key: `${node.id}__node-${Date.now().toString(36)}`,
-    default: {
-      node,
-      hovered: false,
-      selected: false,
-      selectedHandles: {},
-      handles: {
-        source: {},
-        target: {},
-      },
-      rect: defaultRect,
-      forceRender: 0,
-    },
+  return atomWithImmer<NodeAtom<T>>({
+    node,
+    ...createDefaultNodeDescriber(),
   });
 }
+
+export const DummyNodeAtom: JotaiImmerAtom<NodeAtom> = atomWithImmer({
+  node: {
+    id: 'dummy',
+    left: NaN,
+    top: NaN,
+    type: '',
+  },
+  ...createDefaultNodeDescriber(),
+});

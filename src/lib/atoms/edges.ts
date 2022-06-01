@@ -1,16 +1,13 @@
-import { Edge, EdgeAtom, EdgeInProgressAtomType, SelectorInput } from '@app/types';
-import { atom, selectorFamily } from 'recoil';
+import { Edge, EdgeAtom, EdgeInProgressAtomType } from '@app/types';
+import { atomWithImmer } from 'jotai/immer';
 
 export function createEdgeAtom(edge: Edge) {
-  return atom<EdgeAtom>({
-    key: `${edge.id}__edge-${Date.now().toString(36)}`,
-    default: {
-      edge,
-      selected: false,
-      hovered: false,
-      reconnect: false,
-      forceRender: 0,
-    },
+  return atomWithImmer<EdgeAtom>({
+    edge,
+    selected: false,
+    hovered: false,
+    reconnect: false,
+    forceRender: 0,
   });
 }
 
@@ -20,57 +17,12 @@ const emptySourceTarget = {
   targetX: NaN,
   targetY: NaN,
 };
-const emptyHandle = {
-  x: NaN,
-  y: NaN,
-};
 
-export const computedEdgeSelector = selectorFamily({
-  key: 'edgeWrapperSelector',
-  get: (input: any) => ({ get }) => {
-    const { edge, nodeAtoms } = input as SelectorInput;
-    const edgeState = get(edge);
-    const {
-      edge: { sourceNode, targetNode, source, target },
-    } = edgeState;
-    const sourceAtom = nodeAtoms[sourceNode],
-      targetAtom = nodeAtoms[targetNode];
-    if (!sourceAtom || !targetAtom) {
-      return {
-        ...edgeState,
-        ...emptySourceTarget,
-      };
-    }
-    const {
-      handles: { source: sourceHandles },
-      node: { left: sourceLeft, top: sourceTop },
-    } = get(sourceAtom);
-    const {
-      handles: { target: targetHandles },
-      node: { left: targetLeft, top: targetTop },
-    } = get(targetAtom);
-
-    const { x: sourceX, y: sourceY } = sourceHandles[source] ?? emptyHandle;
-    const { x: targetX, y: targetY } = targetHandles[target] ?? emptyHandle;
-
-    return {
-      ...edgeState,
-      sourceX: sourceX + sourceLeft,
-      sourceY: sourceY + sourceTop,
-      targetX: targetX + targetLeft,
-      targetY: targetY + targetTop,
-    };
-  },
-});
-
-export const edgeInProgressAtom = atom<EdgeInProgressAtomType>({
-  key: 'tailEdgeInProgress',
-  default: {
-    active: false,
-    reconnect: false,
-    to: 'target',
-    nodeId: '',
-    handleId: '',
-    ...emptySourceTarget,
-  },
+export const edgeInProgressAtom = atomWithImmer<EdgeInProgressAtomType>({
+  active: false,
+  reconnect: false,
+  to: 'target',
+  nodeId: '',
+  handleId: '',
+  ...emptySourceTarget,
 });

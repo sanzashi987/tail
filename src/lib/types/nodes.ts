@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import type { ComponentType } from 'react';
-import type { RecoilState } from 'recoil';
+import { JotaiImmerAtom } from './jotai';
 import type { HandlesInfo, coordinates, AtomForceRender, DraggerData, Rect, IObject } from '.';
 
 export type Node<T extends IObject = {}> = {
@@ -26,23 +26,19 @@ export type TemplateNodeClass = IObject<NodeCom<any>>;
 export type TemplatePickerType = (node: Node<any>) => [string, string];
 
 export type NodeRendererProps = {
-  // nodes: IObject<Node>;
   templates: IObject<TemplateNodeClass>;
   templatePicker: TemplatePickerType;
-  // mounted(): void;
-  // storeUpdater: (atom: RecoilState<NodeAtom>, updater: UpdaterType<NodeAtom>) => void;
 };
 
-export type NodeAtomType<T extends IObject = {}> = RecoilState<NodeAtom<T>>;
+export type NodeAtomType<T extends IObject = {}> = JotaiImmerAtom<NodeAtom<T>>;
 
 export type NodeWrapperProps<T extends IObject = {}> = {
   atom: NodeAtomType<T>;
-  // atom: RecoilState<NodeAtom>;
   templates: IObject<TemplateNodeClass>;
   templatePicker: TemplatePickerType;
 };
 
-export type Nodes = IObject<Node>; // NodeRendererProps['nodes'];
+export type Nodes = IObject<Node>;
 
 export type NodeProps<T extends IObject = {}> = {
   node: Node<T>;
@@ -69,6 +65,5 @@ export type NodeAtomRaw<T extends IObject = {}> = Omit<NodeProps<T>, 'updateNode
 };
 
 export type NodeAtom<T extends IObject = {}> = NodeAtomRaw<T> & AtomForceRender;
-// export type NodeAtom = NodeAtomRaw & AtomForceRender;
 
-export type NodeAtomsType = IObject<RecoilState<NodeAtom>>;
+export type NodeAtomsType = IObject<JotaiImmerAtom<NodeAtom>>;
