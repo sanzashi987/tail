@@ -46,33 +46,26 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   );
   const dragEnd = useCallback(
     (e: MouseEvent, c: DraggerData) => {
-      // setCoordinate(c);
       return rootInterface.node.onDragEnd?.(e, node, c);
     },
     [node],
   );
-  const onNodeClick = useCallback(
-    (e: React.MouseEvent) => {
-      // e.stopPropagation();
-      rootInterface.activateItem(e, 'node', node.id, selected);
-      rootInterface.node.onNodeClick?.(e, node);
-    },
-    [selected, node],
-  );
 
-  const onHoverIn = useCallback((e: React.MouseEvent) => {
-    setNodeInternal(setHovered);
-  }, []);
-  const onHoverOut = useCallback((e: React.MouseEvent) => {
-    setNodeInternal(setNotHovered);
-  }, []);
+  const onNodeClick = (e: React.MouseEvent) => {
+    // e.stopPropagation();
+    rootInterface.activateItem(e, 'node', node.id, selected);
+    rootInterface.node.onNodeClick?.(e, node);
+  };
+  const onHoverIn = () => {
+    !hovered && setNodeInternal(setHovered);
+  };
+  const onHoverOut = () => {
+    hovered && setNodeInternal(setNotHovered);
+  };
 
-  const onContextMenu = useCallback(
-    (e: React.MouseEvent) => {
-      rootInterface.node.onNodeContextMenu?.(e, node);
-    },
-    [node],
-  );
+  const onContextMenu = (e: React.MouseEvent) => {
+    rootInterface.node.onNodeContextMenu?.(e, node);
+  };
 
   const updateNodeHandles = useCallback(() => {
     const scale = rootInterface.getScale();
@@ -93,10 +86,13 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
     return () => rootInterface.activateItem(null, 'node', node.id, false, true);
   }, []);
 
-  const NodeComponent: NodeCom = templatePicker(node).reduce<any>((last, val) => {
-    if (last[val]) return last[val];
-    return BasicNode;
-  }, templates);
+  const NodeComponent: NodeCom = useMemo(() => {
+    return templatePicker(node).reduce<any>((last, val) => {
+      if (last[val]) return last[val];
+      return BasicNode;
+    }, templates);
+  }, [templatePicker, node]);
+
   // console.log('render ==>', node.id);
   return (
     <Dragger
@@ -112,7 +108,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
         className={wrapperClassname}
         style={style}
         ref={ref}
-        onMouseOver={onHoverIn}
+        onMouseEnter={onHoverIn}
         onMouseLeave={onHoverOut}
         onClick={onNodeClick}
         onContextMenu={onContextMenu}
