@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useCallback, useContext, useEffect, useRef } from 'react';
+import React, { FC, useMemo, useContext, useEffect, useRef } from 'react';
 import type { EdgeWrapperProps } from '@app/types';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { computedEdgeSelector } from '@app/atoms/edges';
@@ -18,27 +18,21 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates, updateE
   );
   const setEdge = useSetRecoilState(atom);
   const rootInterface = useContext(InstanceInterface)!;
-  const onClick = useCallback(
-    (e: React.MouseEvent) => {
-      rootInterface.activateItem(e, 'edge', edge.id, selected);
-      rootInterface.edge.onEdgeClick?.(e, edge);
-    },
-    [selected, edge],
-  );
 
-  const onHoverIn = useCallback((e: React.MouseEvent) => {
-    setEdge(setHovered);
-  }, []);
-  const onHoverOut = useCallback((e: React.MouseEvent) => {
-    setEdge(setNotHovered);
-  }, []);
+  const onClick = (e: React.MouseEvent) => {
+    rootInterface.activateItem(e, 'edge', edge.id, selected);
+    rootInterface.edge.onEdgeClick?.(e, edge);
+  };
+  const onHoverIn = () => {
+    !hovered && setEdge(setHovered);
+  };
+  const onHoverOut = () => {
+    hovered && setEdge(setNotHovered);
+  };
 
-  const onContextMenu = useCallback(
-    (e: React.MouseEvent) => {
-      rootInterface.edge.onEdgeContextMenu?.(e, edge);
-    },
-    [edge],
-  );
+  const onContextMenu = (e: React.MouseEvent) => {
+    rootInterface.edge.onEdgeContextMenu?.(e, edge);
+  };
 
   const { markerEnd, markerStart, source, sourceNode, target, targetNode } = edge;
   const lastEdge = useRef(edge);
@@ -89,7 +83,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates, updateE
         <g
           className="tail-edge__event-enhancer"
           onClick={onClick}
-          onMouseOver={onHoverIn}
+          onMouseEnter={onHoverIn}
           onMouseLeave={onHoverOut}
           onContextMenu={onContextMenu}
         >
