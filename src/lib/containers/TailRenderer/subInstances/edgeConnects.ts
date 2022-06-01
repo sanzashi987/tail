@@ -233,8 +233,8 @@ class EdgeConnects {
           const { [type]: prevHandleId, [toNode]: prevNodeId } = edgeState.edge;
           if (prevHandleId !== handleId || prevNodeId !== nodeId) {
             this.core.props.onEdgeUpdate?.(prevEdgeId, newPayload);
-            this.core.setAtomState('edge', prevEdgeId, disableEdgeReconnect);
           }
+          this.core.setAtomState('edge', prevEdgeId, disableEdgeReconnect);
         } else if (!validateExistEdge(newPayload, this.core.edgeRef.current!.edgeTree)) {
           this.core.props.onEdgeCreate?.(newPayload);
         }
