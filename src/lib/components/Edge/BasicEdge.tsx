@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import type { EdgeProps } from '@app/types';
+import type { EdgeProps } from '@lib/types';
 
 //Straight Edge
 class BasicEdge extends Component<EdgeProps> {

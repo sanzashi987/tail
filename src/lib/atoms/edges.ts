@@ -1,4 +1,4 @@
-import { Edge, EdgeAtom, EdgeInProgressAtomType, SelectorInput } from '@app/types';
+import { Edge, EdgeAtom, EdgeInProgressAtomType, SelectorInput } from '@lib/types';
 import { atom, selectorFamily } from 'recoil';
 
 export function createEdgeAtom(edge: Edge) {

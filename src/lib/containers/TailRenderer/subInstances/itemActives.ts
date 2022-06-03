@@ -7,9 +7,9 @@ import type {
   IObject,
   SelectedItemCollection,
   ActiveNextType,
-} from '@app/types';
+} from '@lib/types';
 import type { RecoilState } from 'recoil';
-import { CtrlOrCmd, isModifierExact } from '@app/utils';
+import { CtrlOrCmd, isModifierExact } from '@lib/utils';
 import { getAtom } from '../mutation';
 import type TailCore from '..';
 
@@ -82,7 +82,9 @@ class ItemActives {
      *  the `force` & `null` Event obj shall come in pair, and in such case the `selected` variable
      *  directly indicates the active state the component want to be
      */
-    if (force || e === null) return this.switchActive(type, id, selected, this.activeItems[type]);
+    if (e === null) {
+      return force && this.switchActive(type, id, selected, this.activeItems[type]);
+    }
     const hold = isModifierExact(e) && CtrlOrCmd(e);
     if (!hold && selected) return;
     if (!hold) {

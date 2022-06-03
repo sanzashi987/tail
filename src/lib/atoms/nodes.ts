@@ -1,4 +1,4 @@
-import type { Node, NodeAtom } from '@app/types';
+import type { Node, NodeAtom } from '@lib/types';
 import { atom } from 'recoil';
 
 export const defaultRect = {

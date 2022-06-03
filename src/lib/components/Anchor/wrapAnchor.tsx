@@ -1,5 +1,5 @@
 import React, { ComponentType, FC } from 'react';
-import { MarkerWrapperProps, AnchorProps } from '@app/types';
+import { MarkerWrapperProps, AnchorProps } from '@lib/types';
 
 const wrapAnchor = (Symbol: ComponentType<AnchorProps>) => {
   const MarkerWrapper: FC<MarkerWrapperProps> = ({

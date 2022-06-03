@@ -1,5 +1,5 @@
 import React from 'react';
-import type { DraggerProps, coordinates, DraggerIterState } from '@app/types';
+import type { DraggerProps, coordinates, DraggerIterState } from '@lib/types';
 import { DraggerCore } from '../Dragger';
 import { getDraggerRelativeCoordinates } from '../Dragger/utils/calc';
 

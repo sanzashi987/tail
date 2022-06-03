@@ -1,4 +1,4 @@
-import type { Node, TemplateNodeClass , IObject } from '@app/types';
+import type { Node, TemplateNodeClass , IObject } from '@lib/types';
 import { BasicNode, BasicFoldedNode } from '../../components/Node';
 
 ;

@@ -1,4 +1,4 @@
-import type { DraggerData, MouseEventCollection } from '@app/types';
+import type { DraggerData, MouseEventCollection } from '@lib/types';
 import { getCoordinatesFromParent, getDraggerRelativeCoordinates } from './utils/calc';
 
 const defaultState = {

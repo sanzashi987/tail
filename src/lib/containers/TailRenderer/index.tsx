@@ -1,5 +1,5 @@
 import React, { Component, createRef, forwardRef, useImperativeHandle, useRef } from 'react';
-import { InterfaceProvider } from '@app/contexts/instance';
+import { InterfaceProvider } from '@lib/contexts/instance';
 import { RecoilState } from 'recoil';
 import type {
   InterfaceValue,
@@ -12,8 +12,8 @@ import type {
   SelectModeType,
   IObject,
   CoreMethods,
-} from '@app/types';
-import { StoreContext } from '@app/contexts/store';
+} from '@lib/types';
+import { StoreContext } from '@lib/contexts/store';
 import { findDeletedItem, getAtom } from './mutation';
 import ItemActives from './subInstances/itemActives';
 import NodeMoves from './subInstances/nodeMoves';
@@ -24,7 +24,7 @@ import EdgeRenderer from '../EdgeRenderer';
 import InfiniteViewer from '../InfiniteViewer';
 import MarkerDefs from '../MarkerDefs';
 import StoreRoot from '../../containers/StoreRoot';
-import '@app/styles/index.scss';
+import '@lib/styles/index.scss';
 
 class TailCore extends Component<TailCoreProps> {
   static displayName = 'TailCore';
@@ -87,12 +87,13 @@ class TailCore extends Component<TailCoreProps> {
     const atom = this.getAtomState<NodeAtom>('node', nodeId);
     if (!atom) return;
     const {
-      node: { left, top },
+      node: { left, top, id },
       rect: { width, height },
     } = atom;
     const centerX = left + (isNaN(width) ? 0 : width) / 2;
     const centerY = top + (isNaN(height) ? 0 : height) / 2;
     this.viewer.current?.moveCamera(centerX, centerY);
+    this.ItemActives.loadActiveItems({ node: { [id]: id }, edge: {} });
   };
 
   render() {

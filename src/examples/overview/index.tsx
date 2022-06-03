@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { DraggerData, Edge, EdgeBasic, Node, IObject } from '@app/types';
+import { DraggerData, Edge, EdgeBasic, Node, IObject } from '@lib/types';
 // import { MiniMap, Tail } from '../../../dist/esm/index';
-import Tail, { MiniMap, Background } from '@app/index';
+import Tail, { MiniMap, Background } from '@lib/index';
 // import '../../../dist/esm/index.css';
 
 const nodes: IObject<Node> = {

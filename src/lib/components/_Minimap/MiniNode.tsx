@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useMemo, useRef } from 'react';
-import { MiniNodeProps, Box } from '@app/types';
+import { MiniNodeProps, Box } from '@lib/types';
 import { useRecoilValue } from 'recoil';
-import { isNotNum } from '@app/utils';
+import { isNotNum } from '@lib/utils';
 import { toBox } from './utils';
 
 const MiniNode: FC<MiniNodeProps> = ({ atom, activeColor, nodeColor, updateBox, removeBox }) => {

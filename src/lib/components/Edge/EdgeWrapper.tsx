@@ -1,10 +1,10 @@
 import React, { FC, useMemo, useContext, useEffect, useRef } from 'react';
-import type { EdgeWrapperProps } from '@app/types';
+import type { EdgeWrapperProps } from '@lib/types';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { computedEdgeSelector } from '@app/atoms/edges';
-import { InstanceInterface } from '@app/contexts/instance';
-import { isNum } from '@app/utils';
-import { setHovered, setNotHovered } from '@app/atoms/reducers';
+import { computedEdgeSelector } from '@lib/atoms/edges';
+import { InstanceInterface } from '@lib/contexts/instance';
+import { isNum } from '@lib/utils';
+import { setHovered, setNotHovered } from '@lib/atoms/reducers';
 import { BasicEdge, BasicShadow } from '.';
 
 const getMarkerId = (markerId?: string) => {
