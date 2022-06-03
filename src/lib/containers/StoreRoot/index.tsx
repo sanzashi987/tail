@@ -1,8 +1,8 @@
 import React, { Component, createRef } from 'react';
-import { RecoilNexus } from '@app/utils';
+import { RecoilNexus } from '@lib/utils';
 import { RecoilRoot, RecoilState, RecoilValue } from 'recoil';
-import type { RecoilNexusInterface, UpdaterType } from '@app/types';
-import { StoreProvider } from '@app/contexts/store';
+import type { RecoilNexusInterface, UpdaterType } from '@lib/types';
+import { StoreProvider } from '@lib/contexts/store';
 
 class StoreRoot extends Component {
   nexus = createRef<RecoilNexusInterface>();

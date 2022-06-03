@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { EdgeBasicProps, EdgeProps } from '@app/types';
+import { EdgeBasicProps, EdgeProps } from '@lib/types';
 import { drawBezier } from './drawBezier';
 
 const getCenter = ({

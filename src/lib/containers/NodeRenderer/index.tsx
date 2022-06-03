@@ -5,9 +5,9 @@ import type {
   ItemDifferInterface,
   NodeAtomType,
   IObject,
-} from '@app/types';
-import { NodeWrapper } from '@app/components/Node';
-import { DifferContext } from '@app/contexts/differ';
+} from '@lib/types';
+import { NodeWrapper } from '@lib/components/Node';
+import { DifferContext } from '@lib/contexts/differ';
 import { defaultProps } from './utils';
 
 class NodeRenderer extends Component<NodeRendererProps> {

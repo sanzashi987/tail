@@ -35,7 +35,7 @@
     "declarationDir": "./dist/esm/",
     "jsx": "react-jsx",
     "paths": {
-      "@app/*": [
+      "@lib/*": [
         "./src/lib/*"
       ]
     },

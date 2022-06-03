@@ -1,10 +1,10 @@
 import React, { FC, useMemo, useContext, useEffect, useRef } from 'react';
 import { useAtom } from 'jotai';
-import { InstanceInterface } from '@app/contexts/instance';
-import { isNotNum } from '@app/utils';
-import { setHovered, setNotHovered } from '@app/atoms/reducers';
-import { DummyNodeAtom } from '@app/atoms/nodes';
-import type { EdgeWrapperProps } from '@app/types';
+import { InstanceInterface } from '@lib/contexts/instance';
+import { isNotNum } from '@lib/utils';
+import { setHovered, setNotHovered } from '@lib/atoms/reducers';
+import { DummyNodeAtom } from '@lib/atoms/nodes';
+import type { EdgeWrapperProps } from '@lib/types';
 import { defaultEdgePair, emptyHandle } from './helpers';
 
 const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates, updateEdge }) => {

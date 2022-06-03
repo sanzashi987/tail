@@ -1,5 +1,5 @@
-// import { defaultVal } from '@app/contexts/viewer';
-import { coordinates, UpdaterType } from '@app/types';
+// import { defaultVal } from '@lib/contexts/viewer';
+import { coordinates, UpdaterType } from '@lib/types';
 
 export function getCSSVar({ x, y }: coordinates, scale: number) {
   const bg = 96 * scale,

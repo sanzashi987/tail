@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { StoreRootInterface } from '@app/types';
+import { StoreRootInterface } from '@lib/types';
 
 export const StoreContext = createContext<StoreRootInterface | null>(null);
 StoreContext.displayName = 'StoreContext';

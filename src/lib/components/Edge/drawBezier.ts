@@ -1,4 +1,4 @@
-import { EdgeBasicProps } from '@app/types';
+import { EdgeBasicProps } from '@lib/types';
 
 const PERCENT = 0.25;
 const DIST = 30;

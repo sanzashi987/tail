@@ -1,6 +1,6 @@
 import React, { ReactNode, Component } from 'react';
-import { BasicClosedMarker, BasicMarker } from '@app/components/Anchor';
-import type { Marker, MarkerDefsProps, MarkerTemplatesType, MarkerTemplateType } from '@app/types';
+import { BasicClosedMarker, BasicMarker } from '@lib/components/Anchor';
+import type { Marker, MarkerDefsProps, MarkerTemplatesType, MarkerTemplateType } from '@lib/types';
 
 const defaultTemplates: MarkerTemplatesType = {
   tailBasic: BasicMarker,

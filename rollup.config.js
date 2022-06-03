@@ -88,7 +88,7 @@ export const baseConfig = ({ outputDir = 'dist/esm', injectCSS = true } = {}) =>
     visualizer(),
     alias({
       entries: {
-        '@app': path.resolve(__dirname, '../src/lib')
+        '@lib': path.resolve(__dirname, '../src/lib')
       }
     }),
     // builtins()

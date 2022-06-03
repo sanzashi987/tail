@@ -1,4 +1,4 @@
-import { Edge, EdgeAtom, EdgeInProgressAtomType } from '@app/types';
+import { Edge, EdgeAtom, EdgeInProgressAtomType, SelectorInput } from '@lib/types';
 import { atomWithImmer } from 'jotai/immer';
 
 export function createEdgeAtom(edge: Edge) {

@@ -6,9 +6,9 @@ import type {
   ItemDifferInterface,
   EdgeAtomType,
   IObject,
-} from '@app/types';
-import { EdgeInProgress, EdgeWrapper } from '@app/components/Edge';
-import { DifferContext } from '@app/contexts/differ';
+} from '@lib/types';
+import { EdgeInProgress, EdgeWrapper } from '@lib/components/Edge';
+import { DifferContext } from '@lib/contexts/differ';
 import styles from './index.module.scss';
 import { registerChild, removeChild, defaultProps } from './utils';
 

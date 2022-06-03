@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { ItemDifferInterface } from '@app/types';
+import type { ItemDifferInterface } from '@lib/types';
 // export default ConnectingContext;
 
 export const DifferContext = createContext<ItemDifferInterface | null>(null);

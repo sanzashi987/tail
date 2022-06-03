@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { EdgeBasicProps } from '@app/types';
+import { EdgeBasicProps } from '@lib/types';
 
 const BasicShadow: FC<EdgeBasicProps> = ({ sourceX, sourceY, targetX, targetY }) => {
   return (

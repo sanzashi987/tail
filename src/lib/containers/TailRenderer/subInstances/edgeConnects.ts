@@ -1,4 +1,4 @@
-import { CoordinateCalc } from '@app/components/Dragger';
+import { CoordinateCalc } from '@lib/components/Dragger';
 import type {
   EdgeAtom,
   EdgeInProgressAtomType,
@@ -11,8 +11,8 @@ import type {
   ConnectMethodType,
   DraggerData,
   IObject,
-} from '@app/types';
-import { edgeInProgressAtom } from '@app/atoms/edges';
+} from '@lib/types';
+import { edgeInProgressAtom } from '@lib/atoms/edges';
 import type ItemActives from './itemActives';
 import type TailCore from '..';
 

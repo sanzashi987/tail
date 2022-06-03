@@ -12,12 +12,12 @@ import {
   MapBoundary,
   DraggerData,
   MapContainerState,
-} from '@app/types';
+} from '@lib/types';
 
-import { ViewerContext } from '@app/contexts/viewer';
-import { DifferContext } from '@app/contexts/differ';
-import { isNotNum } from '@app/utils';
-import { JotaiImmerAtom } from '@app/types/jotai';
+import { ViewerContext } from '@lib/contexts/viewer';
+import { DifferContext } from '@lib/contexts/differ';
+import { isNotNum } from '@lib/utils';
+import { JotaiImmerAtom } from '@lib/types/jotai';
 import styles from './index.module.scss';
 import MiniNode from './MiniNode';
 import { binaryRemoveBox, binaryUpdateBox, getLargeBox, toBox, toRect } from './utils';

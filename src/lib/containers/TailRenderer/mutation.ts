@@ -1,4 +1,4 @@
-import type { DeletePayload, EdgeTree, NodeAtom, IObject } from '@app/types';
+import type { DeletePayload, EdgeTree, NodeAtom, IObject } from '@lib/types';
 import type { RecoilState } from 'recoil';
 
 export function getAtom<T>(id: string, atomPool?: IObject<RecoilState<T>>) {

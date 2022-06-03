@@ -1,8 +1,8 @@
-import type { AtomUpdater, NodeAtom, Node, Edge, EdgeAtom, UpdaterType, IObject } from '@app/types';
-import { createNodeAtom } from '@app/atoms/nodes';
-import { createEdgeAtom } from '@app/atoms/edges';
+import type { AtomUpdater, NodeAtom, Node, Edge, EdgeAtom, UpdaterType, IObject } from '@lib/types';
+import { createNodeAtom } from '@lib/atoms/nodes';
+import { createEdgeAtom } from '@lib/atoms/edges';
 import EventEmitter from 'eventemitter3';
-import { JotaiImmerAtom } from '@app/types/jotai';
+import { JotaiImmerAtom } from '@lib/types/jotai';
 
 abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
   protected itemAtoms: IObject<JotaiImmerAtom<A>> = {};

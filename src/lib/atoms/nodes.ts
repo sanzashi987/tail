@@ -1,6 +1,6 @@
-import type { Node, NodeAtom } from '@app/types';
-import { JotaiImmerAtom } from '@app/types/jotai';
+import { JotaiImmerAtom } from '@lib/types/jotai';
 import { atomWithImmer } from 'jotai/immer';
+import type { Node, NodeAtom } from '@lib/types';
 
 export const defaultRect = {
   x: NaN,

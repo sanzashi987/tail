@@ -7,9 +7,9 @@ import React, {
   useEffect,
   useContext,
 } from 'react';
-import type { NodeWrapperProps, NodeCom, DraggerData } from '@app/types';
-import { InstanceInterface } from '@app/contexts/instance';
-import { setHovered, setNotHovered } from '@app/atoms/reducers';
+import type { NodeWrapperProps, NodeCom, DraggerData } from '@lib/types';
+import { InstanceInterface } from '@lib/contexts/instance';
+import { setHovered, setNotHovered } from '@lib/atoms/reducers';
 import { useAtom } from 'jotai';
 import Dragger from './Dragger';
 import { getNodeInfo } from './utils';
