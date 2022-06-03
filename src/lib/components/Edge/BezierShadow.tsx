@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { EdgeBasicProps } from '@app/types';
+import { EdgeBasicProps } from '@lib/types';
 import { drawBezier } from './drawBezier';
 
 const BezierShadow: FC<EdgeBasicProps> = (props) => {

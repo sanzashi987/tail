@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { DifferProvider } from '@app/contexts/differ';
-import type { ItemDifferProps, ItemDifferInterface } from '@app/types';
+import { DifferProvider } from '@lib/contexts/differ';
+import type { ItemDifferProps, ItemDifferInterface } from '@lib/types';
 import { EdgeUpdater, NodeUpdater } from './subInstances/itemUpdater';
 
 class ItemDiffer extends Component<ItemDifferProps> {

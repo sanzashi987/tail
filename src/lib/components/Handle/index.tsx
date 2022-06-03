@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import type { HandleProps, InterfaceValue } from '@app/types';
+import type { HandleProps, InterfaceValue } from '@lib/types';
 import styles from './index.module.scss';
 import { InstanceInterface } from '../../contexts/instance';
 

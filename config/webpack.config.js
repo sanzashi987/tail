@@ -317,7 +317,7 @@ module.exports = function (webpackEnv) {
           'scheduler/tracing': 'scheduler/tracing-profiling',
         }),
         ...(modules.webpackAliases || {}),
-        '@app': path.resolve(__dirname, '../src/lib'),
+        '@lib': path.resolve(__dirname, '../src/lib'),
         '@types': path.resolve(__dirname, '../src/lib/types/index.ts'),
       },
       plugins: [

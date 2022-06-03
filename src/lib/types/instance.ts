@@ -1,5 +1,5 @@
 import React, { ComponentType } from 'react';
-import { EdgeUpdater, NodeUpdater } from '@app/containers/TailRenderer/subInstances/itemUpdater';
+import { EdgeUpdater, NodeUpdater } from '@lib/containers/TailRenderer/subInstances/itemUpdater';
 import type { RecoilValue, RecoilState } from 'recoil';
 import type {
   NodeMouseInterface,

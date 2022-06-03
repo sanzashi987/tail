@@ -1,4 +1,4 @@
-import type { Edge, EdgeTree } from '@app/types';
+import type { Edge, EdgeTree } from '@lib/types';
 
 export const defaultProps = { templates: {} };
 

@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { InterfaceValue } from '@app/types';
+import type { InterfaceValue } from '@lib/types';
 // export default ConnectingContext;
 
 export const InstanceInterface = createContext<InterfaceValue | null>(null);

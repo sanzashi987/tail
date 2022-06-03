@@ -1,7 +1,7 @@
 import React, { useContext, FC } from 'react';
-import { ViewerContext } from '@app/contexts/viewer';
-import type { BackgroundProps } from '@app/types';
-import { getCSSVar } from '@app/containers/InfiniteViewer/utils';
+import { ViewerContext } from '@lib/contexts/viewer';
+import type { BackgroundProps } from '@lib/types';
+import { getCSSVar } from '@lib/containers/InfiniteViewer/utils';
 import styles from './index.module.scss';
 
 const { 'tail-editor-background': bgClass } = styles;

@@ -7,9 +7,9 @@ import type {
   IObject,
   SelectedItemCollection,
   ActiveNextType,
-} from '@app/types';
+} from '@lib/types';
 import type { RecoilState } from 'recoil';
-import { CtrlOrCmd, isModifierExact } from '@app/utils';
+import { CtrlOrCmd, isModifierExact } from '@lib/utils';
 import { getAtom } from '../mutation';
 import type TailCore from '..';
 
@@ -82,7 +82,9 @@ class ItemActives {
      *  the `force` & `null` Event obj shall come in pair, and in such case the `selected` variable
      *  directly indicates the active state the component want to be
      */
-    if (force || e === null) return this.switchActive(type, id, selected, this.activeItems[type]);
+    if (e === null) {
+      return force && this.switchActive(type, id, selected, this.activeItems[type]);
+    }
     const hold = isModifierExact(e) && CtrlOrCmd(e);
     if (!hold && selected) return;
     if (!hold) {
@@ -92,22 +94,20 @@ class ItemActives {
   };
 
   deactivateLast = () => {
-    this.batchSwitch('node', false);
-    this.batchSwitch('edge', false);
+    this.batchSwitch('node', false, this.activeItems.node);
+    this.batchSwitch('edge', false, this.activeItems.edge);
   };
 
-  private batchSwitch(type: SelectedItemType, active: boolean) {
-    const pool = this.activeItems[type];
+  private batchSwitch(type: SelectedItemType, active: boolean, pool: IObject) {
     Object.keys(pool).forEach((key) => {
-      this.switchActive(type, key, active, pool);
+      this.switchActive(type, key, active, this.activeItems[type]);
     });
   }
 
   loadActiveItems = (items: SelectedItemCollection) => {
     this.deactivateLast();
-    this.activeItems = items;
-    this.batchSwitch('node', true);
-    this.batchSwitch('edge', true);
+    this.batchSwitch('node', true, items.node);
+    this.batchSwitch('edge', true, items.edge);
   };
 
   switchActive = (

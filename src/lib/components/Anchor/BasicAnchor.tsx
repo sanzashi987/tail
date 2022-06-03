@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import type { AnchorProps } from '@app/types';
+import type { AnchorProps } from '@lib/types';
 import { wrapAnchor } from '.';
 
 const BasicAnchor: FC<AnchorProps> = ({ color = 'black', strokeWidth = 2 }) => {

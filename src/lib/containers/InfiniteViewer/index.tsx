@@ -6,13 +6,13 @@ import {
   InfiniteViewerState,
   SelectModeType,
   UpdaterType,
-} from '@app/types';
+} from '@lib/types';
 import ResizeObserver from 'resize-observer-polyfill';
-import { CoordinateCalc } from '@app/components/Dragger';
-import SelectArea from '@app/components/SelectArea';
-import { createMemo, preventDefault } from '@app/utils';
+import { CoordinateCalc } from '@lib/components/Dragger';
+import SelectArea from '@lib/components/SelectArea';
+import { createMemo, preventDefault } from '@lib/utils';
 import debounce from 'lodash.debounce';
-import { ViewerProvider } from '@app/contexts/viewer';
+import { ViewerProvider } from '@lib/contexts/viewer';
 import styles from './index.module.scss';
 import { captureTrue, commonDragOpt, getViewerContext } from './utils';
 
@@ -143,9 +143,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
           this.props.onSelectEnd?.(dragStart, dragEnd, offset, scale);
         }
       } else {
-        if (Math.abs(e.timeStamp - this.mouseDownTime) < 100) {
-          this.disFocus(e);
-        }
+        this.disFocus(e);
       }
     }
 
@@ -173,10 +171,11 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
 
   private onMoveEnd = (e: MouseEvent) => {
     e.stopPropagation();
+    this.disFocus(e);
   };
 
   private disFocus = (e: MouseEvent) => {
-    if (this.isBlankClicked(e)) {
+    if (this.isBlankClicked(e) && Math.abs(e.timeStamp - this.mouseDownTime) < 100) {
       e.stopPropagation();
       this.props.onClick?.(e);
       this.props.onViewerClick?.(e, this.state.offset, this.state.scale);

@@ -1,4 +1,4 @@
-import type { Node, DraggerData, NodeAtom, IObject } from '@app/types';
+import type { Node, DraggerData, NodeAtom, IObject } from '@lib/types';
 import type ItemActives from './itemActives';
 import type TailCore from '..';
 

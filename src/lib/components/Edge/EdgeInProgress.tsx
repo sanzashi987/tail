@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
-import { edgeInProgressAtom } from '@app/atoms/edges';
-import { EdgeInProgressProps } from '@app/types';
+import { edgeInProgressAtom } from '@lib/atoms/edges';
+import { EdgeInProgressProps } from '@lib/types';
 import { useRecoilValue } from 'recoil';
 import BasicEdge from './BasicEdge';
 
