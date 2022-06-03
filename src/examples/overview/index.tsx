@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DraggerData, Edge, EdgeBasic, Node, IObject } from '@lib/types';
 // import { MiniMap, Tail } from '../../../dist/esm/index';
 import Tail, { MiniMap, Background } from '@lib/index';
@@ -79,10 +79,18 @@ function Overview() {
       });
     }, 5000);
   }, []);
-
+  const ref = useRef<any>();
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
+      <button
+        onClick={() => {
+          ref.current?.focusNode('id3');
+        }}
+      >
+        focus
+      </button>
       <Tail
+        ref={ref}
         nodes={nodeState}
         edges={edgeState}
         onEdgeClick={noop}

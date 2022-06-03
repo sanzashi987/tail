@@ -94,22 +94,20 @@ class ItemActives {
   };
 
   deactivateLast = () => {
-    this.batchSwitch('node', false);
-    this.batchSwitch('edge', false);
+    this.batchSwitch('node', false, this.activeItems.node);
+    this.batchSwitch('edge', false, this.activeItems.edge);
   };
 
-  private batchSwitch(type: SelectedItemType, active: boolean) {
-    const pool = this.activeItems[type];
+  private batchSwitch(type: SelectedItemType, active: boolean, pool: IObject) {
     Object.keys(pool).forEach((key) => {
-      this.switchActive(type, key, active, pool);
+      this.switchActive(type, key, active, this.activeItems[type]);
     });
   }
 
   loadActiveItems = (items: SelectedItemCollection) => {
     this.deactivateLast();
-    this.activeItems = items;
-    this.batchSwitch('node', true);
-    this.batchSwitch('edge', true);
+    this.batchSwitch('node', true, items.node);
+    this.batchSwitch('edge', true, items.edge);
   };
 
   switchActive = (
