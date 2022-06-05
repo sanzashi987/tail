@@ -12,6 +12,8 @@ import { DifferContext } from '@lib/contexts/differ';
 import styles from './index.module.scss';
 import { registerChild, removeChild, defaultProps } from './utils';
 
+const EdgeClassname = `tail-edge-container ${styles['edge-container']}`;
+
 class EdgeRenderer extends Component<EdgeRendererProps> {
   static defaultProps = defaultProps;
   static contextType = DifferContext;
@@ -33,6 +35,10 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
     registerChild(this.edgeTree, nextEdge);
   };
 
+  removeEdge = (lastEdge: Edge) => {
+    removeChild(this.edgeTree, lastEdge);
+  };
+
   mountEdge = (edge: Edge, atom: EdgeAtomType) => {
     const NodeAtoms = this.context.nodeUpdater.getItemAtoms();
     const { id } = edge;
@@ -44,6 +50,7 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
         atom={atom}
         templates={this.props.templates}
         updateEdge={this.updateEdge}
+        removeEdge={this.removeEdge}
       />
     );
   };
@@ -60,7 +67,7 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
 
   render() {
     return (
-      <svg className={`tail-edge-container ${styles['edge-container']}`}>
+      <svg className={EdgeClassname}>
         {this.props.children /*for marker definition */}
         {this.memoEdges}
         <EdgeInProgress template={this.props.connectingEdge} />

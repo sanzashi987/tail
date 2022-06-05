@@ -7,7 +7,13 @@ import { DummyNodeAtom } from '@lib/atoms/nodes';
 import type { EdgeWrapperProps } from '@lib/types';
 import { defaultEdgePair, emptyHandle } from './helpers';
 
-const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates, updateEdge }) => {
+const EdgeWrapper: FC<EdgeWrapperProps> = ({
+  atom,
+  nodeAtoms,
+  templates,
+  updateEdge,
+  removeEdge,
+}) => {
   const rootInterface = useContext(InstanceInterface)!;
   const [{ edge, selected, reconnect, hovered }, setEdge] = useAtom(atom);
   const { markerEnd, markerStart, source, sourceNode, target, targetNode, type = '' } = edge;
@@ -50,62 +56,56 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates, updateE
     rootInterface.edge.onEdgeContextMenu?.(e, edge);
   };
 
+  const notValidEdge = useMemo(() => {
+    return [sourceX, sourceY, targetX, targetY].some(isNotNum);
+  }, [sourceX, sourceY, targetX, targetY]);
+
   const lastEdge = useRef(edge);
   useEffect(() => {
     if (lastEdge.current !== edge) {
-      updateEdge(lastEdge.current, edge);
+      notValidEdge ? removeEdge(lastEdge.current) : updateEdge(lastEdge.current, edge);
       lastEdge.current = edge;
+    } else {
+      notValidEdge && removeEdge(lastEdge.current);
     }
-  }, [source, sourceNode, target, targetNode]);
+  }, [source, sourceNode, target, notValidEdge, targetNode]);
 
   useEffect(() => {
     return () => rootInterface.activateItem(null, 'edge', edge.id, false, true);
   }, []);
-
-  // const markerStartUrl = useMemo(() => getMarkerId(markerStart), [markerStart]);
-  // const markerEndUrl = useMemo(() => getMarkerId(markerEnd), [markerEnd]);
 
   const [EdgeComponent, ShadowComponent] = useMemo(() => {
     const { default: d, shadow } = templates[type] ?? defaultEdgePair;
     return [d, shadow];
   }, [templates, type]);
 
-  const memoVNode = useMemo(() => {
-    if ([sourceX, sourceY, targetX, targetY].some(isNotNum) || reconnect) return null;
-    return (
-      <>
-        <g className="tail-edge__wrapper">
-          <EdgeComponent
-            edge={edge}
-            hovered={hovered}
-            selected={selected}
-            sourceX={sourceX}
-            sourceY={sourceY}
-            targetX={targetX}
-            targetY={targetY}
-            markerEnd={markerEnd}
-            markerStart={markerStart}
-          />
-        </g>
-        <g
-          className="tail-edge__event-enhancer"
-          onClick={onClick}
-          onMouseEnter={onHoverIn}
-          onMouseLeave={onHoverOut}
-          onContextMenu={onContextMenu}
-        >
-          <ShadowComponent
-            sourceX={sourceX}
-            sourceY={sourceY}
-            targetX={targetX}
-            targetY={targetY}
-          />
-        </g>
-      </>
-    );
-  }, [edge, hovered, selected, sourceX, sourceY, targetX, targetY, markerEnd, markerStart]);
-
-  return memoVNode;
+  if (notValidEdge || reconnect) return null;
+  return (
+    <>
+      <g className="tail-edge__wrapper">
+        <EdgeComponent
+          edge={edge}
+          hovered={hovered}
+          selected={selected}
+          sourceX={sourceX}
+          sourceY={sourceY}
+          targetX={targetX}
+          targetY={targetY}
+          markerEnd={markerEnd}
+          markerStart={markerStart}
+        />
+      </g>
+      <g
+        className="tail-edge__event-enhancer"
+        onClick={onClick}
+        onMouseEnter={onHoverIn}
+        onMouseLeave={onHoverOut}
+        onContextMenu={onContextMenu}
+      >
+        <ShadowComponent sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY={targetY} />
+      </g>
+    </>
+  );
 };
 
 export default EdgeWrapper;

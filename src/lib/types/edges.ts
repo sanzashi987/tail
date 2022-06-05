@@ -58,6 +58,7 @@ export type EdgeWrapperProps<T extends IObject = {}> = {
   nodeAtoms: NodeAtomsType;
   templates: EdgeTemplatesType;
   updateEdge(lastEdge: Edge, nextEdge: Edge): void;
+  removeEdge(edge: Edge): void;
 };
 
 export type SelectorInput = {
