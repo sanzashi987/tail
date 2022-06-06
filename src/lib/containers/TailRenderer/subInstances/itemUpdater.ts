@@ -46,28 +46,36 @@ abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
     for (const key in deleted) {
       this.deleteItem(deleted[key]);
     }
-    dirty && this.emit('sizeChange');
+    requestIdleCallback(() => {
+      dirty && this.emit('sizeChange');
+    });
     this.lastItems = next;
   }
 
   private deleteItem(item: T) {
-    this.emit('delete', item);
-    delete this.itemAtoms[item.id];
+    requestIdleCallback(() => {
+      this.emit('delete', item);
+      delete this.itemAtoms[item.id];
+    });
   }
 
   private mountItem(item: T) {
-    const atom = this.createAtom(item);
-    this.itemAtoms[item.id] = atom;
-    this.emit('mount', item, atom);
+    requestIdleCallback(() => {
+      const atom = this.createAtom(item);
+      this.itemAtoms[item.id] = atom;
+      this.emit('mount', item, atom);
+    });
   }
   private updateItem(lastItem: T, nextItem: T) {
-    if (lastItem.id !== nextItem.id) {
-      console.error('error input ==>', lastItem, nextItem);
-      throw new Error('fail to update the item as their id is different');
-    }
-    const updater = this.createAtomUpdater(nextItem);
-    this.updater(this.itemAtoms[nextItem.id], updater);
-    this.emit('update');
+    requestIdleCallback(() => {
+      if (lastItem.id !== nextItem.id) {
+        console.error('error input ==>', lastItem, nextItem);
+        throw new Error('fail to update the item as their id is different');
+      }
+      const updater = this.createAtomUpdater(nextItem);
+      this.updater(this.itemAtoms[nextItem.id], updater);
+      this.emit('update');
+    });
   }
 
   abstract createAtom(item: T): RecoilState<A>;
