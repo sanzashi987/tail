@@ -79,3 +79,4 @@ package-lock.json
 .vscode
 stats.html
 .env
+pnpm-lock.yaml
