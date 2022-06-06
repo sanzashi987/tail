@@ -7,7 +7,6 @@ import {
   SelectModeType,
   UpdaterType,
 } from '@lib/types';
-import ResizeObserver from 'resize-observer-polyfill';
 import { CoordinateCalc } from '@lib/components/Dragger';
 import SelectArea from '@lib/components/SelectArea';
 import { createMemo, preventDefault } from '@lib/utils';

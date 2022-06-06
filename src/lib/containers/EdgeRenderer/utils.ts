@@ -12,13 +12,12 @@ function ensureParent(tree: Map<string, any>, parentId: string) {
   if (tree.get(parentId) === undefined) {
     tree.set(parentId, new Map());
   }
+  return tree.get(parentId)!;
 }
 
 function setChild(edgeTree: EdgeTree, nodeId: string, handleId: string, edgeId: string) {
-  ensureParent(edgeTree, nodeId);
-  const nodeMap = edgeTree.get(nodeId)!;
-  ensureParent(nodeMap, handleId);
-  nodeMap.get(handleId)!.set(edgeId, edgeId);
+  const nodeMap = ensureParent(edgeTree, nodeId);
+  ensureParent(nodeMap, handleId).set(edgeId, edgeId);
 }
 
 export function registerChild(edgeTree: EdgeTree, edge: Edge) {

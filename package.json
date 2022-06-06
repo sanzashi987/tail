@@ -60,7 +60,6 @@
     "fs-extra": "^10.0.0",
     "html-webpack-plugin": "^5.5.0",
     "identity-obj-proxy": "^3.0.0",
-    "immer": "^9.0.12",
     "jest": "^27.4.3",
     "jest-resolve": "^27.4.2",
     "jest-watch-typeahead": "^1.0.0",
@@ -79,7 +78,6 @@
     "react-refresh": "^0.11.0",
     "recoil": "^0.6.1",
     "release-it": "^14.13.1",
-    "resize-observer-polyfill": "^1.5.1",
     "resolve": "^1.20.0",
     "resolve-url-loader": "^4.0.0",
     "rollup": "^2.70.1",
@@ -110,7 +108,7 @@
     "jotai": "^1.7.0",
     "lodash.debounce": "^4.0.8",
     "recoil": "^0.6.1",
-    "resize-observer-polyfill": "^1.5.1"
+    "immer": "^9.0.14"
   },
   "peerDependencies": {
     "react": "^17.0.2",

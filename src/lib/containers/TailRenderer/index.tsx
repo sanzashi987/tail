@@ -37,7 +37,6 @@ class TailCore extends Component<TailCoreProps> {
 
   viewer = createRef<InfiniteViewer>();
   edgeRef = createRef<EdgeRenderer>();
-  nodeRef = createRef<NodeRenderer>();
   differRef = createRef<ItemDiffer>();
   contextInterface: InterfaceValue;
 
@@ -125,7 +124,6 @@ class TailCore extends Component<TailCoreProps> {
           <InterfaceProvider value={this.contextInterface}>
             <NodeRenderer
               templates={nodeTemplates}
-              ref={this.nodeRef}
               templatePicker={nodeTemplatePicker}
             />
             <EdgeRenderer

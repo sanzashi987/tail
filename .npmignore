@@ -15,3 +15,4 @@ stats.html
 tsconfig.json
 yarn-error.log
 yarn.lock
+pnpm-lock.yaml
