@@ -8,12 +8,10 @@ import type {
   EdgeAtom,
   NodeAtom,
   DeletePayload,
-  StoreRootInterface,
   SelectModeType,
   IObject,
   CoreMethods,
 } from '@lib/types';
-import { StoreContext } from '@lib/contexts/store';
 import { findDeletedItem, getAtom } from './mutation';
 import ItemActives from './subInstances/itemActives';
 import NodeMoves from './subInstances/nodeMoves';
@@ -23,7 +21,6 @@ import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
 import InfiniteViewer from '../InfiniteViewer';
 import MarkerDefs from '../MarkerDefs';
-import StoreRoot from '../../containers/StoreRoot';
 import '@lib/styles/index.scss';
 
 class TailCore extends Component<TailCoreProps> {
@@ -32,8 +29,6 @@ class TailCore extends Component<TailCoreProps> {
     dropThreshold: 40,
     quickNodeUpdate: true,
   };
-  static contextType = StoreContext;
-  context!: StoreRootInterface;
 
   viewer = createRef<InfiniteViewer>();
   edgeRef = createRef<EdgeRenderer>();
@@ -109,7 +104,6 @@ class TailCore extends Component<TailCoreProps> {
       markers,
       markerTemplates,
     } = this.props;
-    const { set } = this.context;
     const { deactivateLast, batchActivateNodes } = this.ItemActives;
     return (
       <ItemDiffer ref={this.differRef} nodes={nodes} edges={edges} atomSetter={set}>
@@ -151,18 +145,6 @@ class TailCore extends Component<TailCoreProps> {
     return getAtom(id, (pool as unknown) as IObject<RecoilState<T>>);
   };
 
-  getAtomState = <T,>(type: SelectedItemType, id: string) => {
-    const atom = this.getAtom(type, id);
-    if (!atom) return atom;
-    return this.context.get((atom as unknown) as RecoilState<T>);
-  };
-
-  setAtomState = <T,>(type: SelectedItemType, id: string, updater: T | ((cur: T) => T)) => {
-    const atom = this.getAtom(type, id);
-    if (!atom) return atom;
-    return this.context.set((atom as unknown) as RecoilState<T>, updater);
-  };
-
   getEdgeAtoms = () => this.differRef.current?.differInterface.edgeUpdater.getItemAtoms() ?? {};
 
   getNodeAtoms = () => this.differRef.current?.differInterface.nodeUpdater.getItemAtoms() ?? {};
@@ -190,11 +172,9 @@ const Tail = forwardRef<CoreMethods, TailCoreProps>(({ children, ...otherprops }
     [],
   );
   return (
-    <StoreRoot>
-      <TailCore ref={coreRef} {...otherprops}>
-        {children}
-      </TailCore>
-    </StoreRoot>
+    <TailCore ref={coreRef} {...otherprops}>
+      {children}
+    </TailCore>
   );
 });
 

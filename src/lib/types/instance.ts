@@ -1,4 +1,4 @@
-import React, { ComponentType } from 'react';
+import React, { ComponentType, ReactNode } from 'react';
 import { EdgeUpdater, NodeUpdater } from '@lib/containers/TailRenderer/subInstances/itemUpdater';
 import type { RecoilValue, RecoilState } from 'recoil';
 import { JotaiImmerAtom } from './jotai';
@@ -54,6 +54,7 @@ export type TailCoreOptionalProps = {
 export type TailCoreProps = {
   nodes: IObject<Node>;
   edges: IObject<Edge>;
+  children?: ReactNode;
 } & NodeMouseInterface &
   EdgeMouseInterface &
   TailCoreOptionalProps;
@@ -121,13 +122,6 @@ export interface RecoilNexusInterface {
 }
 
 export type UpdaterType<T> = T | ((currVal: T) => T);
-
-export interface StoreRootInterface {
-  get: <T>(atom: RecoilValue<T>) => T;
-  getPromise: <T>(atom: RecoilValue<T>) => Promise<T>;
-  set: <T>(atom: RecoilState<T>, valOrUpdater: UpdaterType<T>) => void;
-  reset: (atom: RecoilState<any>) => void;
-}
 
 export type AtomForceRender = {
   forceRender: number;

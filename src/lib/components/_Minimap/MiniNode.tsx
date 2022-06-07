@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useMemo, useRef } from 'react';
 import { MiniNodeProps, Box } from '@lib/types';
-import { useRecoilValue } from 'recoil';
+import { useAtomValue } from 'jotai';
 import { isNotNum } from '@lib/utils';
 import { toBox } from './utils';
 
@@ -9,7 +9,7 @@ const MiniNode: FC<MiniNodeProps> = ({ atom, activeColor, nodeColor, updateBox, 
     node: { left: x, top: y },
     rect: { width, height },
     selected,
-  } = useRecoilValue(atom);
+  } = useAtomValue(atom);
   const lastBox = useRef<Box>();
   const nodeBox = toBox({ x, y, width, height });
   useEffect(() => {
