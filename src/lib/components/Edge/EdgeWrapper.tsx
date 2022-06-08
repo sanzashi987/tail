@@ -1,5 +1,5 @@
-import React, { FC, useMemo, useContext, useEffect, useRef } from 'react';
-import { useAtom } from 'jotai';
+import React, { FC, useMemo, useContext } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
 import { InstanceInterface } from '@lib/contexts/instance';
 import { isNotNum } from '@lib/utils';
 import { setHovered, setNotHovered } from '@lib/atoms/reducers';
@@ -7,19 +7,13 @@ import { DummyNodeAtom } from '@lib/atoms/nodes';
 import type { EdgeWrapperProps } from '@lib/types';
 import { defaultEdgePair, emptyHandle } from './helpers';
 
-const EdgeWrapper: FC<EdgeWrapperProps> = ({
-  atom,
-  nodeAtoms,
-  templates,
-  updateEdge,
-  removeEdge,
-}) => {
+const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates }) => {
   const rootInterface = useContext(InstanceInterface)!;
   const [{ edge, selected, reconnect, hovered }, setEdge] = useAtom(atom);
   const { markerEnd, markerStart, source, sourceNode, target, targetNode, type = '' } = edge;
   const { [sourceNode]: sourceAtom, [targetNode]: targetAtom } = nodeAtoms;
-  const [sourceNodeState] = useAtom(sourceAtom ?? DummyNodeAtom);
-  const [targetNodeState] = useAtom(targetAtom ?? DummyNodeAtom);
+  const sourceNodeState = useAtomValue(sourceAtom ?? DummyNodeAtom);
+  const targetNodeState = useAtomValue(targetAtom ?? DummyNodeAtom);
 
   const { sourceX, sourceY, targetX, targetY } = useMemo(() => {
     const {
@@ -53,26 +47,12 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({
   };
 
   const onContextMenu = (e: React.MouseEvent) => {
-    rootInterface.edge.onEdgeContextMenu?.(e, edge);
+    selected && rootInterface.edge.onEdgeContextMenu?.(e, edge);
   };
 
   const notValidEdge = useMemo(() => {
     return [sourceX, sourceY, targetX, targetY].some(isNotNum);
   }, [sourceX, sourceY, targetX, targetY]);
-
-  const lastEdge = useRef(edge);
-  useEffect(() => {
-    if (lastEdge.current !== edge) {
-      notValidEdge ? removeEdge(lastEdge.current) : updateEdge(lastEdge.current, edge);
-      lastEdge.current = edge;
-    } else {
-      notValidEdge && removeEdge(lastEdge.current);
-    }
-  }, [source, sourceNode, target, notValidEdge, targetNode]);
-
-  useEffect(() => {
-    return () => rootInterface.activateItem(null, 'edge', edge.id, false, true);
-  }, []);
 
   const [EdgeComponent, ShadowComponent] = useMemo(() => {
     const { default: d, shadow } = templates[type] ?? defaultEdgePair;

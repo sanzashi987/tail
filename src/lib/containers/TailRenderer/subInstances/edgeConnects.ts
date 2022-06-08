@@ -252,39 +252,6 @@ class EdgeConnects {
     this.core.context.reset(edgeInProgressAtom);
   };
 
-  private tryConnect = (e: MouseEvent, { x, y }: DraggerData) => {
-    const { reconnect, prevEdgeId, to: type } = this.core.context.get(edgeInProgressAtom);
-
-    block: {
-      if (reconnect && prevEdgeId) {
-        const { getAtomState: GET, setAtomState: SET } = this.core;
-        const typeNode = addHandleNode[type];
-        const edgeState = GET<EdgeAtom>('edge', prevEdgeId);
-        if (!edgeState) break block;
-        const {
-          edge: { [typeNode]: originNode, [type]: originHandle },
-        } = edgeState;
-        const nodeState = GET<NodeAtom>('node', originNode);
-        if (!nodeState) break block;
-        const { x: X, y: Y } = nodeState.handles[type][originHandle];
-        const threshold = this.core.props.dropThreshold!;
-        if (Math.abs(x - X) < threshold && Math.abs(y - Y) < threshold) {
-          SET<EdgeAtom>('edge', prevEdgeId, disableEdgeReconnect);
-        } else {
-          this.itemActives.switchActive(
-            'edge',
-            prevEdgeId,
-            false,
-            this.itemActives.activeItems['edge'],
-          );
-          this.core.deleteItem([{ type: 'edge', id: prevEdgeId }]);
-        }
-      }
-    }
-
-    this.core.context.reset(edgeInProgressAtom);
-  };
-
   private connectReset = () => {
     this.dragger.reset();
     this.core.context.reset(edgeInProgressAtom);

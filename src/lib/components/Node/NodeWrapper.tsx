@@ -51,11 +51,13 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
     [node],
   );
 
-  const onNodeClick = (e: React.MouseEvent) => {
-    // e.stopPropagation();
-    rootInterface.activateItem(e, 'node', node.id, selected);
-    rootInterface.node.onNodeClick?.(e, node);
-  };
+  const onNodeClick = useCallback(
+    (e: MouseEvent) => {
+      rootInterface.activateItem(e, 'node', node.id, selected);
+      rootInterface.node.onNodeClick?.(e, node);
+    },
+    [node],
+  );
   const onHoverIn = () => {
     !hovered && setNodeInternal(setHovered);
   };
@@ -64,13 +66,12 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   };
 
   const onContextMenu = (e: React.MouseEvent) => {
-    rootInterface.node.onNodeContextMenu?.(e, node);
+    selected && rootInterface.node.onNodeContextMenu?.(e, node);
   };
 
   const updateNodeHandles = useCallback(() => {
     const scale = rootInterface.getScale();
     const [rect, handles] = getNodeInfo(ref, node, scale);
-    // console.log(rect);
     setNodeInternal((prev) => {
       return {
         ...prev,
@@ -83,7 +84,6 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   // built-in life cycle
   useEffect(() => {
     updateNodeHandles();
-    return () => rootInterface.activateItem(null, 'node', node.id, false, true);
   }, []);
 
   const NodeComponent: NodeCom = useMemo(() => {
@@ -93,7 +93,6 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
     }, templates);
   }, [templatePicker, node]);
 
-  // console.log('render ==>', node.id);
   return (
     <Dragger
       x={x}
@@ -102,6 +101,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
       onDragStart={dragStart}
       onDrag={drag}
       onDragEnd={dragEnd}
+      onClick={onNodeClick}
       nodeRef={ref}
     >
       <div
@@ -110,7 +110,6 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
         ref={ref}
         onMouseEnter={onHoverIn}
         onMouseLeave={onHoverOut}
-        onClick={onNodeClick}
         onContextMenu={onContextMenu}
       >
         <NodeComponent

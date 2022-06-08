@@ -1,22 +1,16 @@
 import React, { Component, createRef, forwardRef, useImperativeHandle, useRef } from 'react';
 import { InterfaceProvider } from '@lib/contexts/instance';
-import { RecoilState } from 'recoil';
 import type {
   InterfaceValue,
   TailCoreProps,
-  SelectedItemType,
-  EdgeAtom,
   NodeAtom,
-  DeletePayload,
   SelectModeType,
-  IObject,
   CoreMethods,
 } from '@lib/types';
-import { findDeletedItem, getAtom } from './mutation';
 import ItemActives from './subInstances/itemActives';
 import NodeMoves from './subInstances/nodeMoves';
 import EdgeConnects from './subInstances/edgeConnects';
-import ItemDiffer from './ItemDiffer';
+import ItemParser from '../../components/ItemParser';
 import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
 import InfiniteViewer from '../InfiniteViewer';
@@ -26,13 +20,13 @@ import '@lib/styles/index.scss';
 class TailCore extends Component<TailCoreProps> {
   static displayName = 'TailCore';
   static defaultProps = {
-    dropThreshold: 40,
     quickNodeUpdate: true,
+    lazyRenderNodes: true,
   };
 
   viewer = createRef<InfiniteViewer>();
   edgeRef = createRef<EdgeRenderer>();
-  differRef = createRef<ItemDiffer>();
+  differRef = createRef<ItemParser>();
   contextInterface: InterfaceValue;
 
   ItemActives: ItemActives;
@@ -69,6 +63,8 @@ class TailCore extends Component<TailCoreProps> {
     };
   }
 
+  getScale = () => this.viewer.current?.getScale() || 1;
+
   setScale = (scale: number) => {
     this.viewer.current?.setScale(scale);
   };
@@ -78,12 +74,12 @@ class TailCore extends Component<TailCoreProps> {
   };
 
   focusNode = (nodeId: string) => {
-    const atom = this.getAtomState<NodeAtom>('node', nodeId);
-    if (!atom) return;
+    const nodeState = this.getAtomState<NodeAtom>('node', nodeId);
+    if (!nodeState) return;
     const {
       node: { left, top, id },
       rect: { width, height },
-    } = atom;
+    } = nodeState;
     const centerX = left + (isNaN(width) ? 0 : width) / 2;
     const centerY = top + (isNaN(height) ? 0 : height) / 2;
     this.viewer.current?.moveCamera(centerX, centerY);
@@ -105,7 +101,7 @@ class TailCore extends Component<TailCoreProps> {
     } = this.props;
     const { deactivateLast, batchActivateNodes } = this.ItemActives;
     return (
-      <ItemDiffer ref={this.differRef} nodes={nodes} edges={edges} atomSetter={set}>
+      <ItemParser ref={this.differRef} nodes={nodes} edges={edges}>
         <InfiniteViewer
           ref={this.viewer}
           onClick={deactivateLast}
@@ -116,10 +112,7 @@ class TailCore extends Component<TailCoreProps> {
           onViewerScale={this.props.onViewerScale}
         >
           <InterfaceProvider value={this.contextInterface}>
-            <NodeRenderer
-              templates={nodeTemplates}
-              templatePicker={nodeTemplatePicker}
-            />
+            <NodeRenderer templates={nodeTemplates} templatePicker={nodeTemplatePicker} />
             <EdgeRenderer
               ref={this.edgeRef}
               templates={edgeTemplates}
@@ -129,25 +122,9 @@ class TailCore extends Component<TailCoreProps> {
             </EdgeRenderer>
           </InterfaceProvider>
         </InfiniteViewer>
-      </ItemDiffer>
+      </ItemParser>
     );
   }
-
-  deleteItem(payload: DeletePayload) {
-    const { nodes, edges } = findDeletedItem(this.edgeRef.current!.edgeTree, payload);
-    this.props.onDelete?.(nodes, edges);
-  }
-
-  getAtom = <T extends EdgeAtom | NodeAtom>(type: SelectedItemType, id: string) => {
-    const pool = type === 'edge' ? this.getEdgeAtoms() : this.getNodeAtoms();
-    return getAtom(id, (pool as unknown) as IObject<RecoilState<T>>);
-  };
-
-  getEdgeAtoms = () => this.differRef.current?.differInterface.edgeUpdater.getItemAtoms() ?? {};
-
-  getNodeAtoms = () => this.differRef.current?.differInterface.nodeUpdater.getItemAtoms() ?? {};
-
-  getScale = () => this.viewer.current?.getScale() || 1;
 }
 
 const Tail = forwardRef<CoreMethods, TailCoreProps>(({ children, ...otherprops }, ref) => {

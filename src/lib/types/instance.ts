@@ -1,7 +1,7 @@
 import React, { ComponentType, ReactNode } from 'react';
-import { EdgeUpdater, NodeUpdater } from '@lib/containers/TailRenderer/subInstances/itemUpdater';
+import { EdgeUpdater, NodeUpdater } from '@lib/components/ItemParser/itemUpdater';
 import type { RecoilValue, RecoilState } from 'recoil';
-import { JotaiImmerAtom } from './jotai';
+import { ImmerUpdater, JotaiImmerAtom } from './jotai';
 import type {
   NodeMouseInterface,
   EdgeBasic,
@@ -20,6 +20,7 @@ import type {
   SelectModeType,
   IObject,
   EdgeTree,
+  MouseEventCollection,
 } from '.';
 
 export type CoreMethods = {
@@ -38,8 +39,8 @@ export type TailCoreOptionalProps = {
   markerTemplates?: MarkerTemplatesType;
   nodeTemplatePicker?: TemplatePickerType;
   connectingEdge?: ComponentType<EdgeBasicProps>;
-  dropThreshold?: number;
   quickNodeUpdate?: boolean;
+  lazyRenderNodes?: boolean;
   onDelete?(nodes: string[], edges: string[]): void; //come with id array
   onActivate?(items: SelectedItemCollection): void;
   // getMethods?: (methods: CoreMethods) => void;
@@ -88,7 +89,7 @@ export type HandlesInfo = {
 };
 
 export type ActiveNextType = (
-  e: React.MouseEvent | null,
+  e: MouseEventCollection | null,
   type: SelectedItemType,
   id: string,
   selected: boolean,
@@ -127,13 +128,6 @@ export type AtomForceRender = {
   forceRender: number;
 };
 
-export type DeleteItem = {
-  type: SelectedItemType;
-  id: string;
-};
-
-export type DeletePayload = DeleteItem[];
-
 export type AtomStateGetterType = <T>(type: SelectedItemType, id: string) => T | false;
 export type AtomStateSetterType = <T>(
   type: SelectedItemType,
@@ -141,12 +135,11 @@ export type AtomStateSetterType = <T>(
   updater: T | ((c: T) => T),
 ) => T;
 
-export type AtomUpdater<T> = (atom: JotaiImmerAtom<T>, updater: UpdaterType<T>) => void;
+export type AtomUpdater<T> = (atom: JotaiImmerAtom<T>, updater: ImmerUpdater<T>) => void;
 
-export type ItemDifferProps = {
+export type ItemParserProps = {
   nodes: IObject<Node>;
   edges: IObject<Edge>;
-  atomSetter: <T>(atom: RecoilState<T>, updater: UpdaterType<T>) => void;
 };
 
 export type ItemDifferInterface = {

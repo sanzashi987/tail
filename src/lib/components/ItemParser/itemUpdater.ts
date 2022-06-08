@@ -1,11 +1,12 @@
-import type { AtomUpdater, NodeAtom, Node, Edge, EdgeAtom, UpdaterType, IObject } from '@lib/types';
+import type { AtomUpdater, NodeAtom, Node, Edge, EdgeAtom, IObject } from '@lib/types';
 import { createNodeAtom } from '@lib/atoms/nodes';
 import { createEdgeAtom } from '@lib/atoms/edges';
 import EventEmitter from 'eventemitter3';
-import { JotaiImmerAtom } from '@lib/types/jotai';
+import { ImmerUpdater, JotaiImmerAtom } from '@lib/types/jotai';
+import { deleteItem, mountItem, updateItem } from './helpers';
 
-abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
-  protected itemAtoms: IObject<JotaiImmerAtom<A>> = {};
+export abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
+  protected atoms: IObject<JotaiImmerAtom<A>> = {};
   protected lastItems: IObject<T> = {};
   constructor(protected updater: AtomUpdater<A>, items: IObject<T>) {
     super();
@@ -13,11 +14,14 @@ abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
     const _on = EventEmitter.prototype.on;
     this.on = function (eventName: string | symbol, listener: (...args: any[]) => void) {
       if (eventName === 'mount') {
-        const { lastItems, itemAtoms } = this;
+        const { lastItems, atoms: itemAtoms } = this;
         Object.entries(itemAtoms).forEach(([id, atom]) => {
-          listener(lastItems[id], atom);
+          requestIdleCallback(() => {
+            listener(lastItems[id], atom);
+          });
         });
       }
+      this.rerender();
       _on.call(this, eventName, listener);
       return this;
     };
@@ -46,43 +50,32 @@ abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
     for (const key in deleted) {
       this.deleteItem(deleted[key]);
     }
-    requestIdleCallback(() => {
-      dirty && this.emit('sizeChange');
-    });
+    dirty && this.rerender();
     this.lastItems = next;
   }
 
-  private deleteItem(item: T) {
+  private rerender() {
     requestIdleCallback(() => {
-      this.emit('delete', item);
-      delete this.itemAtoms[item.id];
+      this.emit('rerender');
     });
   }
 
-  private mountItem(item: T) {
-    requestIdleCallback(() => {
-      const atom = this.createAtom(item);
-      this.itemAtoms[item.id] = atom;
-      this.emit('mount', item, atom);
-    });
+  protected deleteItem(item: T) {
+    deleteItem.call(this as any, item);
   }
-  private updateItem(lastItem: T, nextItem: T) {
-    requestIdleCallback(() => {
-      if (lastItem.id !== nextItem.id) {
-        console.error('error input ==>', lastItem, nextItem);
-        throw new Error('fail to update the item as their id is different');
-      }
-      const updater = this.createAtomUpdater(nextItem);
-      this.updater(this.itemAtoms[nextItem.id], updater);
-      this.emit('update');
-    });
+
+  protected mountItem(item: T) {
+    mountItem.call(this as any, item);
+  }
+  protected updateItem(lastItem: T, nextItem: T) {
+    updateItem.call(this as any, lastItem, nextItem);
   }
 
   abstract createAtom(item: T): JotaiImmerAtom<A>;
-  abstract createAtomUpdater(item: T): UpdaterType<A>;
+  abstract createAtomUpdater(item: T): ImmerUpdater<A>;
 
   getItemAtoms() {
-    return this.itemAtoms;
+    return this.atoms;
   }
 }
 
@@ -101,6 +94,17 @@ export class EdgeUpdater extends ItemUpdater<Edge, EdgeAtom> {
   }
   createAtomUpdater(item: Edge) {
     return (prev: EdgeAtom): EdgeAtom => ({ ...prev, edge: item });
+  }
+
+  protected deleteItem(item: Edge) {
+    deleteItem.call(this as any, item);
+  }
+
+  protected mountItem(item: Edge) {
+    mountItem.call(this as any, item);
+  }
+  protected updateItem(lastItem: Edge, nextItem: Edge) {
+    updateItem.call(this as any, lastItem, nextItem);
   }
 }
 

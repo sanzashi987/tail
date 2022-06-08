@@ -1,4 +1,4 @@
-import type { DeletePayload, EdgeTree, NodeAtom, IObject } from '@lib/types';
+import type { EdgeTree, NodeAtom, IObject } from '@lib/types';
 import type { RecoilState } from 'recoil';
 
 export function getAtom<T>(id: string, atomPool?: IObject<RecoilState<T>>) {
@@ -10,22 +10,21 @@ export function getAtom<T>(id: string, atomPool?: IObject<RecoilState<T>>) {
   return atom;
 }
 
-export function findDeletedItem(edgeTree: EdgeTree, payload: DeletePayload) {
-  const edges: string[] = [],
-    nodes: string[] = [];
-  payload.forEach((val) => {
-    const { type, id } = val;
-    if (type === 'node') {
-      nodes.push(id);
-      const keys = edgeTree.get(id)?.keys() ?? [];
-      edges.push(...keys);
-    } else if (type === 'edge') {
-      edges.push(id);
-    }
-  });
+export const flatNodeEdgeMap = (edgeTree: EdgeTree) => {
+  return [...edgeTree.keys()].reduce<string[]>((last, curr) => {
+    return last.concat(getConnectedEdgeByNode(curr, edgeTree));
+  }, []);
+};
 
-  return { nodes, edges };
-}
+export const getConnectedEdgeByNode = (nodeId: string, edgeTree: EdgeTree) => {
+  const handles = edgeTree.get(nodeId)?.values();
+  if (!handles) return [];
+
+  const res = [...handles].reduce<string[]>((last, handle) => {
+    return last.concat([...handle.values()]);
+  }, []);
+  return res;
+};
 
 export function createNodeDeltaMove(deltaX: number, deltaY: number) {
   return function (prev: NodeAtom): NodeAtom {

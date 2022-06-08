@@ -11,7 +11,6 @@ import { DifferContext } from '@lib/contexts/differ';
 import { defaultProps } from './utils';
 
 class NodeRenderer extends Component<NodeRendererProps> {
-  // memoTemplates: ReturnType<typeof createMemoTemplates>;
   static defaultProps = defaultProps;
   static contextType = DifferContext;
   context!: ItemDifferInterface;
@@ -22,8 +21,7 @@ class NodeRenderer extends Component<NodeRendererProps> {
   componentDidMount() {
     this.context.nodeUpdater.on('mount', this.mountNode);
     this.context.nodeUpdater.on('delete', this.unmountNode);
-    this.context.nodeUpdater.on('sizeChange', this.updateMemoNodes);
-    this.updateMemoNodes();
+    this.context.nodeUpdater.on('rerender', this.updateMemoNodes);
   }
 
   mountNode = (node: Node, atom: NodeAtomType) => {
@@ -34,7 +32,7 @@ class NodeRenderer extends Component<NodeRendererProps> {
     );
   };
 
-  updateNode = (lastNode: Node, nextNode: Node) => {
+  updateNode = () => {
     return;
   };
 

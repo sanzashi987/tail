@@ -4,16 +4,11 @@ import { DraggerCore } from '../Dragger';
 import { getDraggerRelativeCoordinates } from '../Dragger/utils/calc';
 
 class Dragger extends DraggerCore<DraggerProps, DraggerIterState> {
-  // state: DraggerIterState = {
-  //   // x: NaN,
-  //   // y: NaN,
-  //   lastX: NaN,
-  //   lastY: NaN
-  // }
   last = {
     x: NaN,
     y: NaN,
   };
+  mouseDownTime = NaN;
 
   onDragStart = (e: React.MouseEvent) => {
     const coordniate = this.getEventCoordinate(e);
@@ -23,16 +18,12 @@ class Dragger extends DraggerCore<DraggerProps, DraggerIterState> {
     this._onMouseDown(e);
     this.last.x = coordniate.x;
     this.last.y = coordniate.y;
-    // this.setState({
-    //   lastX: coordniate.x,
-    //   lastY: coordniate.y,
-    // });
+    this.mouseDownTime = e.timeStamp;
   };
 
   onDrag = (e: MouseEvent) => {
     if (!this.dragging) {
-      this.onDragEnd(e);
-      return;
+      this.dragging = true;
     }
     e.stopPropagation();
     const coordinates = this.processDrag(this._onMouseMove(e));
@@ -41,10 +32,16 @@ class Dragger extends DraggerCore<DraggerProps, DraggerIterState> {
 
   onDragEnd = (e: MouseEvent) => {
     e.stopPropagation();
-    const coordinates = this._onMouseUp(e);
-    // if (!this.dragging) return coordinates;
-    const data = this.processDrag(coordinates);
-    this.props.onDragEnd(e, data);
+    if (!this.dragging) {
+      if (e.timeStamp - this.mouseDownTime < 180) {
+        this.props.onClick?.(e);
+      }
+    } else {
+      const coordinates = this._onMouseUp(e);
+      const data = this.processDrag(coordinates);
+      this.props.onDragEnd(e, data);
+    }
+    this.dragging = false;
   };
 
   processDrag(coordinates: coordinates) {

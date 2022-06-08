@@ -12,16 +12,14 @@ class DraggerCore<T extends DraggerCoreBasic = DraggerCoreBasic, S = any> extend
     if (!this.dragging && e.button === 0) {
       document.addEventListener('mousemove', this.onDrag, options);
       document.addEventListener('mouseup', this.onDragEnd, options);
-      this.dragging = true;
       addUserSelectStyles(document);
     }
     return this.getEventCoordinate(e);
   };
 
   onDrag = (e: MouseEvent) => {
-    if (!this.dragging) { 
-      this._onMouseUp(e);
-      return;
+    if (!this.dragging) {
+      this.dragging = true;
     }
     this._onMouseMove(e);
   };

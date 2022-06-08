@@ -46,7 +46,11 @@ export interface DraggerInterface {
   onDragEnd: (e: MouseEvent, c: DraggerData) => boolean | void;
 }
 
-export type DraggerProps = DraggerInterface & DraggerCoreBasic & coordinates;
+export type DraggerProps = DraggerInterface &
+  DraggerCoreBasic &
+  coordinates & {
+    onClick?(e: MouseEvent): void;
+  };
 
 export type BasicPosture = {
   x: number;

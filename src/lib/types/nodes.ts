@@ -49,7 +49,7 @@ export type NodeProps<T extends IObject = {}> = {
 };
 
 export interface NodeMouseInterface extends DraggerCallbacksType {
-  onNodeClick?: (e: React.MouseEvent, node: Node) => void;
+  onNodeClick?: (e: MouseEvent, node: Node) => void;
   onNodeContextMenu?: (e: React.MouseEvent, node: Node) => void;
 }
 

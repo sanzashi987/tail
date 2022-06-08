@@ -57,8 +57,6 @@ export type EdgeWrapperProps<T extends IObject = {}> = {
   atom: JotaiImmerAtom<EdgeAtom<T>>;
   nodeAtoms: NodeAtomsType;
   templates: EdgeTemplatesType;
-  updateEdge(lastEdge: Edge, nextEdge: Edge): void;
-  removeEdge(edge: Edge): void;
 };
 
 export type SelectorInput = {

@@ -10,12 +10,11 @@ import type {
 import { EdgeInProgress, EdgeWrapper } from '@lib/components/Edge';
 import { DifferContext } from '@lib/contexts/differ';
 import styles from './index.module.scss';
-import { registerChild, removeChild, defaultProps } from './utils';
 
 const EdgeClassname = `tail-edge-container ${styles['edge-container']}`;
 
 class EdgeRenderer extends Component<EdgeRendererProps> {
-  static defaultProps = defaultProps;
+  static defaultProps = { templates: {} };
   static contextType = DifferContext;
   context!: ItemDifferInterface;
 
@@ -26,37 +25,18 @@ class EdgeRenderer extends Component<EdgeRendererProps> {
   componentDidMount() {
     this.context.edgeUpdater.on('mount', this.mountEdge);
     this.context.edgeUpdater.on('delete', this.unmountEdge);
-    this.context.edgeUpdater.on('sizeChange', this.updateMemoEdges);
-    this.updateMemoEdges();
+    this.context.edgeUpdater.on('rerender', this.updateMemoEdges);
   }
-
-  updateEdge = (lastEdge: Edge, nextEdge: Edge) => {
-    removeChild(this.edgeTree, lastEdge);
-    registerChild(this.edgeTree, nextEdge);
-  };
-
-  removeEdge = (lastEdge: Edge) => {
-    removeChild(this.edgeTree, lastEdge);
-  };
 
   mountEdge = (edge: Edge, atom: EdgeAtomType) => {
     const NodeAtoms = this.context.nodeUpdater.getItemAtoms();
     const { id } = edge;
-    registerChild(this.edgeTree, edge);
     this.edgeInstances[id] = (
-      <EdgeWrapper
-        key={id}
-        nodeAtoms={NodeAtoms}
-        atom={atom}
-        templates={this.props.templates}
-        updateEdge={this.updateEdge}
-        removeEdge={this.removeEdge}
-      />
+      <EdgeWrapper key={id} nodeAtoms={NodeAtoms} atom={atom} templates={this.props.templates} />
     );
   };
 
   unmountEdge = (edge: Edge) => {
-    removeChild(this.edgeTree, edge);
     delete this.edgeInstances[edge.id];
   };
 

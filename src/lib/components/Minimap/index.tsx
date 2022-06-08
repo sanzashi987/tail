@@ -53,9 +53,12 @@ class MapContainer extends Component<MapContainerProps, MapContainerState> {
             x2: sortedX[sortedX.length - 1],
             y2: sortedY[sortedY.length - 1],
           });
-    const { x: boundaryX, y: boundaryY, width: boundaryWidth, height: boundaryHeight } = toRect(
-      boundaryBox,
-    );
+    const {
+      x: boundaryX,
+      y: boundaryY,
+      width: boundaryWidth,
+      height: boundaryHeight,
+    } = toRect(boundaryBox);
     const maxRatio = Math.max(boundaryWidth / width!, boundaryHeight / height!);
     const [vw, vh] = [width! * maxRatio, height! * maxRatio];
     const left = boundaryX - (vw - boundaryWidth) / 2;
@@ -228,21 +231,12 @@ class Minimap extends Component<MinimapProps, MinimapState> {
         sortedY: sortedNewY,
       };
     });
-
-    // const sortedX = [...this.state.sortedX];
-    // const sortedY = [...this.state.sortedY];
-    // binaryUpdateBox(sortedX, sortedY, box, lastBox);
-    // this.setState({ sortedX, sortedY });
-    // console.log('sorted', sortedX, sortedY);
   };
 
   componentDidMount() {
-    // setTimeout(() => {
     this.context.nodeUpdater.on('mount', this.mountNode);
     this.context.nodeUpdater.on('delete', this.unmountNode);
-    this.context.nodeUpdater.on('sizeChange', this.updateMemoNodes);
-    this.updateMemoNodes();
-    // }, 1000);
+    this.context.nodeUpdater.on('rerender', this.updateMemoNodes);
   }
 
   render() {
