@@ -18,6 +18,7 @@ export type InfiniteViewerState = {
 };
 
 export type SelectCallback = (
+  e: MouseEvent,
   start: coordinates,
   end: coordinates,
   offset: coordinates,

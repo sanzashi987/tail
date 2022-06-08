@@ -209,7 +209,7 @@ class EdgeConnects {
       parent: document.body,
       getScale: this.core.getScale,
       movecb: createMoveCallback(this.edgeInProgressUpdater, newType),
-      endcb: this.tryConnect,
+      endcb: this.rollback,
     });
   };
 
@@ -226,21 +226,30 @@ class EdgeConnects {
     block: {
       if (to === type && active) {
         const newPayload = createEdgePayload(to, nodeId, handleId, storedNode, storedHandle);
+        const isNotExist = !validateExistEdge(newPayload, this.core.edgeRef.current!.edgeTree);
         if (reconnect && prevEdgeId) {
           const toNode = addHandleNode[type];
           const edgeState = this.core.getAtomState<EdgeAtom>('edge', prevEdgeId);
           if (!edgeState) break block;
           const { [type]: prevHandleId, [toNode]: prevNodeId } = edgeState.edge;
-          if (prevHandleId !== handleId || prevNodeId !== nodeId) {
+          if ((prevHandleId !== handleId || prevNodeId !== nodeId) && isNotExist) {
             this.core.props.onEdgeUpdate?.(prevEdgeId, newPayload);
           }
           this.core.setAtomState('edge', prevEdgeId, disableEdgeReconnect);
-        } else if (!validateExistEdge(newPayload, this.core.edgeRef.current!.edgeTree)) {
+        } else if (isNotExist) {
           this.core.props.onEdgeCreate?.(newPayload);
         }
       }
     }
     this.connectReset();
+  };
+
+  private rollback = () => {
+    const { reconnect, prevEdgeId } = this.core.context.get(edgeInProgressAtom);
+    if (reconnect && prevEdgeId) {
+      this.core.setAtomState<EdgeAtom>('edge', prevEdgeId, disableEdgeReconnect);
+    }
+    this.core.context.reset(edgeInProgressAtom);
   };
 
   private tryConnect = (e: MouseEvent, { x, y }: DraggerData) => {

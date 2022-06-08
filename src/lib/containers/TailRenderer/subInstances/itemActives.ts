@@ -141,7 +141,7 @@ class ItemActives {
     }
   };
 
-  batchActivateNodes: SelectCallback = (topleft, bottomRight, offset, scale) => {
+  batchActivateNodes: SelectCallback = (e, topleft, bottomRight, offset, scale) => {
     const pool = this.activeItems['node'];
     const startX = (topleft.x - offset.x) / scale;
     const startY = (topleft.y - offset.y) / scale;
@@ -149,6 +149,9 @@ class ItemActives {
     const endY = (bottomRight.y - offset.y) / scale;
     const [xMin, xMax, yMin, yMax] = [...[startX, endX].sort(sort), ...[startY, endY].sort(sort)];
     const nodeAtoms = this.core.getNodeAtoms();
+    if (!(isModifierExact(e) && CtrlOrCmd(e))) { // not holding ctrl
+      this.deactivateLast();
+    }
     Object.keys(nodeAtoms).forEach((key) => {
       const nodeState = this.core.getAtomState<NodeAtom>('node', key);
       if (!nodeState) return;
