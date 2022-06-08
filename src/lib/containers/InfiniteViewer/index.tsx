@@ -239,8 +239,7 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
           <div
             ref={this.container}
             className="scroller"
-            // transform: translate(var(--x), var(--y)) scale(var(--scale));
-            style={{ transform: ` translate(${x}px,${y}px) scale(${scale})` }}
+            style={{ transform: `translate(${x}px,${y}px) scale(${scale})` }}
           >
             {this.props.children}
           </div>

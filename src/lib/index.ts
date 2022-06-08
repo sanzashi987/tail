@@ -1,5 +1,5 @@
 export { default as Background } from './components/Background';
-export { default as MiniMap } from './components/_Minimap';
+export { default as MiniMap } from './components/Minimap';
 export { drawBezier } from './components/Edge/drawBezier';
 export * from './types';
 export * from './contexts';
