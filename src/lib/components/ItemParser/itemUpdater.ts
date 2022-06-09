@@ -1,9 +1,9 @@
-import type { AtomUpdater, NodeAtom, Node, Edge, EdgeAtom, IObject } from '@lib/types';
+import type { AtomUpdater, NodeAtom, Node, Edge, EdgeAtom, IObject, EdgeTree } from '@lib/types';
 import { createNodeAtom } from '@lib/atoms/nodes';
 import { createEdgeAtom } from '@lib/atoms/edges';
 import EventEmitter from 'eventemitter3';
 import { ImmerUpdater, JotaiImmerAtom } from '@lib/types/jotai';
-import { deleteItem, mountItem, updateItem } from './helpers';
+import { deleteItem, mountItem, registerChild, removeChild, updateItem } from './helpers';
 
 export abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
   protected atoms: IObject<JotaiImmerAtom<A>> = {};
@@ -89,6 +89,8 @@ export class NodeUpdater extends ItemUpdater<Node, NodeAtom> {
 }
 
 export class EdgeUpdater extends ItemUpdater<Edge, EdgeAtom> {
+  edgeTree: EdgeTree = new Map();
+
   createAtom(item: Edge) {
     return createEdgeAtom(item);
   }
@@ -98,14 +100,16 @@ export class EdgeUpdater extends ItemUpdater<Edge, EdgeAtom> {
 
   protected deleteItem(item: Edge) {
     deleteItem.call(this as any, item);
+    removeChild(this.edgeTree, item);
   }
 
   protected mountItem(item: Edge) {
     mountItem.call(this as any, item);
+    registerChild(this.edgeTree, item);
   }
   protected updateItem(lastItem: Edge, nextItem: Edge) {
+    removeChild(this.edgeTree, lastItem);
+    registerChild(this.edgeTree, nextItem);
     updateItem.call(this as any, lastItem, nextItem);
   }
 }
-
-// export default ItemUpdater;

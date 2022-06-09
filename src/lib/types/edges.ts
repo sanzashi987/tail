@@ -55,7 +55,6 @@ export type EdgeProps = Omit<EdgeAtomRaw, 'reconnect'> & EdgeBasicProps & EdgePr
 
 export type EdgeWrapperProps<T extends IObject = {}> = {
   atom: JotaiImmerAtom<EdgeAtom<T>>;
-  nodeAtoms: NodeAtomsType;
   templates: EdgeTemplatesType;
 };
 

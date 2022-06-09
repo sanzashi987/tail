@@ -1,23 +1,20 @@
-import React, { Component, ReactNode, createRef } from 'react';
+import React, { Component, createRef } from 'react';
 import {
   MinimapProps,
   MinimapState,
   Box,
   NodeAtom,
   Node,
-  ItemDifferInterface,
   MapContainerProps,
-  IObject,
   ViewerContextType,
   MapBoundary,
   DraggerData,
   MapContainerState,
 } from '@lib/types';
-
 import { ViewerContext } from '@lib/contexts/viewer';
-import { DifferContext } from '@lib/contexts/differ';
 import { isNotNum } from '@lib/utils';
 import { JotaiImmerAtom } from '@lib/types/jotai';
+import BasicRenderer from '@lib/containers/BasicRenderer';
 import styles from './index.module.scss';
 import MiniNode from './MiniNode';
 import { binaryRemoveBox, binaryUpdateBox, getLargeBox, toBox, toRect } from './utils';
@@ -167,9 +164,7 @@ class MapContainer extends Component<MapContainerProps, MapContainerState> {
   }
 }
 
-class Minimap extends Component<MinimapProps, MinimapState> {
-  static contextType = DifferContext;
-  context!: ItemDifferInterface;
+class Minimap extends BasicRenderer<MinimapProps, MinimapState> {
   static defaultProps = {
     width: 200,
     height: 150,
@@ -178,10 +173,6 @@ class Minimap extends Component<MinimapProps, MinimapState> {
     viewportFrameColor: 'orange',
     style: { background: 'white' },
   };
-
-  nodeInstances: IObject<ReactNode> = {};
-  memoNodes: ReactNode;
-
   state: MinimapState = {
     sortedX: [],
     sortedY: [],
@@ -189,7 +180,7 @@ class Minimap extends Component<MinimapProps, MinimapState> {
 
   mountNode = (node: Node, atom: JotaiImmerAtom<NodeAtom>) => {
     const { activeColor, nodeColor } = this.props;
-    this.nodeInstances[node.id] = (
+    this.itemInstances[node.id] = (
       <MiniNode
         key={node.id}
         atom={atom}
@@ -201,12 +192,7 @@ class Minimap extends Component<MinimapProps, MinimapState> {
     );
   };
   unmountNode = (node: Node) => {
-    delete this.nodeInstances[node.id];
-  };
-
-  updateMemoNodes = () => {
-    this.memoNodes = Object.keys(this.nodeInstances).map((k) => this.nodeInstances[k]);
-    this.forceUpdate();
+    delete this.itemInstances[node.id];
   };
 
   removeBox = (box: Box) => {
@@ -236,7 +222,7 @@ class Minimap extends Component<MinimapProps, MinimapState> {
   componentDidMount() {
     this.context.nodeUpdater.on('mount', this.mountNode);
     this.context.nodeUpdater.on('delete', this.unmountNode);
-    this.context.nodeUpdater.on('rerender', this.updateMemoNodes);
+    this.context.nodeUpdater.on('rerender', this.updateMemoVNodes);
   }
 
   render() {
@@ -253,7 +239,7 @@ class Minimap extends Component<MinimapProps, MinimapState> {
         sortedY={sortedY}
         realtimeBoundary={realtimeBoundary}
       >
-        {this.memoNodes}
+        {this.memoVNodes}
       </MapContainer>
     );
   }

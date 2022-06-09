@@ -1,52 +1,31 @@
-import React, { Component, ReactNode } from 'react';
-import type {
-  Node,
-  NodeRendererProps,
-  ItemDifferInterface,
-  NodeAtomType,
-  IObject,
-} from '@lib/types';
+import React from 'react';
+import type { Node, NodeRendererProps, NodeAtomType } from '@lib/types';
 import { NodeWrapper } from '@lib/components/Node';
-import { DifferContext } from '@lib/contexts/differ';
 import { defaultProps } from './utils';
+import BasicRenderer from '../BasicRenderer';
 
-class NodeRenderer extends Component<NodeRendererProps> {
+class NodeRenderer extends BasicRenderer<NodeRendererProps> {
   static defaultProps = defaultProps;
-  static contextType = DifferContext;
-  context!: ItemDifferInterface;
-
-  nodeInstances: IObject<ReactNode> = {};
-  memoNodes: ReactNode;
-
   componentDidMount() {
     this.context.nodeUpdater.on('mount', this.mountNode);
     this.context.nodeUpdater.on('delete', this.unmountNode);
-    this.context.nodeUpdater.on('rerender', this.updateMemoNodes);
+    this.context.nodeUpdater.on('rerender', this.updateMemoVNodes);
   }
 
   mountNode = (node: Node, atom: NodeAtomType) => {
     const { id } = node;
     const { templatePicker, templates } = this.props;
-    this.nodeInstances[id] = (
+    this.itemInstances[id] = (
       <NodeWrapper key={id} atom={atom} templates={templates} templatePicker={templatePicker} />
     );
   };
 
-  updateNode = () => {
-    return;
-  };
-
   unmountNode = (node: Node) => {
-    delete this.nodeInstances[node.id];
-  };
-
-  updateMemoNodes = () => {
-    this.memoNodes = Object.keys(this.nodeInstances).map((k) => this.nodeInstances[k]);
-    this.forceUpdate();
+    delete this.itemInstances[node.id];
   };
 
   render() {
-    return <div className="tail-node-container select-none">{this.memoNodes}</div>;
+    return <div className="tail-node-container select-none">{this.memoVNodes}</div>;
   }
 }
 

@@ -5,13 +5,15 @@ import { isNotNum } from '@lib/utils';
 import { setHovered, setNotHovered } from '@lib/atoms/reducers';
 import { DummyNodeAtom } from '@lib/atoms/nodes';
 import type { EdgeWrapperProps } from '@lib/types';
+import { DifferContext } from '@lib/contexts';
 import { defaultEdgePair, emptyHandle } from './helpers';
 
-const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, nodeAtoms, templates }) => {
+const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
   const rootInterface = useContext(InstanceInterface)!;
+  const { nodeUpdater } = useContext(DifferContext)!;
   const [{ edge, selected, reconnect, hovered }, setEdge] = useAtom(atom);
   const { markerEnd, markerStart, source, sourceNode, target, targetNode, type = '' } = edge;
-  const { [sourceNode]: sourceAtom, [targetNode]: targetAtom } = nodeAtoms;
+  const { [sourceNode]: sourceAtom, [targetNode]: targetAtom } = nodeUpdater.getItemAtoms();
   const sourceNodeState = useAtomValue(sourceAtom ?? DummyNodeAtom);
   const targetNodeState = useAtomValue(targetAtom ?? DummyNodeAtom);
 
