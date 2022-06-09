@@ -22,7 +22,7 @@ export function updateItem<T extends { id: string }, A>(
   //   throw new Error('fail to update the item as their id is different');
   // }
   const updater = this.createAtomUpdater(nextItem);
-  this.updater(this.atoms[nextItem.id], updater);
+  this.setter(this.atoms[nextItem.id], updater);
   this.emit('update');
 }
 

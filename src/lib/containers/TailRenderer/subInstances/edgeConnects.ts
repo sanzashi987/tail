@@ -10,7 +10,6 @@ import type {
   AtomStateGetterType,
   ConnectMethodType,
   DraggerData,
-  IObject,
 } from '@lib/types';
 import { edgeInProgressAtom } from '@lib/atoms/edges';
 import type ItemActives from './itemActives';
@@ -33,7 +32,7 @@ export function disableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
 
 export function hasConnectedEdgeActive(
   edgeTree: EdgeTree,
-  edgePool: IObject<string>,
+  edgePool: Record<string, string>,
   nodeId: string,
   handleId: string,
 ) {
@@ -160,7 +159,7 @@ export function createMoveCallback(setter: EdgeInProgressAtomUpdater, type: Hand
 export function validateExistEdge(edgeBasic: EdgeBasic, edgeTree: EdgeTree) {
   const { source, sourceNode, target, targetNode } = edgeBasic;
   const sourceEdges = [...(edgeTree.get(sourceNode)?.get(source)?.keys() ?? [])].reduce<
-    IObject<string>
+    Record<string, string>
   >((prev, key) => {
     prev[key] = key;
     return prev;

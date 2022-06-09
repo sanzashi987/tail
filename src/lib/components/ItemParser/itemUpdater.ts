@@ -1,14 +1,18 @@
-import type { AtomUpdater, NodeAtom, Node, Edge, EdgeAtom, IObject, EdgeTree } from '@lib/types';
+import type { NodeAtom, Node, Edge, EdgeAtom, EdgeTree } from '@lib/types';
+import type { AtomGetter, AtomSetter, ImmerUpdater, JotaiImmerAtom } from '@lib/types/jotai';
 import { createNodeAtom } from '@lib/atoms/nodes';
 import { createEdgeAtom } from '@lib/atoms/edges';
 import EventEmitter from 'eventemitter3';
-import { ImmerUpdater, JotaiImmerAtom } from '@lib/types/jotai';
 import { deleteItem, mountItem, registerChild, removeChild, updateItem } from './helpers';
 
 export abstract class ItemUpdater<T extends { id: string }, A> extends EventEmitter {
-  protected atoms: IObject<JotaiImmerAtom<A>> = {};
-  protected lastItems: IObject<T> = {};
-  constructor(protected updater: AtomUpdater<A>, items: IObject<T>) {
+  protected atoms: Record<string, JotaiImmerAtom<A>> = {};
+  protected lastItems: Record<string, T> = {};
+  constructor(
+    protected getter: AtomGetter<A>,
+    protected setter: AtomSetter<A>,
+    items: Record<string, T>,
+  ) {
     super();
     this.diff(items);
     const _on = EventEmitter.prototype.on;
@@ -27,9 +31,9 @@ export abstract class ItemUpdater<T extends { id: string }, A> extends EventEmit
     };
   }
 
-  diff(next: IObject<T>) {
+  diff(next: Record<string, T>) {
     let dirty = false;
-    const deleted: IObject<T> = { ...this.lastItems };
+    const deleted: Record<string, T> = { ...this.lastItems };
     const last = { ...this.lastItems };
     for (const key in next) {
       const val = next[key],

@@ -2,7 +2,7 @@
 import React, { ComponentType } from 'react';
 import { UpdaterType } from './instance';
 import { JotaiImmerAtom } from './jotai';
-import { AtomForceRender, HandleType, NodeAtomsType, IObject } from '.';
+import { AtomForceRender, HandleType, NodeAtomsType } from '.';
 
 export type EdgeBasic = {
   source: string;
@@ -11,7 +11,7 @@ export type EdgeBasic = {
   targetNode: string;
 };
 
-export type Edge<T extends IObject = {}> = {
+export type Edge<T extends Record<string, any> = {}> = {
   id: string;
   disable?: boolean;
   type?: string;
@@ -27,7 +27,7 @@ export type EdgeBasicProps = {
   targetY: number;
 };
 
-export type EdgeAtomRaw<T extends IObject = {}> = {
+export type EdgeAtomRaw<T extends Record<string, any> = {}> = {
   edge: Edge<T>;
   selected: boolean;
   hovered: boolean;
@@ -44,16 +44,16 @@ export interface EdgeMouseInterface {
   onEdgeContextMenu?: (e: React.MouseEvent, edge: Edge) => void;
 }
 
-export type EdgeAtom<T extends IObject = {}> = EdgeAtomRaw<T> & AtomForceRender;
+export type EdgeAtom<T extends Record<string, any> = {}> = EdgeAtomRaw<T> & AtomForceRender;
 export type EdgeAtomType = JotaiImmerAtom<EdgeAtom>;
 
-export type EdgeAtomsType = IObject<EdgeAtomType>;
+export type EdgeAtomsType = Record<string, EdgeAtomType>;
 
 export type ComputedEdgeAtom = EdgeAtom & EdgeBasicProps;
 
 export type EdgeProps = Omit<EdgeAtomRaw, 'reconnect'> & EdgeBasicProps & EdgePropsFromWrapper;
 
-export type EdgeWrapperProps<T extends IObject = {}> = {
+export type EdgeWrapperProps<T extends Record<string, any> = {}> = {
   atom: JotaiImmerAtom<EdgeAtom<T>>;
   templates: EdgeTemplatesType;
 };
@@ -68,7 +68,7 @@ export type EdgeComponentPackType = {
   shadow: ComponentType<EdgeBasicProps>;
 };
 
-export type EdgeTemplatesType = IObject<EdgeComponentPackType>;
+export type EdgeTemplatesType = Record<string, EdgeComponentPackType>;
 
 export type EdgeRendererProps = {
   templates: EdgeTemplatesType;

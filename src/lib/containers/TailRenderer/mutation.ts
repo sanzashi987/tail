@@ -1,7 +1,7 @@
-import type { EdgeTree, NodeAtom, IObject } from '@lib/types';
+import type { EdgeTree, NodeAtom } from '@lib/types';
 import type { RecoilState } from 'recoil';
 
-export function getAtom<T>(id: string, atomPool?: IObject<RecoilState<T>>) {
+export function getAtom<T>(id: string, atomPool?: Record<string, RecoilState<T>>) {
   const atom = atomPool?.[id];
   if (!atom) {
     console.warn('fail to fetch atom from the pool', id);

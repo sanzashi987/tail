@@ -6,6 +6,7 @@ import type {
   NodeAtom,
   SelectModeType,
   CoreMethods,
+  TailProps,
 } from '@lib/types';
 import ItemActives from './subInstances/itemActives';
 import NodeMoves from './subInstances/nodeMoves';
@@ -25,8 +26,6 @@ class TailCore extends Component<TailCoreProps> {
   };
 
   viewer = createRef<InfiniteViewer>();
-  edgeRef = createRef<EdgeRenderer>();
-  differRef = createRef<ItemParser>();
   contextInterface: InterfaceValue;
 
   ItemActives: ItemActives;
@@ -88,8 +87,6 @@ class TailCore extends Component<TailCoreProps> {
 
   render() {
     const {
-      nodes,
-      edges,
       edgeTemplates,
       connectingEdge,
       nodeTemplates,
@@ -101,57 +98,49 @@ class TailCore extends Component<TailCoreProps> {
     } = this.props;
     const { deactivateLast, batchActivateNodes } = this.ItemActives;
     return (
-      <ItemParser ref={this.differRef} nodes={nodes} edges={edges}>
-        <InfiniteViewer
-          ref={this.viewer}
-          onClick={deactivateLast}
-          onSelectEnd={batchActivateNodes}
-          onViewerDrop={onViewerDrop}
-          onViewerClick={onViewerClick}
-          outerChildren={this.props.children}
-          onViewerScale={this.props.onViewerScale}
-        >
-          <InterfaceProvider value={this.contextInterface}>
-            <NodeRenderer templates={nodeTemplates} templatePicker={nodeTemplatePicker} />
-            <EdgeRenderer
-              ref={this.edgeRef}
-              templates={edgeTemplates}
-              connectingEdge={connectingEdge}
-            >
-              <MarkerDefs markers={markers} markerTemplates={markerTemplates} />
-            </EdgeRenderer>
-          </InterfaceProvider>
-        </InfiniteViewer>
-      </ItemParser>
+      <InfiniteViewer
+        ref={this.viewer}
+        onClick={deactivateLast}
+        onSelectEnd={batchActivateNodes}
+        onViewerDrop={onViewerDrop}
+        onViewerClick={onViewerClick}
+        outerChildren={this.props.children}
+        onViewerScale={this.props.onViewerScale}
+      >
+        <InterfaceProvider value={this.contextInterface}>
+          <NodeRenderer templates={nodeTemplates} templatePicker={nodeTemplatePicker} />
+          <EdgeRenderer templates={edgeTemplates} connectingEdge={connectingEdge}>
+            <MarkerDefs markers={markers} markerTemplates={markerTemplates} />
+          </EdgeRenderer>
+        </InterfaceProvider>
+      </InfiniteViewer>
     );
   }
 }
 
-const Tail = forwardRef<CoreMethods, TailCoreProps>(({ children, ...otherprops }, ref) => {
-  const coreRef = useRef<TailCore>(null);
-  useImperativeHandle(
-    ref,
-    () => ({
-      setScale: (s) => coreRef.current?.setScale(s),
-      switchMode: (t) => coreRef.current?.switchMode(t),
-      focusNode: (i) => coreRef.current?.focusNode(i),
-      getActiveItems: () =>
-        coreRef.current?.ItemActives.activeItems ?? {
-          node: {},
-          edge: {},
-        },
-      getEdgeTree: () => coreRef.current?.edgeRef.current?.edgeTree ?? new Map(),
-      moveViewCenter: (x, y) => coreRef.current?.viewer.current?.moveCamera(x, y),
-      setActiveItems: (i) => coreRef.current?.ItemActives.loadActiveItems(i),
-    }),
-    [],
-  );
-  return (
-    <TailCore ref={coreRef} {...otherprops}>
-      {children}
-    </TailCore>
-  );
-});
+const Tail = forwardRef<CoreMethods, TailProps>(
+  ({ children, nodes, edges, ...otherprops }, ref) => {
+    const coreRef = useRef<TailCore>(null);
+    useImperativeHandle(
+      ref,
+      () => ({
+        setScale: (s) => coreRef.current?.setScale(s),
+        switchMode: (t) => coreRef.current?.switchMode(t),
+        focusNode: (i) => coreRef.current?.focusNode(i),
+        getEdgeTree: () => coreRef.current?.edgeRef.current?.edgeTree ?? new Map(),
+        moveViewCenter: (x, y) => coreRef.current?.viewer.current?.moveCamera(x, y),
+      }),
+      [],
+    );
+    return (
+      <ItemParser nodes={nodes} edges={edges}>
+        <TailCore ref={coreRef} {...otherprops}>
+          {children}
+        </TailCore>
+      </ItemParser>
+    );
+  },
+);
 
 Tail.displayName = 'Tail';
 

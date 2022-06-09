@@ -1,14 +1,15 @@
 import React, { FC, useEffect, useRef } from 'react';
 import { DifferProvider } from '@lib/contexts/differ';
 import type { ItemParserProps } from '@lib/types';
-import { useAtomSetter } from '@lib/hooks/jotai';
+import { useAtomGetter, useAtomSetter } from '@lib/hooks/jotai';
 import { EdgeUpdater, NodeUpdater } from './itemUpdater';
 
 const ItemParser: FC<ItemParserProps> = ({ nodes, edges, children }) => {
   const atomSetter = useAtomSetter();
+  const atomGetter = useAtomGetter();
   const differ = useRef({
-    nodeUpdater: new NodeUpdater(atomSetter, nodes),
-    edgeUpdater: new EdgeUpdater(atomSetter, edges),
+    nodeUpdater: new NodeUpdater(atomGetter, atomSetter, nodes),
+    edgeUpdater: new EdgeUpdater(atomGetter, atomSetter, edges),
   });
 
   useEffect(() => {

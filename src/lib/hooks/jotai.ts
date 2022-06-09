@@ -3,25 +3,17 @@ import { ImmerUpdater, JotaiImmerAtom } from '@lib/types/jotai';
 import { useAtomCallback } from 'jotai/utils';
 
 export function useAtomSetter() {
-  const atomSetter = useAtomCallback(
-    useCallback(
-      (get, set) =>
-        <T>(atom: JotaiImmerAtom<T>, updater: ImmerUpdater<T>) => {
-          set(atom, updater);
-        },
-      [],
-    ),
+  const atomSetter = useAtomCallback<void, any>(
+    useCallback((get, set, arg) => set(arg.atom, arg.updater), []),
   );
-  return atomSetter;
+  return useCallback(<T>(atom: JotaiImmerAtom<T>, updater: ImmerUpdater<T>) => {
+    atomSetter({ atom, updater });
+  }, []);
 }
+
 export function useAtomGetter() {
-  const atomGetter = useAtomCallback(
-    useCallback(
-      (get) =>
-        <T>(atom: JotaiImmerAtom<T>) =>
-          get(atom),
-      [],
-    ),
-  );
-  return atomGetter;
+  const atomGetter = useAtomCallback<any, any>(useCallback((get, set, arg) => get(arg), []));
+  return useCallback(<T>(atom: JotaiImmerAtom<T>) => {
+    return atomGetter(atom) as unknown as T;
+  }, []);
 }

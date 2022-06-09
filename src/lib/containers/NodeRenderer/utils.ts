@@ -1,7 +1,5 @@
-import type { Node, TemplateNodeClass , IObject } from '@lib/types';
+import type { Node, TemplateNodeClass } from '@lib/types';
 import { BasicNode, BasicFoldedNode } from '../../components/Node';
-
-;
 
 export const defaultProps = {
   templatePicker: (node: Node) => [node.type, node.fold ? 'folded' : 'default'],
@@ -15,10 +13,9 @@ const defaultTemplate: TemplateNodeClass = {
 
 const defaultTemplates = { logical: defaultTemplate };
 
-
 export function createMemoTemplates() {
-  let lastTemplates: IObject<TemplateNodeClass>, lastRes: IObject<TemplateNodeClass>;
-  return function (templates: IObject<TemplateNodeClass>) {
+  let lastTemplates: Record<string, TemplateNodeClass>, lastRes: Record<string, TemplateNodeClass>;
+  return function (templates: Record<string, TemplateNodeClass>) {
     if (templates !== lastTemplates) {
       lastTemplates = templates;
       lastRes = { ...defaultTemplates, ...templates };

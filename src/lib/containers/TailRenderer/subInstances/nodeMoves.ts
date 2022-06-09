@@ -1,4 +1,4 @@
-import type { Node, DraggerData, NodeAtom, IObject } from '@lib/types';
+import type { Node, DraggerData, NodeAtom } from '@lib/types';
 import type ItemActives from './itemActives';
 import type TailCore from '..';
 
@@ -6,7 +6,7 @@ import { createNodeDeltaMove } from '../mutation';
 
 class NodeMoves {
   constructor(private core: TailCore, private itemActives: ItemActives) {}
-  node: IObject<string> = {};
+  node: Record<string, string> = {};
 
   onDragStart = (e: React.MouseEvent, n: Node, c: DraggerData) => {
     return this.core.props.onDragStart?.(e, n, c);

@@ -1,7 +1,6 @@
 import React, { ComponentType, ReactNode } from 'react';
 import { EdgeUpdater, NodeUpdater } from '@lib/components/ItemParser/itemUpdater';
 import type { RecoilValue, RecoilState } from 'recoil';
-import { ImmerUpdater, JotaiImmerAtom } from './jotai';
 import type {
   NodeMouseInterface,
   EdgeBasic,
@@ -18,7 +17,6 @@ import type {
   MarkerDefsProps,
   EdgeBasicProps,
   SelectModeType,
-  IObject,
   EdgeTree,
   MouseEventCollection,
 } from '.';
@@ -27,10 +25,10 @@ export type CoreMethods = {
   switchMode(m: SelectModeType): void;
   setScale(scale: number): void;
   focusNode(id: string): void;
-  getActiveItems(): SelectedItemCollection;
+  // getActiveItems(): SelectedItemCollection;
   getEdgeTree(): EdgeTree;
   moveViewCenter(x: number, y: number): void;
-  setActiveItems(items: SelectedItemCollection): void;
+  // setActiveItems(items: SelectedItemCollection): void;
 };
 
 export type TailCoreOptionalProps = {
@@ -53,12 +51,18 @@ export type TailCoreOptionalProps = {
   MarkerDefsProps;
 
 export type TailCoreProps = {
-  nodes: IObject<Node>;
-  edges: IObject<Edge>;
+  // nodes: Record<string,Node>;
+  // edges: Record<string,Edge>;
   children?: ReactNode;
 } & NodeMouseInterface &
   EdgeMouseInterface &
   TailCoreOptionalProps;
+
+export type TailProps = {
+  nodes: Record<string, Node>;
+  edges: Record<string, Edge>;
+  children?: ReactNode;
+} & TailCoreProps;
 
 export interface NodeMutation {
   // onNodeCreate(): void;
@@ -75,8 +79,8 @@ export interface EdgeMutation {
 export type SelectedItemType = 'node' | 'edge';
 
 export type SelectedItemCollection = {
-  node: IObject<string>;
-  edge: IObject<string>;
+  node: Record<string, string>;
+  edge: Record<string, string>;
 };
 
 export type HandleMap = {
@@ -135,11 +139,9 @@ export type AtomStateSetterType = <T>(
   updater: T | ((c: T) => T),
 ) => T;
 
-export type AtomUpdater<T> = (atom: JotaiImmerAtom<T>, updater: ImmerUpdater<T>) => void;
-
 export type ItemParserProps = {
-  nodes: IObject<Node>;
-  edges: IObject<Edge>;
+  nodes: Record<string, Node>;
+  edges: Record<string, Edge>;
 };
 
 export type ItemDifferInterface = {

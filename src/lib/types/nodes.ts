@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import type { ComponentType } from 'react';
 import { JotaiImmerAtom } from './jotai';
-import type { HandlesInfo, coordinates, AtomForceRender, DraggerData, Rect, IObject } from '.';
+import type { HandlesInfo, coordinates, AtomForceRender, DraggerData, Rect } from '.';
 
-export type Node<T extends IObject = {}> = {
+export type Node<T extends Record<string, any> = {}> = {
   id: string;
   left: number;
   top: number;
@@ -17,34 +17,34 @@ export type MouseEventCollection = React.MouseEvent | MouseEvent;
 export type NodeMouseCallback = (e: MouseEventCollection, n: Node) => void;
 export type DraggerMouseCallback = (e: MouseEventCollection, c: coordinates) => boolean | void;
 
-export type NodeTemplatesType = IObject<TemplateNodeClass>;
+export type NodeTemplatesType = Record<string, TemplateNodeClass>;
 
-export type NodeCom<T extends IObject = {}> = ComponentType<NodeProps<T>>;
+export type NodeCom<T extends Record<string, any> = {}> = ComponentType<NodeProps<T>>;
 
-export type TemplateNodeClass = IObject<NodeCom<any>>;
+export type TemplateNodeClass = Record<string, NodeCom<any>>;
 
 export type TemplatePickerType = (node: Node<any>) => [string, string];
 
 export type NodeRendererProps = {
-  templates: IObject<TemplateNodeClass>;
+  templates: Record<string, TemplateNodeClass>;
   templatePicker: TemplatePickerType;
 };
 
-export type NodeAtomType<T extends IObject = {}> = JotaiImmerAtom<NodeAtom<T>>;
+export type NodeAtomType<T extends Record<string, any> = {}> = JotaiImmerAtom<NodeAtom<T>>;
 
-export type NodeWrapperProps<T extends IObject = {}> = {
+export type NodeWrapperProps<T extends Record<string, any> = {}> = {
   atom: NodeAtomType<T>;
-  templates: IObject<TemplateNodeClass>;
+  templates: Record<string, TemplateNodeClass>;
   templatePicker: TemplatePickerType;
 };
 
-export type Nodes = IObject<Node>;
+export type Nodes = Record<string, Node>;
 
-export type NodeProps<T extends IObject = {}> = {
+export type NodeProps<T extends Record<string, any> = {}> = {
   node: Node<T>;
   selected: boolean;
   hovered: boolean;
-  selectedHandles: IObject<number>;
+  selectedHandles: Record<string, number>;
   updateNodeHandles(): void;
 };
 
@@ -59,11 +59,14 @@ export type DraggerCallbacksType = {
   onDragEnd?: (e: MouseEvent, n: Node, c: DraggerData) => boolean | void;
 };
 
-export type NodeAtomRaw<T extends IObject = {}> = Omit<NodeProps<T>, 'updateNodeHandles'> & {
+export type NodeAtomRaw<T extends Record<string, any> = {}> = Omit<
+  NodeProps<T>,
+  'updateNodeHandles'
+> & {
   handles: HandlesInfo;
   rect: Rect;
 };
 
-export type NodeAtom<T extends IObject = {}> = NodeAtomRaw<T> & AtomForceRender;
+export type NodeAtom<T extends Record<string, any> = {}> = NodeAtomRaw<T> & AtomForceRender;
 
-export type NodeAtomsType = IObject<JotaiImmerAtom<NodeAtom>>;
+export type NodeAtomsType = Record<string, JotaiImmerAtom<NodeAtom>>;

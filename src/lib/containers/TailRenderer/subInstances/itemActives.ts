@@ -4,7 +4,6 @@ import type {
   NodeAtom,
   coordinates,
   SelectCallback,
-  IObject,
   SelectedItemCollection,
   ActiveNextType,
   NodeAtomsType,
@@ -99,7 +98,7 @@ class ItemActives {
     this.batchSwitch('edge', false, this.activeItems.edge);
   };
 
-  private batchSwitch(type: SelectedItemType, active: boolean, pool: IObject) {
+  private batchSwitch(type: SelectedItemType, active: boolean, pool: Record<string, any>) {
     Object.keys(pool).forEach((key) => {
       this.switchActive(type, key, active, this.activeItems[type]);
     });
@@ -115,7 +114,7 @@ class ItemActives {
     type: SelectedItemType,
     id: string,
     active: boolean,
-    activePool: IObject<string>,
+    activePool: Record<string, string>,
   ) => {
     const _this = this.core;
     const atom = _this.getAtom(type, id);
@@ -149,7 +148,8 @@ class ItemActives {
     const endY = (bottomRight.y - offset.y) / scale;
     const [xMin, xMax, yMin, yMax] = [...[startX, endX].sort(sort), ...[startY, endY].sort(sort)];
     const nodeAtoms = this.core.getNodeAtoms();
-    if (!(isModifierExact(e) && CtrlOrCmd(e))) { // not holding ctrl
+    if (!(isModifierExact(e) && CtrlOrCmd(e))) {
+      // not holding ctrl
       this.deactivateLast();
     }
     Object.keys(nodeAtoms).forEach((key) => {

@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { DraggerData, Edge, EdgeBasic, Node, IObject } from '@lib/types';
+import { DraggerData, Edge, EdgeBasic, Node } from '@lib/types';
 // import { MiniMap, Tail } from '../../../dist/esm/index';
 import Tail, { MiniMap, Background } from '@lib/index';
 // import '../../../dist/esm/index.css';
 
-const nodes: IObject<Node> = {
+const nodes: Record<string, Node> = {
   id1: {
     id: 'id1',
     left: 10,
@@ -25,7 +25,7 @@ const nodes: IObject<Node> = {
   },
 };
 
-const edges: IObject<Edge> = {
+const edges: Record<string, Edge> = {
   id1: {
     id: 'id1',
     source: 'output',

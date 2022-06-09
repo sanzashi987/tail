@@ -1,14 +1,12 @@
-import type { IObject } from '@lib/types';
-
 export function diff<T>(
-  last: IObject<T>,
-  next: IObject<T>,
+  last: Record<string, T>,
+  next: Record<string, T>,
   creater: (item: T) => void,
   updater: (last: T, next: T) => void,
   deleter: (item: T) => void,
 ) {
   let dirty = false;
-  const deleted: IObject<T> = { ...last };
+  const deleted: Record<string, T> = { ...last };
   for (const key in next) {
     const val = next[key],
       lastVal = last[key];
