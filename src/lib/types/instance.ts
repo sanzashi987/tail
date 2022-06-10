@@ -25,10 +25,8 @@ export type CoreMethods = {
   switchMode(m: SelectModeType): void;
   setScale(scale: number): void;
   focusNode(id: string): void;
-  // getActiveItems(): SelectedItemCollection;
   getEdgeTree(): EdgeTree;
   moveViewCenter(x: number, y: number): void;
-  // setActiveItems(items: SelectedItemCollection): void;
 };
 
 export type TailCoreOptionalProps = {
@@ -40,9 +38,8 @@ export type TailCoreOptionalProps = {
   quickNodeUpdate?: boolean;
   lazyRenderNodes?: boolean;
   onDelete?(nodes: string[], edges: string[]): void; //come with id array
-  onActivate?(items: SelectedItemCollection): void;
-  // getMethods?: (methods: CoreMethods) => void;
-  // instanceRef?: { current: any };
+  onActivate?: ActiveNextType;
+  onSelect?(e: MouseEvent, nodes: string[]): void;
 } & NodeMutation &
   EdgeMutation &
   NodeMouseInterface &
@@ -77,11 +74,6 @@ export interface EdgeMutation {
 }
 
 export type SelectedItemType = 'node' | 'edge';
-
-export type SelectedItemCollection = {
-  node: Record<string, string>;
-  edge: Record<string, string>;
-};
 
 export type HandleMap = {
   [handleId: string]: HandleElement;
@@ -142,9 +134,11 @@ export type AtomStateSetterType = <T>(
 export type ItemParserProps = {
   nodes: Record<string, Node>;
   edges: Record<string, Edge>;
+  activeNodes: string[];
+  activeEdges: string[];
 };
 
-export type ItemDifferInterface = {
+export type ItemParserInterface = {
   nodeUpdater: NodeUpdater;
   edgeUpdater: EdgeUpdater;
 };

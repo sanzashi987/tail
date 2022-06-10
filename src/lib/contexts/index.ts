@@ -1,3 +1,3 @@
-export * from './differ';
+export * from './parser';
 export * from './instance';
 export * from './viewer';

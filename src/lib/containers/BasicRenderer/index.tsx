@@ -1,10 +1,10 @@
 import React, { Component, ReactNode } from 'react';
-import { DifferContext } from '@lib/contexts/differ';
-import type { ItemDifferInterface } from '@lib/types';
+import { ParserContext } from '@lib/contexts/parser';
+import type { ItemParserInterface } from '@lib/types';
 //eslint-disable-next-line
 class BasicRenderer<T, S = {}> extends Component<T, S> {
-  static contextType = DifferContext;
-  context!: ItemDifferInterface;
+  static contextType = ParserContext;
+  context!: ItemParserInterface;
 
   itemInstances: Record<string, ReactNode> = {};
   memoVNodes: ReactNode;

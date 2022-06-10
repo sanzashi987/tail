@@ -1,29 +1,22 @@
-import type { Node, DraggerData, NodeAtom } from '@lib/types';
-import type ItemActives from './itemActives';
+import type { Node, DraggerData } from '@lib/types';
 import type TailCore from '..';
 
 import { createNodeDeltaMove } from '../mutation';
 
 class NodeMoves {
-  constructor(private core: TailCore, private itemActives: ItemActives) {}
-  node: Record<string, string> = {};
+  constructor(private core: TailCore) {}
 
-  onDragStart = (e: React.MouseEvent, n: Node, c: DraggerData) => {
-    return this.core.props.onDragStart?.(e, n, c);
+  batchNodeDragStart = (e: MouseEvent, n: Node, d: DraggerData) => {
+    this.core.props.onDragStart?.(e, n, d);
   };
 
   batchNodeDrag = (e: MouseEvent, n: Node, d: DraggerData) => {
-    if (!this.itemActives.activeItems.node[n.id]) {
-      this.node = { [n.id]: n.id };
-    } else {
-      this.node = this.itemActives.activeItems.node;
-    }
     if (!this.core.props.quickNodeUpdate) {
       this.batchEmitUpdate(e, n, d);
     } else {
       const updater = createNodeDeltaMove(d.deltaX, d.deltaY);
       Object.keys(this.node).forEach((e: string) => {
-        this.core.setAtomState('node', e, updater);
+        this.core.context.nodeUpdater.setState(e, updater);
       });
     }
     this.core.props.onDrag?.(e, n, d);
@@ -38,7 +31,7 @@ class NodeMoves {
     const updater = createNodeDeltaMove(d.deltaX, d.deltaY);
     const updatePayload: Node[] = [];
     Object.keys(this.node).forEach((e: string) => {
-      const nodeState = this.core.getAtomState<NodeAtom>('node', e);
+      const nodeState = this.core.context.nodeUpdater.getState(e);
       nodeState && updatePayload.push(updater(nodeState).node);
     });
     this.core.props.onNodeUpdate?.(updatePayload);

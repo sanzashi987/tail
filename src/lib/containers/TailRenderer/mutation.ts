@@ -1,14 +1,4 @@
 import type { EdgeTree, NodeAtom } from '@lib/types';
-import type { RecoilState } from 'recoil';
-
-export function getAtom<T>(id: string, atomPool?: Record<string, RecoilState<T>>) {
-  const atom = atomPool?.[id];
-  if (!atom) {
-    console.warn('fail to fetch atom from the pool', id);
-    return false;
-  }
-  return atom;
-}
 
 export const flatNodeEdgeMap = (edgeTree: EdgeTree) => {
   return [...edgeTree.keys()].reduce<string[]>((last, curr) => {

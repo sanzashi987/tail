@@ -176,7 +176,6 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
   private disFocus = (e: MouseEvent) => {
     if (this.isBlankClicked(e) && Math.abs(e.timeStamp - this.mouseDownTime) < 180) {
       e.stopPropagation();
-      this.props.onClick?.(e);
       this.props.onViewerClick?.(e, this.state.offset, this.state.scale);
     }
   };
@@ -224,7 +223,6 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
   render() {
     const { scale, offset, selecting, dragEnd, dragStart, viewerHeight, viewerWidth } = this.state;
     const { x, y } = offset;
-    // const cssvar = this.memoCSSVar(offset, scale);
     const contextVal = this.memoContext(offset, scale, viewerHeight, viewerWidth, this.setOffset);
     return (
       <div

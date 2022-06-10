@@ -28,7 +28,6 @@ export type SelectCallback = (
 export type ViewerDropCallback = (e: React.DragEvent, offset: coordinates, scale: number) => void;
 
 export type InfiniteViewerProps = {
-  onClick?(e: MouseEvent): void;
   onSelecting?: SelectCallback;
   onSelectEnd?: SelectCallback;
   onContainerResize?(width: number, height: number): void;
