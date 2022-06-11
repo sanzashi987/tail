@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useEffect, useMemo, useRef } from 'react';
 import { ParserProvider } from '@lib/contexts/parser';
 import type { ItemParserProps } from '@lib/types';
 import { useAtomGetter, useAtomSetter } from '@lib/hooks/jotai';
@@ -29,7 +29,16 @@ const ItemParser: FC<ItemParserProps> = ({ nodes, edges, activeEdges, activeNode
   useEffect(() => {
     actives.current.edgeSelector.diff(activeEdges);
   }, [activeEdges]);
-  return <ParserProvider value={differ.current}>{children}</ParserProvider>;
+
+  const ctx = useMemo(
+    () => ({
+      ...differ.current,
+      ...actives.current,
+    }),
+    [],
+  );
+
+  return <ParserProvider value={ctx}>{children}</ParserProvider>;
 };
 
 export default ItemParser;

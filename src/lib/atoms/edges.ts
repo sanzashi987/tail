@@ -1,8 +1,8 @@
-import { Edge, EdgeAtom, EdgeInProgressAtomType, SelectorInput } from '@lib/types';
+import { Edge, EdgeAtomState, EdgeInProgressAtomType } from '@lib/types';
 import { atomWithImmer } from 'jotai/immer';
 
 export function createEdgeAtom(edge: Edge) {
-  return atomWithImmer<EdgeAtom>({
+  return atomWithImmer<EdgeAtomState>({
     edge,
     selected: false,
     hovered: false,
@@ -18,11 +18,13 @@ const emptySourceTarget = {
   targetY: NaN,
 };
 
-export const edgeInProgressAtom = atomWithImmer<EdgeInProgressAtomType>({
+export const edgeInProgressAtomDefault = {
   active: false,
   reconnect: false,
   to: 'target',
   nodeId: '',
   handleId: '',
   ...emptySourceTarget,
-});
+} as const;
+
+export const edgeInProgressAtom = atomWithImmer<EdgeInProgressAtomType>(edgeInProgressAtomDefault);

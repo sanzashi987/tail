@@ -3,7 +3,7 @@ import {
   MinimapProps,
   MinimapState,
   Box,
-  NodeAtom,
+  NodeAtomState,
   Node,
   MapContainerProps,
   ViewerContextType,
@@ -178,7 +178,7 @@ class Minimap extends BasicRenderer<MinimapProps, MinimapState> {
     sortedY: [],
   };
 
-  mountNode = (node: Node, atom: JotaiImmerAtom<NodeAtom>) => {
+  mountNode = (node: Node, atom: JotaiImmerAtom<NodeAtomState>) => {
     const { activeColor, nodeColor } = this.props;
     this.itemInstances[node.id] = (
       <MiniNode

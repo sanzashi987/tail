@@ -1,6 +1,6 @@
 import { JotaiImmerAtom } from '@lib/types/jotai';
 import { atomWithImmer } from 'jotai/immer';
-import type { Node, NodeAtom } from '@lib/types';
+import type { Node, NodeAtomState } from '@lib/types';
 
 export const defaultRect = {
   x: NaN,
@@ -22,13 +22,13 @@ const createDefaultNodeDescriber = () => ({
 });
 
 export function createNodeAtom<T>(node: Node<T>) {
-  return atomWithImmer<NodeAtom<T>>({
+  return atomWithImmer<NodeAtomState<T>>({
     node,
     ...createDefaultNodeDescriber(),
   });
 }
 
-export const DummyNodeAtom: JotaiImmerAtom<NodeAtom> = atomWithImmer({
+export const DummyNodeAtom: JotaiImmerAtom<NodeAtomState> = atomWithImmer({
   node: {
     id: 'dummy',
     left: NaN,

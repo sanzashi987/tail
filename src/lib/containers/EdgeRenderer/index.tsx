@@ -1,5 +1,5 @@
 import React from 'react';
-import type { EdgeRendererProps, Edge, EdgeAtomType } from '@lib/types';
+import type { EdgeRendererProps, Edge, EdgeAtom } from '@lib/types';
 import { EdgeInProgress, EdgeWrapper } from '@lib/components/Edge';
 import styles from './index.module.scss';
 import BasicRenderer from '../BasicRenderer';
@@ -15,7 +15,7 @@ class EdgeRenderer extends BasicRenderer<EdgeRendererProps> {
     this.context.edgeUpdater.on('rerender', this.updateMemoVNodes);
   }
 
-  mountEdge = (edge: Edge, atom: EdgeAtomType) => {
+  mountEdge = (edge: Edge, atom: EdgeAtom) => {
     const { id } = edge;
     this.itemInstances[id] = <EdgeWrapper key={id} atom={atom} templates={this.props.templates} />;
   };

@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import type { ComponentType } from 'react';
-import { JotaiImmerAtom } from './jotai';
-import type { HandlesInfo, coordinates, AtomForceRender, DraggerData, Rect } from '.';
+import type { ComponentType, CSSProperties } from 'react';
+import type { JotaiImmerAtom, AtomForceRender } from './jotai';
+import { UpdaterType } from './instance';
+import type { HandlesInfo, DraggerData, Rect } from '.';
 
 export type Node<T extends Record<string, any> = {}> = {
   id: string;
@@ -11,11 +12,7 @@ export type Node<T extends Record<string, any> = {}> = {
   disable?: boolean;
   type: string;
 } & T;
-
-export type MouseEventCollection = React.MouseEvent | MouseEvent;
-
-export type NodeMouseCallback = (e: MouseEventCollection, n: Node) => void;
-export type DraggerMouseCallback = (e: MouseEventCollection, c: coordinates) => boolean | void;
+export type Nodes = Record<string, Node>;
 
 export type NodeTemplatesType = Record<string, TemplateNodeClass>;
 
@@ -30,15 +27,16 @@ export type NodeRendererProps = {
   templatePicker: TemplatePickerType;
 };
 
-export type NodeAtomType<T extends Record<string, any> = {}> = JotaiImmerAtom<NodeAtom<T>>;
+export type NodeAtomState<T extends Record<string, any> = {}> = NodeAtomRaw<T> & AtomForceRender;
+
+export type NodeAtom<T extends Record<string, any> = {}> = JotaiImmerAtom<NodeAtomState<T>>;
+export type NodeAtomsType = Record<string, NodeAtom>;
 
 export type NodeWrapperProps<T extends Record<string, any> = {}> = {
-  atom: NodeAtomType<T>;
+  atom: NodeAtom<T>;
   templates: Record<string, TemplateNodeClass>;
   templatePicker: TemplatePickerType;
 };
-
-export type Nodes = Record<string, Node>;
 
 export type NodeProps<T extends Record<string, any> = {}> = {
   node: Node<T>;
@@ -46,6 +44,7 @@ export type NodeProps<T extends Record<string, any> = {}> = {
   hovered: boolean;
   selectedHandles: Record<string, number>;
   updateNodeHandles(): void;
+  setContainerStyle(css: UpdaterType<CSSProperties>): void;
 };
 
 export interface NodeMouseInterface extends DraggerCallbacksType {
@@ -54,7 +53,7 @@ export interface NodeMouseInterface extends DraggerCallbacksType {
 }
 
 export type DraggerCallbacksType = {
-  onDragStart?: (e: React.MouseEvent, n: Node, c: DraggerData) => boolean | void;
+  onDragStart?: (e: MouseEvent, n: Node, c: DraggerData) => boolean | void;
   onDrag?: (e: MouseEvent, n: Node, c: DraggerData) => boolean | void;
   onDragEnd?: (e: MouseEvent, n: Node, c: DraggerData) => boolean | void;
 };
@@ -66,7 +65,3 @@ export type NodeAtomRaw<T extends Record<string, any> = {}> = Omit<
   handles: HandlesInfo;
   rect: Rect;
 };
-
-export type NodeAtom<T extends Record<string, any> = {}> = NodeAtomRaw<T> & AtomForceRender;
-
-export type NodeAtomsType = Record<string, JotaiImmerAtom<NodeAtom>>;

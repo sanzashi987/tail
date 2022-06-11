@@ -1,4 +1,22 @@
-import { EdgeBasicProps } from '@lib/types';
+import type { EdgeTree, EdgeBasicProps } from '@lib/types';
+
+export { wrapAnchor } from '@lib/components/Anchor';
+
+export const flatNodeEdgeMap = (edgeTree: EdgeTree) => {
+  return [...edgeTree.keys()].reduce<string[]>((last, curr) => {
+    return last.concat(getConnectedEdgeByNode(curr, edgeTree));
+  }, []);
+};
+
+export const getConnectedEdgeByNode = (nodeId: string, edgeTree: EdgeTree) => {
+  const handles = edgeTree.get(nodeId)?.values();
+  if (!handles) return [];
+
+  const res = [...handles].reduce<string[]>((last, handle) => {
+    return last.concat([...handle.values()]);
+  }, []);
+  return res;
+};
 
 const PERCENT = 0.25;
 const DIST = 30;

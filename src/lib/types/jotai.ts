@@ -10,3 +10,6 @@ export type AtomCallback = Parameters<Parameters<typeof useAtomCallback>[0]>;
 export type WriteGetter = AtomCallback[0];
 export type Setter = AtomCallback[1];
 export type UpdaterSetter<T> = (id: string, updater: ImmerUpdater<T>) => null | void;
+export type AtomForceRender = {
+  forceRender: number;
+};

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Node, NodeRendererProps, NodeAtomType } from '@lib/types';
+import type { Node, NodeRendererProps, NodeAtom } from '@lib/types';
 import { NodeWrapper } from '@lib/components/Node';
 import { defaultProps } from './utils';
 import BasicRenderer from '../BasicRenderer';
@@ -12,7 +12,7 @@ class NodeRenderer extends BasicRenderer<NodeRendererProps> {
     this.context.nodeUpdater.on('rerender', this.updateMemoVNodes);
   }
 
-  mountNode = (node: Node, atom: NodeAtomType) => {
+  mountNode = (node: Node, atom: NodeAtom) => {
     const { id } = node;
     const { templatePicker, templates } = this.props;
     this.itemInstances[id] = (

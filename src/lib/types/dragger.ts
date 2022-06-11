@@ -1,5 +1,7 @@
 import React from 'react';
 
+export type MouseEventCollection = React.MouseEvent | MouseEvent;
+
 export type DraggerIterState = {
   // x: number,
   // y: number,

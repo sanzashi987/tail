@@ -1,21 +1,17 @@
 import { CoordinateCalc } from '@lib/components/Dragger';
 import type {
-  EdgeAtom,
+  EdgeAtomState,
   EdgeInProgressAtomType,
   EdgeTree,
-  HandleType,
   EdgeBasic,
   EdgeInProgressAtomUpdater,
-  NodeAtom,
-  AtomStateGetterType,
-  ConnectMethodType,
-  DraggerData,
-} from '@lib/types';
-import { edgeInProgressAtom } from '@lib/atoms/edges';
-import type ItemActives from './itemActives';
+} from '@lib/types/edges';
+import { HandleType, ConnectMethodType, DraggerData, coordinates } from '@lib/types';
+import { AtomGetter, AtomSetter } from '@lib/types/jotai';
+import { edgeInProgressAtom, edgeInProgressAtomDefault } from '@lib/atoms/edges';
 import type TailCore from '..';
 
-export function enableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
+function enableEdgeReconnect(prev: EdgeAtomState): EdgeAtomState {
   return {
     ...prev,
     hovered: false,
@@ -23,29 +19,25 @@ export function enableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
   };
 }
 
-export function disableEdgeReconnect(prev: EdgeAtom): EdgeAtom {
+function disableEdgeReconnect(prev: EdgeAtomState): EdgeAtomState {
   return {
     ...prev,
     reconnect: false,
   };
 }
 
-export function hasConnectedEdgeActive(
+function hasConnectedEdgeActive(
   edgeTree: EdgeTree,
-  edgePool: Record<string, string>,
+  edgeId: string,
   nodeId: string,
   handleId: string,
 ) {
   const arr = [...(edgeTree.get(nodeId)?.get(handleId)?.keys() ?? [])];
-  for (const edge of arr) {
-    if (edgePool[edge]) {
-      return edge;
-    }
-  }
+  if (arr.includes(edgeId)) return edgeId;
   return false;
 }
 
-export const flipHandle = {
+const flipHandle = {
   source: 'target',
   target: 'source',
 } as const;
@@ -53,7 +45,7 @@ const flipHandleNode = {
   source: 'targetNode',
   target: 'sourceNode',
 } as const;
-export const addHandleNode = {
+const addHandleNode = {
   source: 'sourceNode',
   target: 'targetNode',
 } as const;
@@ -63,7 +55,7 @@ const handleToCoor = {
   target: ['targetX', 'targetY'],
 } as const;
 
-export function createEdgePayload(
+function createEdgePayload(
   to: HandleType,
   nodeId: string,
   handleId: string,
@@ -81,7 +73,7 @@ export function createEdgePayload(
   } as EdgeBasic;
 }
 
-export function setTarget(x: number, y: number) {
+function setTarget(x: number, y: number) {
   return function (prev: EdgeInProgressAtomType) {
     const next = { ...prev };
     [next.targetX, next.targetY] = [x, y];
@@ -89,7 +81,7 @@ export function setTarget(x: number, y: number) {
   };
 }
 
-export function setSource(x: number, y: number) {
+function setSource(x: number, y: number) {
   return function (prev: EdgeInProgressAtomType) {
     const next = { ...prev };
     [next.sourceX, next.sourceY] = [x, y];
@@ -97,7 +89,7 @@ export function setSource(x: number, y: number) {
   };
 }
 
-export function createBasicConnect(
+function createBasicConnect(
   to: HandleType,
   x: number,
   y: number,
@@ -117,30 +109,23 @@ export function createBasicConnect(
   };
 }
 
-export function addReconnectToState(
+function addReconnectToState(
+  this: EdgeConnects,
   state: EdgeInProgressAtomType,
   type: HandleType,
   prevEdgeId: string,
-  atomStateGetter: AtomStateGetterType,
 ) {
   const next = { ...state };
   const opposite = flipHandle[type];
   const [X, Y] = handleToCoor[opposite];
   const oppositeNode = addHandleNode[opposite];
-  const edgeState = atomStateGetter<EdgeAtom>('edge', prevEdgeId);
+  const edgeState = this.parser.edgeUpdater.getState(prevEdgeId);
   if (!edgeState) return false;
   const { [opposite]: storedHandle, [oppositeNode]: storedNode } = edgeState.edge;
-  const nodeState = atomStateGetter<NodeAtom>('node', storedNode);
-  if (!nodeState) return false;
-  const {
-    handles: {
-      [opposite]: {
-        [storedHandle]: { x, y },
-      },
-    },
-    node: { top, left },
-  } = nodeState;
-  [next[X], next[Y]] = [x + left, y + top];
+  const handleCoor = this.getHandleAbsCoordinate(storedNode, opposite, storedHandle);
+  if (!handleCoor) return false;
+  next[X] = handleCoor.x;
+  next[Y] = handleCoor.y;
   next.nodeId = storedNode;
   next.handleId = storedHandle;
   next.to = type;
@@ -149,14 +134,14 @@ export function addReconnectToState(
   return [opposite, next] as const;
 }
 
-export function createMoveCallback(setter: EdgeInProgressAtomUpdater, type: HandleType) {
+function createMoveCallback(setter: EdgeInProgressAtomUpdater, type: HandleType) {
   const moveUpdater = flipHandle[type] === 'source' ? setSource : setTarget;
   return (e: MouseEvent, { x, y }: DraggerData) => {
     setter(moveUpdater(x, y));
   };
 }
 
-export function validateExistEdge(edgeBasic: EdgeBasic, edgeTree: EdgeTree) {
+function validateExistEdge(edgeBasic: EdgeBasic, edgeTree: EdgeTree) {
   const { source, sourceNode, target, targetNode } = edgeBasic;
   const sourceEdges = [...(edgeTree.get(sourceNode)?.get(source)?.keys() ?? [])].reduce<
     Record<string, string>
@@ -172,39 +157,38 @@ export function validateExistEdge(edgeBasic: EdgeBasic, edgeTree: EdgeTree) {
 
 class EdgeConnects {
   private dragger = new CoordinateCalc();
-  constructor(private core: TailCore, private itemActives: ItemActives) {}
+  protected parser;
+  protected edgeAtomSetter;
+  protected edgeAtomGetter;
+  constructor(private core: TailCore) {
+    this.parser = core.context;
+    const { getter, setter } = this.parser.edgeUpdater;
+    this.edgeAtomSetter = (setter as unknown) as AtomSetter<EdgeInProgressAtomType>;
+    this.edgeAtomGetter = (getter as unknown) as AtomGetter<EdgeInProgressAtomType>;
+  }
   onHandleMouseDown: ConnectMethodType = (e, type, nodeId, handleId) => {
     //only edge active will try reconnect
     let newType = type;
-    const edgeAtoms = this.core.getEdgeAtoms();
-    const { edgeTree } = this.core.edgeRef.current!;
-    const onlyEdge = Object.keys(this.itemActives.activeItems.edge).length === 1;
+    const { edgeTree } = this.parser.edgeUpdater;
+    const activeEdges = this.parser.edgeSelector.currentItems;
     const possibleEdge =
-      onlyEdge &&
-      hasConnectedEdgeActive(edgeTree, this.itemActives.activeItems['edge'], nodeId, handleId);
-    const nodeState = this.core.getAtomState<NodeAtom>('node', nodeId);
-    if (!nodeState) return;
-    const {
-      handles: {
-        [newType]: {
-          [handleId]: { x, y },
-        },
-      },
-      node: { left, top },
-    } = nodeState;
-    const [absX, absY] = [x + left, y + top];
-    let basicState = createBasicConnect(newType, absX, absY, nodeId, handleId);
+      activeEdges.length === 1 &&
+      hasConnectedEdgeActive(edgeTree, activeEdges[0], nodeId, handleId);
+    const handleAbs = this.getHandleAbsCoordinate(nodeId, newType, handleId);
+    if (!handleAbs) return;
+    const { x, y } = handleAbs;
+    let basicState = createBasicConnect(newType, x, y, nodeId, handleId);
     if (possibleEdge !== false) {
       // reconnect
-      const res = addReconnectToState(basicState, newType, possibleEdge, this.core.getAtomState);
+      const res = addReconnectToState.call(this, basicState, newType, possibleEdge);
       if (!res) return;
       [newType, basicState] = res;
-      this.core.context.set(edgeAtoms[possibleEdge], enableEdgeReconnect);
+      this.parser.edgeUpdater.setState(possibleEdge, enableEdgeReconnect);
     }
     this.edgeInProgressUpdater(basicState);
     this.dragger.start(e, {
-      x: absX,
-      y: absY,
+      x,
+      y,
       parent: document.body,
       getScale: this.core.getScale,
       movecb: createMoveCallback(this.edgeInProgressUpdater, newType),
@@ -221,20 +205,20 @@ class EdgeConnects {
       to,
       nodeId: storedNode,
       handleId: storedHandle,
-    } = this.core.context.get(edgeInProgressAtom);
+    } = this.edgeAtomGetter(edgeInProgressAtom);
     block: {
       if (to === type && active) {
         const newPayload = createEdgePayload(to, nodeId, handleId, storedNode, storedHandle);
-        const isNotExist = !validateExistEdge(newPayload, this.core.edgeRef.current!.edgeTree);
+        const isNotExist = !validateExistEdge(newPayload, this.parser.edgeUpdater.edgeTree);
         if (reconnect && prevEdgeId) {
           const toNode = addHandleNode[type];
-          const edgeState = this.core.getAtomState<EdgeAtom>('edge', prevEdgeId);
+          const edgeState = this.parser.edgeUpdater.getState(prevEdgeId);
           if (!edgeState) break block;
           const { [type]: prevHandleId, [toNode]: prevNodeId } = edgeState.edge;
           if ((prevHandleId !== handleId || prevNodeId !== nodeId) && isNotExist) {
             this.core.props.onEdgeUpdate?.(prevEdgeId, newPayload);
           }
-          this.core.setAtomState('edge', prevEdgeId, disableEdgeReconnect);
+          this.parser.edgeUpdater.setState(prevEdgeId, disableEdgeReconnect);
         } else if (isNotExist) {
           this.core.props.onEdgeCreate?.(newPayload);
         }
@@ -244,21 +228,35 @@ class EdgeConnects {
   };
 
   private rollback = () => {
-    const { reconnect, prevEdgeId } = this.core.context.get(edgeInProgressAtom);
+    const { reconnect, prevEdgeId } = this.edgeAtomGetter(edgeInProgressAtom);
     if (reconnect && prevEdgeId) {
-      this.core.setAtomState<EdgeAtom>('edge', prevEdgeId, disableEdgeReconnect);
+      this.parser.edgeUpdater.setState(prevEdgeId, disableEdgeReconnect);
     }
-    this.core.context.reset(edgeInProgressAtom);
+    this.edgeAtomSetter(edgeInProgressAtom, edgeInProgressAtomDefault);
   };
 
   private connectReset = () => {
     this.dragger.reset();
-    this.core.context.reset(edgeInProgressAtom);
+    this.edgeAtomSetter(edgeInProgressAtom, edgeInProgressAtomDefault);
   };
 
   private edgeInProgressUpdater: EdgeInProgressAtomUpdater = (updater) => {
-    this.core.context.set(edgeInProgressAtom, updater);
+    this.edgeAtomSetter(edgeInProgressAtom, updater);
   };
+
+  protected getHandleAbsCoordinate(nodeId: string, handleType: HandleType, handleId: string) {
+    const nodeState = this.parser.nodeUpdater.getState(nodeId);
+    if (!nodeState) return null;
+    const {
+      handles: {
+        [handleType]: {
+          [handleId]: { x, y },
+        },
+      },
+      node: { left, top },
+    } = nodeState;
+    return { x: x + left, y: y + top } as coordinates;
+  }
 }
 
 export default EdgeConnects;

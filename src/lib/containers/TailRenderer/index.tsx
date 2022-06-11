@@ -2,7 +2,6 @@ import React, { Component, createRef, forwardRef, useImperativeHandle, useRef } 
 import type {
   InterfaceValue,
   TailCoreProps,
-  NodeAtom,
   SelectModeType,
   CoreMethods,
   TailProps,
@@ -11,7 +10,7 @@ import type {
 } from '@lib/types';
 import { ParserContext, InterfaceProvider } from '@lib/contexts';
 import { noop } from '@lib/utils/converter';
-import { ItemActives, NodeMoves, EdgeConnects } from './subInstances';
+import { NodeMoves, EdgeConnects } from './callbackFactory';
 import { getInsideIds } from './helpers';
 import ItemParser from '../../components/ItemParser';
 import NodeRenderer from '../NodeRenderer';
@@ -21,7 +20,6 @@ import MarkerDefs from '../MarkerDefs';
 import '@lib/styles/index.scss';
 
 class TailCore extends Component<TailCoreProps> {
-  static displayName = 'TailCore';
   static defaultProps = {
     quickNodeUpdate: true,
     lazyRenderNodes: true,
@@ -32,17 +30,11 @@ class TailCore extends Component<TailCoreProps> {
   viewer = createRef<InfiniteViewer>();
   Interface: InterfaceValue;
 
-  NodeMoves: NodeMoves;
-  EdgeConnects: EdgeConnects;
-
   constructor(props: TailCoreProps) {
     super(props);
     const { onEdgeClick, onNodeClick, onEdgeContextMenu, onNodeContextMenu } = props;
-    this.NodeMoves = new NodeMoves(this);
-    this.EdgeConnects = new EdgeConnects(this, this.ItemActives);
-
-    const { batchNodeDragStart, batchNodeDrag, batchNodeDragEnd } = this.NodeMoves;
-    const { onHandleMouseUp, onHandleMouseDown } = this.EdgeConnects;
+    const { batchNodeDragStart, batchNodeDrag, batchNodeDragEnd } = new NodeMoves(this);
+    const { onHandleMouseUp, onHandleMouseDown } = new EdgeConnects(this);
 
     // context methods are not responsive
     this.Interface = {
@@ -115,8 +107,8 @@ class TailCore extends Component<TailCoreProps> {
         onSelectEnd={this.onSelectEnd}
         onViewerDrop={onViewerDrop}
         onViewerClick={onViewerClick}
-        outerChildren={this.props.children}
         onViewerScale={this.props.onViewerScale}
+        outerChildren={this.props.children}
       >
         <InterfaceProvider value={this.Interface}>
           <NodeRenderer templates={nodeTemplates} templatePicker={nodeTemplatePicker} />
@@ -130,7 +122,7 @@ class TailCore extends Component<TailCoreProps> {
 }
 
 const Tail = forwardRef<CoreMethods, TailProps>(
-  ({ children, nodes, edges, ...otherprops }, ref) => {
+  ({ children, nodes, edges, activeEdges, activeNodes, ...otherprops }, ref) => {
     const coreRef = useRef<TailCore>(null);
     useImperativeHandle(
       ref,
@@ -144,7 +136,7 @@ const Tail = forwardRef<CoreMethods, TailProps>(
       [],
     );
     return (
-      <ItemParser nodes={nodes} edges={edges}>
+      <ItemParser nodes={nodes} edges={edges} activeNodes={activeNodes} activeEdges={activeEdges}>
         <TailCore ref={coreRef} {...otherprops}>
           {children}
         </TailCore>

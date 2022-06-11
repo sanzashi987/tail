@@ -1,4 +1,4 @@
-import type { coordinates, NodeAtom } from '@lib/types';
+import type { coordinates, NodeAtomState } from '@lib/types';
 
 function isInside(
   comStart: coordinates,
@@ -25,7 +25,7 @@ function sort(a: number, b: number) {
 
 export function getInsideIds(
   nodes: string[],
-  getNodes: (id: string) => NodeAtom | null,
+  getNodes: (id: string) => NodeAtomState | null,
   topleft: coordinates,
   bottomRight: coordinates,
   offset: coordinates,

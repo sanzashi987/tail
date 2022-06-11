@@ -1,4 +1,4 @@
-import type { NodeAtom, Node, Edge, EdgeAtom, EdgeTree } from '@lib/types';
+import type { NodeAtomState, Node, Edge, EdgeAtomState, EdgeTree } from '@lib/types';
 import type {
   AtomGetter,
   AtomSetter,
@@ -21,17 +21,16 @@ import {
 
 export abstract class ItemUpdater<
   PropsState extends { id: string },
-  AtomState,
+  AtomState
 > extends EventEmitter {
   protected atoms: Record<string, JotaiImmerAtom<AtomState>> = {};
-  protected lastItems: Record<string, PropsState> = {};
-  constructor(protected getter: AtomGetter<AtomState>, protected setter: AtomSetter<AtomState>) {
+  protected currentItems: Record<string, PropsState> = {};
+  constructor(public getter: AtomGetter<AtomState>, public setter: AtomSetter<AtomState>) {
     super();
-    // this.diff(items);
     const { on: _on } = EventEmitter.prototype;
     this.on = function (eventName: string | symbol, listener: (...args: any[]) => void) {
       if (eventName === 'mount') {
-        const { lastItems, atoms: itemAtoms } = this;
+        const { currentItems: lastItems, atoms: itemAtoms } = this;
         Object.entries(itemAtoms).forEach(([id, atom]) => {
           requestIdleCallback(() => {
             listener(lastItems[id], atom);
@@ -49,8 +48,8 @@ export abstract class ItemUpdater<
 
   diff(next: Record<string, PropsState>) {
     let dirty = false;
-    const deleted = { ...this.lastItems };
-    const last = { ...this.lastItems };
+    const deleted = { ...this.currentItems };
+    const last = { ...this.currentItems };
     for (const key in next) {
       const val = next[key],
         lastVal = last[key];
@@ -71,7 +70,7 @@ export abstract class ItemUpdater<
       this.deleteItem(deleted[key]);
     }
     dirty && this.rerender();
-    this.lastItems = next;
+    this.currentItems = next;
   }
 
   private rerender() {
@@ -112,23 +111,23 @@ export abstract class ItemUpdater<
   abstract createAtomUpdater(item: PropsState): ImmerUpdater<AtomState>;
 }
 
-export class NodeUpdater extends ItemUpdater<Node, NodeAtom> {
+export class NodeUpdater extends ItemUpdater<Node, NodeAtomState> {
   createAtom(item: Node) {
     return createNodeAtom(item);
   }
   createAtomUpdater(item: Node) {
-    return (prev: NodeAtom): NodeAtom => ({ ...prev, node: item });
+    return (prev: NodeAtomState): NodeAtomState => ({ ...prev, node: item });
   }
 }
 
-export class EdgeUpdater extends ItemUpdater<Edge, EdgeAtom> {
+export class EdgeUpdater extends ItemUpdater<Edge, EdgeAtomState> {
   edgeTree: EdgeTree = new Map();
 
   createAtom(item: Edge) {
     return createEdgeAtom(item);
   }
   createAtomUpdater(item: Edge) {
-    return (prev: EdgeAtom): EdgeAtom => ({ ...prev, edge: item });
+    return (prev: EdgeAtomState): EdgeAtomState => ({ ...prev, edge: item });
   }
 
   protected deleteItem(item: Edge) {
@@ -147,11 +146,11 @@ export class EdgeUpdater extends ItemUpdater<Edge, EdgeAtom> {
 }
 
 export class ItemSelector<AtomState> {
-  lastItems: string[] = [];
+  currentItems: string[] = [];
   constructor(private setter: UpdaterSetter<AtomState>) {}
 
   diff(next: string[]) {
-    const deleted = new Set(this.lastItems);
+    const deleted = new Set(this.currentItems);
     for (const val of next) {
       if (!deleted.has(val)) {
         this.setter(val, selectItem);
@@ -163,6 +162,6 @@ export class ItemSelector<AtomState> {
       this.setter(val, unselectItem);
     });
 
-    this.lastItems = next;
+    this.currentItems = next;
   }
 }

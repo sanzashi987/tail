@@ -6,6 +6,7 @@ import React, {
   useCallback,
   useEffect,
   useContext,
+  useState,
 } from 'react';
 import type { NodeWrapperProps, NodeCom, DraggerData } from '@lib/types';
 import { InstanceInterface } from '@lib/contexts/instance';
@@ -22,13 +23,15 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   const [{ node, selected, selectedHandles, hovered }, setNodeInternal] = useAtom(atom);
   const ref = useRef<HTMLDivElement>(null);
   const rootInterface = useContext(InstanceInterface)!;
+  const [styled, setStyle] = useState<CSSProperties>({});
   const { left: x, top: y } = node;
 
   const style = useMemo(() => {
     return {
+      ...styled,
       transform: `translate(${x}px,${y}px)`,
     } as CSSProperties;
-  }, [x, y]);
+  }, [x, y, styled]);
 
   //built-in event callbacks
   const dragStart = useCallback(
@@ -118,6 +121,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
           selected={selected}
           selectedHandles={selectedHandles}
           updateNodeHandles={updateNodeHandles}
+          setContainerStyle={setStyle}
         />
       </div>
     </Dragger>

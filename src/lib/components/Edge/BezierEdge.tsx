@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { EdgeBasicProps, EdgeProps } from '@lib/types';
-import { drawBezier } from './drawBezier';
+import { drawBezier } from '@lib/utilsProvided';
 
 const getCenter = ({
   sourceX,

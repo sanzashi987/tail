@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import React, { ComponentType } from 'react';
-import { UpdaterType } from './instance';
-import { JotaiImmerAtom } from './jotai';
-import { AtomForceRender, HandleType, NodeAtomsType } from '.';
+import React, { ComponentType, CSSProperties } from 'react';
+import type { ImmerUpdater, JotaiImmerAtom, AtomForceRender } from './jotai';
+import type { HandleType } from './handles';
+import type { UpdaterType } from './instance';
 
 export type EdgeBasic = {
   source: string;
@@ -27,7 +27,7 @@ export type EdgeBasicProps = {
   targetY: number;
 };
 
-export type EdgeAtomRaw<T extends Record<string, any> = {}> = {
+export type EdgeAtomStateRaw<T extends Record<string, any> = {}> = {
   edge: Edge<T>;
   selected: boolean;
   hovered: boolean;
@@ -37,6 +37,7 @@ export type EdgeAtomRaw<T extends Record<string, any> = {}> = {
 export type EdgePropsFromWrapper = {
   markerStart?: string;
   markerEnd?: string;
+  setContainerStyle(css: UpdaterType<CSSProperties>): void;
 };
 
 export interface EdgeMouseInterface {
@@ -44,23 +45,16 @@ export interface EdgeMouseInterface {
   onEdgeContextMenu?: (e: React.MouseEvent, edge: Edge) => void;
 }
 
-export type EdgeAtom<T extends Record<string, any> = {}> = EdgeAtomRaw<T> & AtomForceRender;
-export type EdgeAtomType = JotaiImmerAtom<EdgeAtom>;
+export type EdgeAtomState<T extends Record<string, any> = {}> = EdgeAtomStateRaw<T> &
+  AtomForceRender;
+export type EdgeAtom = JotaiImmerAtom<EdgeAtomState>;
+export type EdgeAtoms = Record<string, EdgeAtom>;
 
-export type EdgeAtomsType = Record<string, EdgeAtomType>;
-
-export type ComputedEdgeAtom = EdgeAtom & EdgeBasicProps;
-
-export type EdgeProps = Omit<EdgeAtomRaw, 'reconnect'> & EdgeBasicProps & EdgePropsFromWrapper;
-
+export type EdgeTemplatesType = Record<string, EdgeComponentPackType>;
+export type EdgeProps = Omit<EdgeAtomStateRaw, 'reconnect'> & EdgeBasicProps & EdgePropsFromWrapper;
 export type EdgeWrapperProps<T extends Record<string, any> = {}> = {
-  atom: JotaiImmerAtom<EdgeAtom<T>>;
+  atom: JotaiImmerAtom<EdgeAtomState<T>>;
   templates: EdgeTemplatesType;
-};
-
-export type SelectorInput = {
-  edge: EdgeAtomType;
-  nodeAtoms: NodeAtomsType;
 };
 
 export type EdgeComponentPackType = {
@@ -68,13 +62,33 @@ export type EdgeComponentPackType = {
   shadow: ComponentType<EdgeBasicProps>;
 };
 
-export type EdgeTemplatesType = Record<string, EdgeComponentPackType>;
-
 export type EdgeRendererProps = {
   templates: EdgeTemplatesType;
   connectingEdge?: ComponentType<EdgeBasicProps>;
 };
 
+type NodeId = string;
+type HandleId = string;
+type EdgeId = string;
+export type EdgeTree = Map<NodeId, Map<HandleId, Map<EdgeId, EdgeId>>>;
+
+// edge in progress
+export type EdgeInProgressAtomType = {
+  nodeId: string;
+  handleId: string;
+  to: HandleType;
+  active: boolean;
+  reconnect: boolean;
+  prevEdgeId?: string;
+} & EdgeBasicProps;
+
+export type EdgeInProgressAtomUpdater = (updater: ImmerUpdater<EdgeInProgressAtomType>) => void;
+
+export type EdgeInProgressProps = {
+  template?: ComponentType<EdgeBasicProps>;
+};
+
+// markers
 export type AnchorProps = {
   color?: string;
   strokeWidth?: number;
@@ -101,24 +115,4 @@ export type MarkerDefsProps = {
   // defaultColor?: string;
   markers?: Marker[];
   markerTemplates?: MarkerTemplatesType;
-};
-
-type NodeId = string;
-type HandleId = string;
-type EdgeId = string;
-export type EdgeTree = Map<NodeId, Map<HandleId, Map<EdgeId, EdgeId>>>;
-
-export type EdgeInProgressAtomType = {
-  nodeId: string;
-  handleId: string;
-  to: HandleType;
-  active: boolean;
-  reconnect: boolean;
-  prevEdgeId?: string;
-} & EdgeBasicProps;
-
-export type EdgeInProgressAtomUpdater = (updater: UpdaterType<EdgeInProgressAtomType>) => void;
-
-export type EdgeInProgressProps = {
-  template?: ComponentType<EdgeBasicProps>;
 };

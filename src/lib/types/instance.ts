@@ -1,25 +1,26 @@
 import React, { ComponentType, ReactNode } from 'react';
-import { EdgeUpdater, NodeUpdater } from '@lib/components/ItemParser/itemUpdater';
-import type { RecoilValue, RecoilState } from 'recoil';
-import type {
+import { EdgeUpdater, ItemSelector, NodeUpdater } from '@lib/components/ItemParser/itemUpdater';
+import {
+  Node,
+  NodeAtomState,
   NodeMouseInterface,
+  NodeTemplatesType,
+  TemplatePickerType,
+} from './nodes';
+import {
+  Edge,
+  EdgeBasicProps,
+  EdgeTree,
+  EdgeAtomState,
   EdgeBasic,
   EdgeMouseInterface,
-  HandleElement,
-  Node,
-  Edge,
-  EdgeTemplatesType,
-  NodeTemplatesType,
-  MarkerTemplatesType,
-  ViewerInterface,
-  HandleType,
-  TemplatePickerType,
   MarkerDefsProps,
-  EdgeBasicProps,
-  SelectModeType,
-  EdgeTree,
-  MouseEventCollection,
-} from '.';
+  EdgeTemplatesType,
+  MarkerTemplatesType,
+} from './edges';
+import type { ViewerInterface, SelectModeType } from './viewer';
+import type { HandleElement, HandleType } from './handles';
+import type { MouseEventCollection } from './dragger';
 
 export type CoreMethods = {
   switchMode(m: SelectModeType): void;
@@ -48,32 +49,28 @@ export type TailCoreOptionalProps = {
   MarkerDefsProps;
 
 export type TailCoreProps = {
-  // nodes: Record<string,Node>;
-  // edges: Record<string,Edge>;
   children?: ReactNode;
 } & NodeMouseInterface &
   EdgeMouseInterface &
   TailCoreOptionalProps;
 
-export type TailProps = {
+export type ItemParserProps = {
   nodes: Record<string, Node>;
   edges: Record<string, Edge>;
-  children?: ReactNode;
-} & TailCoreProps;
+  activeNodes: string[];
+  activeEdges: string[];
+};
+
+export type TailProps = ItemParserProps & TailCoreProps;
 
 export interface NodeMutation {
-  // onNodeCreate(): void;
   onNodeUpdate?(id: Node[]): void;
-  // onNodeDelete(): void;
 }
 
 export interface EdgeMutation {
   onEdgeCreate?(edgeBasic: EdgeBasic): void;
   onEdgeUpdate?(id: string, edgeBasic: EdgeBasic): void;
-  // onEdgeDelete(): void;
 }
-
-export type SelectedItemType = 'node' | 'edge';
 
 export type HandleMap = {
   [handleId: string]: HandleElement;
@@ -86,7 +83,7 @@ export type HandlesInfo = {
 
 export type ActiveNextType = (
   e: MouseEventCollection | null,
-  type: SelectedItemType,
+  type: 'node' | 'edge',
   id: string,
   selected: boolean,
   force?: boolean,
@@ -111,34 +108,11 @@ export interface HandleInterface {
   onMouseUp: ConnectMethodType;
 }
 
-export interface RecoilNexusInterface {
-  getRecoil: <T>(atom: RecoilValue<T>) => T;
-  getRecoilPromise: <T>(atom: RecoilValue<T>) => Promise<T>;
-  setRecoil: <T>(atom: RecoilState<T>, valOrUpdater: UpdaterType<T>) => void;
-  resetRecoil: (atom: RecoilState<any>) => void;
-}
-
 export type UpdaterType<T> = T | ((currVal: T) => T);
-
-export type AtomForceRender = {
-  forceRender: number;
-};
-
-export type AtomStateGetterType = <T>(type: SelectedItemType, id: string) => T | false;
-export type AtomStateSetterType = <T>(
-  type: SelectedItemType,
-  id: string,
-  updater: T | ((c: T) => T),
-) => T;
-
-export type ItemParserProps = {
-  nodes: Record<string, Node>;
-  edges: Record<string, Edge>;
-  activeNodes: string[];
-  activeEdges: string[];
-};
 
 export type ItemParserInterface = {
   nodeUpdater: NodeUpdater;
   edgeUpdater: EdgeUpdater;
+  nodeSelector: ItemSelector<NodeAtomState>;
+  edgeSelector: ItemSelector<EdgeAtomState>;
 };
