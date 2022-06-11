@@ -1,4 +1,11 @@
-import type { Edge, EdgeTree } from '@lib/types';
+import type {
+  Edge,
+  EdgeTree,
+  NodeAtom,
+  NodeAtomState,
+  NodeAtomsType,
+  UpdaterType,
+} from '@lib/types';
 import type { Draft } from 'immer';
 import type { ItemUpdater } from './itemUpdater';
 
@@ -58,13 +65,13 @@ export function unselectItem(draft: Draft<any>) {
   draft.selected = false;
 }
 
-function immutableSelectedHandles(prev: NodeAtom) {
+function immutableSelectedHandles(prev: NodeAtomState) {
   const next = { ...prev };
   next.selectedHandles = { ...next.selectedHandles };
   return next;
 }
 
-function deactivateHandle(next: NodeAtom, handleId: string) {
+function deactivateHandle(next: NodeAtomState, handleId: string) {
   const linked = next.selectedHandles[handleId];
   if (linked === 1) {
     delete next.selectedHandles[handleId];
@@ -73,7 +80,7 @@ function deactivateHandle(next: NodeAtom, handleId: string) {
   }
 }
 
-function activateHandle(next: NodeAtom, handleId: string) {
+function activateHandle(next: NodeAtomState, handleId: string) {
   const linked = next.selectedHandles[handleId];
   next.selectedHandles[handleId] = typeof linked === 'number' && linked === linked ? linked + 1 : 1;
 }
@@ -81,14 +88,12 @@ function activateHandle(next: NodeAtom, handleId: string) {
 function setSelectedHandle(
   nodeId: string,
   handleId: string,
-  cb: (next: NodeAtom, handleId: string) => void,
-  setter: (atom: RecoilState<NodeAtom>, updater: NodeAtom | ((cur: NodeAtom) => NodeAtom)) => void,
+  cb: (next: NodeAtomState, handleId: string) => void,
+  setter: (atom: NodeAtom, updater: UpdaterType<NodeAtomsType>) => void,
 ) {
-  const atom = getAtom(nodeId, nodePool);
-  atom &&
-    setter(atom, (prev) => {
-      const next = immutableSelectedHandles(prev);
-      cb(next, handleId);
-      return next;
-    });
+  setter(atom, (prev) => {
+    const next = immutableSelectedHandles(prev);
+    cb(next, handleId);
+    return next;
+  });
 }

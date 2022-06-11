@@ -23,9 +23,10 @@ export const baseConfig = ({ outputDir = 'dist/esm', injectCSS = true } = {}) =>
   external: [
     'react',
     'react-dom',
-    'recoil',
+    'jotai',
+    'immer',
     'lodash.debounce',
-    'resize-observer-polyfill',
+    // 'resize-observer-polyfill',
     'eventemitter3',
     (id) => id.includes('@babel/runtime'),
   ],
