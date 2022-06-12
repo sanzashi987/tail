@@ -20,10 +20,12 @@ import { BasicNode } from '.';
 const wrapperClassname = `tail-node__wrapper ${styles.wrapper}`;
 
 const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) => {
-  const [{ node, selected, selectedHandles, hovered }, setNodeInternal] = useAtom(atom);
+  const [nodeState, setNodeInternal] = useAtom(atom);
   const ref = useRef<HTMLDivElement>(null);
   const rootInterface = useContext(InstanceInterface)!;
   const [styled, setStyle] = useState<CSSProperties>({});
+
+  const { node, selected, /* selectedHandles, */ hovered } = nodeState;
   const { left: x, top: y } = node;
 
   const style = useMemo(() => {
@@ -36,10 +38,9 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   //built-in event callbacks
   const dragStart = useCallback(
     (e: React.MouseEvent, c: DraggerData) => {
-      // if (!selected) return false;
       return rootInterface.node.onDragStart?.(e, node, c);
     },
-    [node, selected],
+    [node],
   );
   const drag = useCallback(
     (e: MouseEvent, c: DraggerData) => {
@@ -56,10 +57,9 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
 
   const onNodeClick = useCallback(
     (e: MouseEvent) => {
-      rootInterface.activateItem(e, 'node', node.id, selected);
-      rootInterface.node.onNodeClick?.(e, node);
+      rootInterface.node.onNodeClick?.(e, nodeState);
     },
-    [node],
+    [node, selected],
   );
   const onHoverIn = () => {
     !hovered && setNodeInternal(setHovered);
@@ -69,7 +69,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   };
 
   const onContextMenu = (e: React.MouseEvent) => {
-    selected && rootInterface.node.onNodeContextMenu?.(e, node);
+    selected && rootInterface.node.onNodeContextMenu?.(e, nodeState);
   };
 
   const updateNodeHandles = useCallback(() => {
@@ -119,7 +119,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
           node={node}
           hovered={hovered}
           selected={selected}
-          selectedHandles={selectedHandles}
+          // selectedHandles={selectedHandles}
           updateNodeHandles={updateNodeHandles}
           setContainerStyle={setStyle}
         />

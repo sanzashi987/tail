@@ -7,10 +7,10 @@ const options = { capture: true, passive: false };
 class DraggerCore<T extends DraggerCoreBasic = DraggerCoreBasic, S = any> extends Component<T, S> {
   dragging = false;
 
-  _onMouseDown = (e: React.MouseEvent) => {
+  _onMouseDown = (e: React.MouseEvent, move: boolean) => {
     // only left click triggers the drag simulation
     if (!this.dragging && e.button === 0) {
-      document.addEventListener('mousemove', this.onDrag, options);
+      move && document.addEventListener('mousemove', this.onDrag, options);
       document.addEventListener('mouseup', this.onDragEnd, options);
       addUserSelectStyles(document);
     }

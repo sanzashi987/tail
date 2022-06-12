@@ -1,4 +1,4 @@
-import { Edge, EdgeAtomState, EdgeInProgressAtomType } from '@lib/types';
+import { Edge, EdgeAtomState, EdgeInProgressAtomState } from '@lib/types';
 import { atomWithImmer } from 'jotai/immer';
 
 export function createEdgeAtom(edge: Edge) {
@@ -27,4 +27,4 @@ export const edgeInProgressAtomDefault = {
   ...emptySourceTarget,
 } as const;
 
-export const edgeInProgressAtom = atomWithImmer<EdgeInProgressAtomType>(edgeInProgressAtomDefault);
+export const edgeInProgressAtom = atomWithImmer<EdgeInProgressAtomState>(edgeInProgressAtomDefault);

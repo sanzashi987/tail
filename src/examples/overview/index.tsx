@@ -44,6 +44,8 @@ function templatePicker(node: Node) {
 function Overview() {
   const [nodeState, setNodeState] = useState(nodes);
   const [edgeState, setEdgeState] = useState(edges);
+  const [activeNodes, setActiveNodes] = useState<string[]>([]);
+  const [activeEdges, setActiveEdges] = useState<string[]>([]);
   const onDrag = useCallback((e: any, n: Node, c: DraggerData) => {
     const { id } = n;
     setNodeState((pre) => {
@@ -85,6 +87,7 @@ function Overview() {
       <button
         onClick={() => {
           ref.current?.focusNode('id3');
+          setActiveNodes(['id3']);
         }}
       >
         focus
@@ -93,8 +96,18 @@ function Overview() {
         ref={ref}
         nodes={nodeState}
         edges={edgeState}
-        onEdgeClick={noop}
-        onNodeClick={noop}
+        activeNodes={activeNodes}
+        activeEdges={activeEdges}
+        onEdgeClick={(e, E) => {
+          !E.selected && setActiveEdges([E.edge.id]);
+        }}
+        onNodeClick={(e, E) => {
+          !E.selected && setActiveNodes([E.node.id]);
+        }}
+        onViewerClick={() => {
+          setActiveEdges([]);
+          setActiveNodes([]);
+        }}
         onNodeUpdate={noop}
         onNodeContextMenu={noop}
         onEdgeCreate={onEdgeCreate}

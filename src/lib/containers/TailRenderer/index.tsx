@@ -50,7 +50,6 @@ class TailCore extends Component<TailCoreProps> {
         onMouseDown: onHandleMouseDown,
         onMouseUp: onHandleMouseUp,
       },
-      activateItem: this.props.onActivate ?? noop,
       getScale: this.getScale,
     };
   }

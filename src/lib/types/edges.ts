@@ -41,8 +41,8 @@ export type EdgePropsFromWrapper = {
 };
 
 export interface EdgeMouseInterface {
-  onEdgeClick?: (e: React.MouseEvent, edge: Edge) => void;
-  onEdgeContextMenu?: (e: React.MouseEvent, edge: Edge) => void;
+  onEdgeClick?: (e: React.MouseEvent, edge: EdgeAtomState) => void;
+  onEdgeContextMenu?: (e: React.MouseEvent, edge: EdgeAtomState) => void;
 }
 
 export type EdgeAtomState<T extends Record<string, any> = {}> = EdgeAtomStateRaw<T> &
@@ -73,7 +73,7 @@ type EdgeId = string;
 export type EdgeTree = Map<NodeId, Map<HandleId, Map<EdgeId, EdgeId>>>;
 
 // edge in progress
-export type EdgeInProgressAtomType = {
+export type EdgeInProgressAtomState = {
   nodeId: string;
   handleId: string;
   to: HandleType;
@@ -82,7 +82,7 @@ export type EdgeInProgressAtomType = {
   prevEdgeId?: string;
 } & EdgeBasicProps;
 
-export type EdgeInProgressAtomUpdater = (updater: ImmerUpdater<EdgeInProgressAtomType>) => void;
+export type EdgeInProgressAtomUpdater = (updater: ImmerUpdater<EdgeInProgressAtomState>) => void;
 
 export type EdgeInProgressProps = {
   template?: ComponentType<EdgeBasicProps>;

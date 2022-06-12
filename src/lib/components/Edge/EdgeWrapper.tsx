@@ -36,7 +36,8 @@ function calcSourceTargetPoint(
 const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
   const rootInterface = useContext(InstanceInterface)!;
   const { nodeUpdater } = useContext(ParserContext)!;
-  const [{ edge, selected, reconnect, hovered }, setEdge] = useAtom(atom);
+  const [edgeState, setEdge] = useAtom(atom);
+  const { edge, selected, reconnect, hovered } = edgeState;
   const { markerEnd, markerStart, source, sourceNode, target, targetNode, type = '' } = edge;
   const { [sourceNode]: sourceAtom, [targetNode]: targetAtom } = nodeUpdater.getAtoms();
   const sourceNodeState = useAtomValue(sourceAtom ?? DummyNodeAtom);
@@ -48,8 +49,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
   }, [sourceNodeState, targetNodeState, source, target]);
 
   const onClick = (e: React.MouseEvent) => {
-    rootInterface.activateItem(e, 'edge', edge.id, selected);
-    rootInterface.edge.onEdgeClick?.(e, edge);
+    rootInterface.edge.onEdgeClick?.(e, edgeState);
   };
   const onHoverIn = () => {
     !hovered && setEdge(setHovered);
@@ -59,7 +59,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
   };
 
   const onContextMenu = (e: React.MouseEvent) => {
-    selected && rootInterface.edge.onEdgeContextMenu?.(e, edge);
+    selected && rootInterface.edge.onEdgeContextMenu?.(e, edgeState);
   };
 
   const notValidEdge = useMemo(() => {
@@ -73,8 +73,8 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
 
   if (notValidEdge || reconnect) return null;
   return (
-    <>
-      <g className="tail-edge__wrapper" style={style}>
+    <g style={style}>
+      <g className="tail-edge__wrapper">
         <EdgeComponent
           edge={edge}
           hovered={hovered}
@@ -90,7 +90,6 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
       </g>
       <g
         className="tail-edge__event-enhancer"
-        style={style}
         onClick={onClick}
         onMouseEnter={onHoverIn}
         onMouseLeave={onHoverOut}
@@ -98,7 +97,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
       >
         <ShadowComponent sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY={targetY} />
       </g>
-    </>
+    </g>
   );
 };
 

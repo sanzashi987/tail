@@ -39,7 +39,6 @@ export type TailCoreOptionalProps = {
   quickNodeUpdate?: boolean;
   lazyRenderNodes?: boolean;
   onDelete?(nodes: string[], edges: string[]): void; //come with id array
-  onActivate?: ActiveNextType;
   onSelect?(e: MouseEvent, nodes: string[]): void;
 } & NodeMutation &
   EdgeMutation &
@@ -57,8 +56,8 @@ export type TailCoreProps = {
 export type ItemParserProps = {
   nodes: Record<string, Node>;
   edges: Record<string, Edge>;
-  activeNodes: string[];
-  activeEdges: string[];
+  activeNodes?: string[];
+  activeEdges?: string[];
 };
 
 export type TailProps = ItemParserProps & TailCoreProps;
@@ -81,15 +80,7 @@ export type HandlesInfo = {
   target: HandleMap;
 };
 
-export type ActiveNextType = (
-  e: MouseEventCollection | null,
-  type: 'node' | 'edge',
-  id: string,
-  selected: boolean,
-  force?: boolean,
-) => void;
 export interface GeneralMethods {
-  activateItem: ActiveNextType;
   getScale(): number;
 }
 export type ConnectMethodType = (

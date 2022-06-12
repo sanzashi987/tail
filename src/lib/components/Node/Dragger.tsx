@@ -13,9 +13,9 @@ class Dragger extends DraggerCore<DraggerProps, DraggerIterState> {
   onDragStart = (e: React.MouseEvent) => {
     const coordniate = this.getEventCoordinate(e);
     const res = this.props.onDragStart(e, { ...coordniate, deltaX: 0, deltaY: 0 });
-    if (res === false) return;
+    const drag = res === false;
     e.stopPropagation();
-    this._onMouseDown(e);
+    this._onMouseDown(e, !drag);
     this.last.x = coordniate.x;
     this.last.y = coordniate.y;
     this.mouseDownTime = e.timeStamp;
@@ -32,12 +32,12 @@ class Dragger extends DraggerCore<DraggerProps, DraggerIterState> {
 
   onDragEnd = (e: MouseEvent) => {
     e.stopPropagation();
+    const coordinates = this._onMouseUp(e);
     if (!this.dragging) {
       if (e.timeStamp - this.mouseDownTime < 180) {
         this.props.onClick?.(e);
       }
     } else {
-      const coordinates = this._onMouseUp(e);
       const data = this.processDrag(coordinates);
       this.props.onDragEnd(e, data);
     }

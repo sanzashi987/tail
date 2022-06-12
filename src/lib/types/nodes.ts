@@ -42,25 +42,25 @@ export type NodeProps<T extends Record<string, any> = {}> = {
   node: Node<T>;
   selected: boolean;
   hovered: boolean;
-  selectedHandles: Record<string, number>;
+  // selectedHandles: Record<string, number>;
   updateNodeHandles(): void;
   setContainerStyle(css: UpdaterType<CSSProperties>): void;
 };
 
 export interface NodeMouseInterface extends DraggerCallbacksType {
-  onNodeClick?: (e: MouseEvent, node: Node) => void;
-  onNodeContextMenu?: (e: React.MouseEvent, node: Node) => void;
+  onNodeClick?: (e: MouseEvent, node: NodeAtomState) => void;
+  onNodeContextMenu?: (e: React.MouseEvent, node: NodeAtomState) => void;
 }
 
 export type DraggerCallbacksType = {
-  onDragStart?: (e: MouseEvent, n: Node, c: DraggerData) => boolean | void;
+  onDragStart?: (e: React.MouseEvent, n: Node, c: DraggerData) => boolean | void;
   onDrag?: (e: MouseEvent, n: Node, c: DraggerData) => boolean | void;
   onDragEnd?: (e: MouseEvent, n: Node, c: DraggerData) => boolean | void;
 };
 
 export type NodeAtomRaw<T extends Record<string, any> = {}> = Omit<
   NodeProps<T>,
-  'updateNodeHandles'
+  'updateNodeHandles' | 'setContainerStyle'
 > & {
   handles: HandlesInfo;
   rect: Rect;

@@ -1,7 +1,7 @@
 import { CoordinateCalc } from '@lib/components/Dragger';
 import type {
   EdgeAtomState,
-  EdgeInProgressAtomType,
+  EdgeInProgressAtomState,
   EdgeTree,
   EdgeBasic,
   EdgeInProgressAtomUpdater,
@@ -74,7 +74,7 @@ function createEdgePayload(
 }
 
 function setTarget(x: number, y: number) {
-  return function (prev: EdgeInProgressAtomType) {
+  return function (prev: EdgeInProgressAtomState) {
     const next = { ...prev };
     [next.targetX, next.targetY] = [x, y];
     return next;
@@ -82,7 +82,7 @@ function setTarget(x: number, y: number) {
 }
 
 function setSource(x: number, y: number) {
-  return function (prev: EdgeInProgressAtomType) {
+  return function (prev: EdgeInProgressAtomState) {
     const next = { ...prev };
     [next.sourceX, next.sourceY] = [x, y];
     return next;
@@ -95,7 +95,7 @@ function createBasicConnect(
   y: number,
   nodeId: string,
   handleId: string,
-): EdgeInProgressAtomType {
+): EdgeInProgressAtomState {
   return {
     active: true,
     reconnect: false,
@@ -111,7 +111,7 @@ function createBasicConnect(
 
 function addReconnectToState(
   this: EdgeConnects,
-  state: EdgeInProgressAtomType,
+  state: EdgeInProgressAtomState,
   type: HandleType,
   prevEdgeId: string,
 ) {
@@ -157,15 +157,18 @@ function validateExistEdge(edgeBasic: EdgeBasic, edgeTree: EdgeTree) {
 
 class EdgeConnects {
   private dragger = new CoordinateCalc();
-  protected parser;
-  protected edgeAtomSetter;
-  protected edgeAtomGetter;
-  constructor(private core: TailCore) {
-    this.parser = core.context;
-    const { getter, setter } = this.parser.edgeUpdater;
-    this.edgeAtomSetter = (setter as unknown) as AtomSetter<EdgeInProgressAtomType>;
-    this.edgeAtomGetter = (getter as unknown) as AtomGetter<EdgeInProgressAtomType>;
+  constructor(private core: TailCore) {}
+  get parser() {
+    return this.core.context;
   }
+
+  edgeAtomSetter: AtomSetter<EdgeInProgressAtomState> = (atom, updater) => {
+    this.core.context.edgeUpdater.setter(atom as any, updater as any);
+  };
+  edgeAtomGetter: AtomGetter<EdgeInProgressAtomState> = (atom) => {
+    return this.core.context.edgeUpdater.getter(atom as any) as unknown as EdgeInProgressAtomState;
+  };
+
   onHandleMouseDown: ConnectMethodType = (e, type, nodeId, handleId) => {
     //only edge active will try reconnect
     let newType = type;

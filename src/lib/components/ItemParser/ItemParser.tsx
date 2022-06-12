@@ -24,10 +24,10 @@ const ItemParser: FC<ItemParserProps> = ({ nodes, edges, activeEdges, activeNode
     differ.current.edgeUpdater.diff(edges);
   }, [edges]);
   useEffect(() => {
-    actives.current.nodeSelector.diff(activeNodes);
+    actives.current.nodeSelector.diff(activeNodes!);
   }, [activeNodes]);
   useEffect(() => {
-    actives.current.edgeSelector.diff(activeEdges);
+    actives.current.edgeSelector.diff(activeEdges!);
   }, [activeEdges]);
 
   const ctx = useMemo(
@@ -39,6 +39,11 @@ const ItemParser: FC<ItemParserProps> = ({ nodes, edges, activeEdges, activeNode
   );
 
   return <ParserProvider value={ctx}>{children}</ParserProvider>;
+};
+
+ItemParser.defaultProps = {
+  activeEdges: [],
+  activeNodes: [],
 };
 
 export default ItemParser;

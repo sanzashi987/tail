@@ -12,7 +12,7 @@ export const defaultRect = {
 const createDefaultNodeDescriber = () => ({
   hovered: false,
   selected: false,
-  selectedHandles: {},
+  // selectedHandles: {},
   handles: {
     source: {},
     target: {},

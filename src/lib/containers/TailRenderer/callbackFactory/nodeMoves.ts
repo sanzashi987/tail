@@ -17,9 +17,10 @@ function createNodeDeltaMove(deltaX: number, deltaY: number) {
 class NodeMoves {
   constructor(private core: TailCore) {}
   private nodes: Set<string> = new Set();
-  batchNodeDragStart = (e: MouseEvent, n: Node, d: DraggerData) => {
+  batchNodeDragStart = (e: React.MouseEvent, n: Node, d: DraggerData) => {
     this.nodes = new Set(this.core.context.nodeSelector.currentItems);
-    this.core.props.onDragStart?.(e, n, d);
+    if (!this.nodes.has(n.id)) return false;
+    return this.core.props.onDragStart?.(e, n, d);
   };
 
   batchNodeDrag = (e: MouseEvent, n: Node, d: DraggerData) => {
