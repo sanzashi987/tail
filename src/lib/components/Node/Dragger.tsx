@@ -32,12 +32,13 @@ class Dragger extends DraggerCore<DraggerProps, DraggerIterState> {
 
   onDragEnd = (e: MouseEvent) => {
     e.stopPropagation();
-    const coordinates = this._onMouseUp(e);
     if (!this.dragging) {
+      this._onMouseUp(e);
       if (e.timeStamp - this.mouseDownTime < 180) {
         this.props.onClick?.(e);
       }
     } else {
+      const coordinates = this._onMouseUp(e);
       const data = this.processDrag(coordinates);
       this.props.onDragEnd(e, data);
     }

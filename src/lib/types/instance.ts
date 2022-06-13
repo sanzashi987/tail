@@ -38,7 +38,7 @@ export type TailCoreOptionalProps = {
   connectingEdge?: ComponentType<EdgeBasicProps>;
   quickNodeUpdate?: boolean;
   lazyRenderNodes?: boolean;
-  onDelete?(nodes: string[], edges: string[]): void; //come with id array
+  // onDelete?(nodes: string[], edges: string[]): void; //come with id array
   onSelect?(e: MouseEvent, nodes: string[]): void;
 } & NodeMutation &
   EdgeMutation &

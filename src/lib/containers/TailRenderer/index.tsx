@@ -77,10 +77,9 @@ class TailCore extends Component<TailCoreProps> {
   };
 
   onSelectEnd: SelectCallback = (e, topLeft, bottomRight, offset, scale) => {
-    const { getAtoms, getState } = this.context.nodeUpdater;
     const res = getInsideIds(
-      Object.keys(getAtoms()),
-      getState,
+      Object.keys(this.context.nodeUpdater.getAtoms()),
+      this.context.nodeUpdater.getState,
       topLeft,
       bottomRight,
       offset,

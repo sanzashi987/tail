@@ -113,7 +113,7 @@ function Overview() {
         onEdgeCreate={onEdgeCreate}
         onEdgeUpdate={noop}
         onEdgeContextMenu={noop}
-        onDelete={noop}
+        // onDelete={noop}
         nodeTemplates={{}}
         edgeTemplates={{}}
         markerTemplates={{}}
