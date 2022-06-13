@@ -24,7 +24,7 @@
     "downlevelIteration": true,
     "noImplicitThis": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "Classic",
     "resolveJsonModule": true,
     // "isolatedModules": true,
     // "emitDeclarationOnly": true,
@@ -33,6 +33,7 @@
     "outDir": "dist/esm",
     "declaration": true,
     "declarationDir": "./dist/esm/",
+    "removeComments": true,
     "jsx": "react-jsx",
     "paths": {
       "@lib/*": [
@@ -43,6 +44,6 @@
   },
   "include": [
     "src/lib",
-    "src/examples"
+    // "src/examples"
   ]
 }

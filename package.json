@@ -115,7 +115,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build2": "node scripts/build.js",
-    "build": "rollup -c --environment NODE_ENV:production && node node_modules/tsc-alias/dist/bin/index.js",
+    "build": "rollup -c --environment NODE_ENV:production && npx tsc-alias",
     "test": "node scripts/test.js",
     "release": "dotenv release-it"
   },
