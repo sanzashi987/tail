@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import type { ComponentType, CSSProperties } from 'react';
 import type { JotaiImmerAtom, AtomForceRender } from './jotai';
-import { UpdaterType } from './instance';
-import type { HandlesInfo, DraggerData, Rect } from '.';
+import type { UpdaterType, HandlesInfo } from './instance';
+import type { DraggerData, Rect } from './dragger';
 
 export type Node<T extends Record<string, any> = {}> = {
   id: string;

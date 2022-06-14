@@ -1,5 +1,6 @@
 import React, { CSSProperties } from 'react';
-import type { coordinates, UpdaterType } from '.';
+import type { coordinates } from './dragger';
+import type { UpdaterType } from './instance';
 
 export enum SelectModeType {
   single = 'single',

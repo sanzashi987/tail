@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
-import { JotaiImmerAtom } from './jotai';
-import { Box, NodeAtomState } from '.';
+import type { JotaiImmerAtom } from './jotai';
+import type { Box } from './dragger';
+import type { NodeAtomState } from './nodes';
 
 export type MinimapProps = {
   activeColor?: string;
