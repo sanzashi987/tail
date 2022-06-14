@@ -1,5 +1,5 @@
 import React, { Component, createRef } from 'react';
-import {
+import type {
   MinimapProps,
   MinimapState,
   Box,
@@ -10,10 +10,10 @@ import {
   MapBoundary,
   DraggerData,
   MapContainerState,
+  JotaiImmerAtom,
 } from '@lib/types';
 import { ViewerContext } from '@lib/contexts/viewer';
 import { isNotNum } from '@lib/utils';
-import { JotaiImmerAtom } from '@lib/types/jotai';
 import BasicRenderer from '@lib/containers/BasicRenderer';
 import styles from './index.module.scss';
 import MiniNode from './MiniNode';
@@ -50,12 +50,9 @@ class MapContainer extends Component<MapContainerProps, MapContainerState> {
             x2: sortedX[sortedX.length - 1],
             y2: sortedY[sortedY.length - 1],
           });
-    const {
-      x: boundaryX,
-      y: boundaryY,
-      width: boundaryWidth,
-      height: boundaryHeight,
-    } = toRect(boundaryBox);
+    const { x: boundaryX, y: boundaryY, width: boundaryWidth, height: boundaryHeight } = toRect(
+      boundaryBox,
+    );
     const maxRatio = Math.max(boundaryWidth / width!, boundaryHeight / height!);
     const [vw, vh] = [width! * maxRatio, height! * maxRatio];
     const left = boundaryX - (vw - boundaryWidth) / 2;

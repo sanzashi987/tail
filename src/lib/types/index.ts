@@ -5,3 +5,4 @@ export * from './dragger';
 export * from './instance';
 export * from './viewer';
 export * from './minimap';
+export * from './jotai';

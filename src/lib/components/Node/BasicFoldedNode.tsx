@@ -1,4 +1,4 @@
-import React, { Component, ComponentType } from 'react';
+import React, { Component } from 'react';
 import type { NodeProps } from '@lib/types';
 import styles from './BasicNode.module.scss';
 import Handle from '../Handle';
