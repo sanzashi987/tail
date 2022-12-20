@@ -104,10 +104,10 @@
     "workbox-webpack-plugin": "^6.4.1"
   },
   "dependencies": {
-    "eventemitter3": "^4.0.7",
-    "immer": "^9.0.14",
-    "jotai": "^1.7.0",
-    "lodash.debounce": "^4.0.8"
+    "eventemitter3": "4.0.7",
+    "immer": "9.0.14",
+    "jotai": "1.7.0",
+    "lodash.debounce": "4.0.8"
   },
   "peerDependencies": {
     "react": "^17.0.2",
