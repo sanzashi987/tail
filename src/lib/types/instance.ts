@@ -1,5 +1,9 @@
 import React, { ComponentType, ReactNode } from 'react';
-import { EdgeUpdater, ItemSelector, NodeUpdater } from '@lib/components/ItemParser/itemUpdater';
+import type {
+  EdgeUpdater,
+  ItemSelector,
+  NodeUpdater,
+} from '@lib/components/ItemParser/itemUpdater';
 import {
   Node,
   NodeAtomState,
@@ -7,7 +11,7 @@ import {
   NodeTemplatesType,
   TemplatePickerType,
 } from './nodes';
-import {
+import type {
   Edge,
   EdgeBasicProps,
   EdgeTree,
@@ -20,7 +24,6 @@ import {
 } from './edges';
 import type { ViewerInterface, SelectModeType } from './viewer';
 import type { HandleElement, HandleType } from './handles';
-import type { MouseEventCollection } from './dragger';
 
 export type CoreMethods = {
   switchMode(m: SelectModeType): void;

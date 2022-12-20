@@ -1,4 +1,4 @@
-import { Box, Rect } from '@lib/types';
+import type { Box, Rect } from '@lib/types';
 
 export function binarySearch(sortedArr: number[], val: number) {
   let minIndex = 0,

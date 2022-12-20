@@ -1,11 +1,4 @@
-import type {
-  Edge,
-  EdgeTree,
-  NodeAtom,
-  NodeAtomState,
-  NodeAtomsType,
-  UpdaterType,
-} from '@lib/types';
+import type { Edge, EdgeTree } from '@lib/types';
 import type { Draft } from 'immer';
 import type { ItemUpdater } from './itemUpdater';
 

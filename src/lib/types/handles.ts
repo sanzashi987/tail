@@ -1,4 +1,4 @@
-import type { Rect } from '.';
+import type { Rect } from './dragger';
 
 export type HandleType = 'target' | 'source';
 

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { ImmerUpdater, JotaiImmerAtom } from '@lib/types/jotai';
+import type { ImmerUpdater, JotaiImmerAtom } from '@lib/types/jotai';
 import { useAtomCallback } from 'jotai/utils';
 
 export function useAtomSetter() {
@@ -14,6 +14,6 @@ export function useAtomSetter() {
 export function useAtomGetter() {
   const atomGetter = useAtomCallback<any, any>(useCallback((get, set, arg) => get(arg), []));
   return useCallback(<T>(atom: JotaiImmerAtom<T>) => {
-    return atomGetter(atom) as unknown as T;
+    return (atomGetter(atom) as unknown) as T;
   }, []);
 }
