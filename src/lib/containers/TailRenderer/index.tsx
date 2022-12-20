@@ -9,7 +9,6 @@ import type {
   SelectCallback,
 } from '@lib/types';
 import { ParserContext, InterfaceProvider } from '@lib/contexts';
-import { noop } from '@lib/utils/converter';
 import { NodeMoves, EdgeConnects } from './callbackFactory';
 import { getInsideIds } from './helpers';
 import ItemParser from '../../components/ItemParser';

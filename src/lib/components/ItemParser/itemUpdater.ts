@@ -21,7 +21,7 @@ import {
 
 export abstract class ItemUpdater<
   PropsState extends { id: string },
-  AtomState
+  AtomState,
 > extends EventEmitter {
   protected atoms: Record<string, JotaiImmerAtom<AtomState>> = {};
   protected currentItems: Record<string, PropsState> = {};
@@ -32,14 +32,16 @@ export abstract class ItemUpdater<
       if (eventName === 'mount') {
         const { currentItems: lastItems, atoms: itemAtoms } = this;
         Object.entries(itemAtoms).forEach(([id, atom]) => {
-          requestIdleCallback(() => {
+          Promise.resolve().then(() => {
             listener(lastItems[id], atom);
           });
+          // requestIdleCallback();
         });
       } else if (eventName === 'rerender') {
-        requestIdleCallback(() => {
+        Promise.resolve().then(() => {
           listener();
         });
+        // requestIdleCallback();
       }
       _on.call(this, eventName, listener);
       return this;
