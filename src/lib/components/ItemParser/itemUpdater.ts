@@ -76,9 +76,8 @@ export abstract class ItemUpdater<
   }
 
   private rerender() {
-    requestIdleCallback(() => {
-      this.emit('rerender');
-    });
+    this.emit('rerender');
+    // requestIdleCallback(() => {});
   }
 
   protected deleteItem(item: PropsState) {
