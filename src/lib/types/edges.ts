@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import React, { ComponentType, CSSProperties } from 'react';
 import type { ImmerUpdater, JotaiImmerAtom, AtomForceRender } from './jotai';
-import type { HandleType } from './handles';
+import type { DescriberType, HandleType } from './handles';
 import type { UpdaterType } from './instance';
 
 export type EdgeBasic = {
   source: string;
   sourceNode: string;
+  sourceDescriber?: DescriberType;
   target: string;
   targetNode: string;
+  targetDescriber?: DescriberType;
 };
 
 export type Edge<T extends Record<string, any> = {}> = {
@@ -80,6 +82,7 @@ export type EdgeInProgressAtomState = {
   active: boolean;
   reconnect: boolean;
   prevEdgeId?: string;
+  describer?: DescriberType;
 } & EdgeBasicProps;
 
 export type EdgeInProgressAtomUpdater = (updater: ImmerUpdater<EdgeInProgressAtomState>) => void;
@@ -116,3 +119,8 @@ export type MarkerDefsProps = {
   markers?: Marker[];
   markerTemplates?: MarkerTemplatesType;
 };
+
+export enum EdgeConnectResult {
+  allow = 'allow',
+  notAllow = 'notAllow',
+}

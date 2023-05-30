@@ -24,6 +24,7 @@ import type {
 } from './edges';
 import type { ViewerInterface, SelectModeType } from './viewer';
 import type { HandleElement, HandleType } from './handles';
+import { coordinates } from './dragger';
 
 export type CoreMethods = {
   switchMode(m: SelectModeType): void;
@@ -31,6 +32,7 @@ export type CoreMethods = {
   focusNode(id: string): void;
   getEdgeTree(): EdgeTree;
   moveViewCenter(x: number, y: number): void;
+  getOffSet(): coordinates;
 };
 
 export type TailCoreOptionalProps = {
@@ -91,6 +93,7 @@ export type ConnectMethodType = (
   type: HandleType,
   nodeId: string,
   handleId: string,
+  desciber?: Record<string, any>,
 ) => void;
 export interface InterfaceValue extends GeneralMethods {
   edge: EdgeMouseInterface;

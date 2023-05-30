@@ -19,6 +19,8 @@ import MarkerDefs from '../MarkerDefs';
 import '@lib/styles/index.scss';
 
 class TailCore extends Component<TailCoreProps> {
+  static offsetFallback = { x: 0, y: 0 };
+
   static defaultProps = {
     quickNodeUpdate: true,
     lazyRenderNodes: true,
@@ -54,6 +56,8 @@ class TailCore extends Component<TailCoreProps> {
   }
 
   getScale = () => this.viewer.current?.getScale() || 1;
+
+  getOffset = () => this.viewer.current?.getOffset();
 
   setScale = (scale: number) => {
     this.viewer.current?.setScale(scale);
@@ -129,6 +133,7 @@ const Tail = forwardRef<CoreMethods, TailProps>(
         focusNode: (i) => coreRef.current?.focusNode(i),
         getEdgeTree: () => coreRef.current?.context.edgeUpdater.edgeTree ?? new Map(),
         moveViewCenter: (x, y) => coreRef.current?.viewer.current?.moveCamera(x, y),
+        getOffSet: () => coreRef.current?.getOffset() ?? TailCore.offsetFallback,
       }),
       [],
     );

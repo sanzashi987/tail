@@ -70,7 +70,7 @@ function createEdgePayload(
     [storedHandle]: handleIdStored,
     [to]: handleId,
     [toNode]: nodeId,
-  } as EdgeBasic;
+  } as unknown as EdgeBasic;
 }
 
 function setTarget(x: number, y: number) {
@@ -169,7 +169,7 @@ class EdgeConnects {
     return this.core.context.edgeUpdater.getter(atom as any) as unknown as EdgeInProgressAtomState;
   };
 
-  onHandleMouseDown: ConnectMethodType = (e, type, nodeId, handleId) => {
+  onHandleMouseDown: ConnectMethodType = (e, type, nodeId, handleId, describer) => {
     //only edge active will try reconnect
     let newType = type;
     const { edgeTree } = this.parser.edgeUpdater;
@@ -199,7 +199,7 @@ class EdgeConnects {
     });
   };
 
-  onHandleMouseUp: ConnectMethodType = (e, type, nodeId, handleId) => {
+  onHandleMouseUp: ConnectMethodType = (e, type, nodeId, handleId, describer) => {
     e.stopPropagation();
     const {
       active,
@@ -208,6 +208,7 @@ class EdgeConnects {
       to,
       nodeId: storedNode,
       handleId: storedHandle,
+      
     } = this.edgeAtomGetter(edgeInProgressAtom);
     block: {
       if (to === type && active) {

@@ -52,6 +52,10 @@ class InfiniteViewer extends Component<InfiniteViewerProps, InfiniteViewerState>
     this.setState({ scale });
   };
 
+  getOffset = () => {
+    return { ...this.state.offset };
+  };
+
   getScale = () => {
     return this.state.scale;
   };

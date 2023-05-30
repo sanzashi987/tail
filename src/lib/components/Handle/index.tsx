@@ -12,25 +12,28 @@ function getHanldeClassName(type: string, selected: boolean) {
 }
 class Handle extends Component<HandlePropsInner> {
   static contextType = InstanceInterface;
-  context!: InterfaceValue;
+  declare context: InterfaceValue;
+
   onMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const { type, handleId, nodeId } = this.props;
-    this.context.handle.onMouseDown(e, type, nodeId, handleId);
+    const { type, handleId, nodeId, describer } = this.props;
+    this.context.handle.onMouseDown(e, type, nodeId, handleId, describer);
   };
 
   onMouseUp = (e: React.MouseEvent) => {
-    const { type, handleId, nodeId } = this.props;
+    const { type, handleId, nodeId, describer } = this.props;
     e.stopPropagation();
-    this.context.handle.onMouseUp(e, type, nodeId, handleId);
+    this.context.handle.onMouseUp(e, type, nodeId, handleId, describer);
+  };
+
+  handlers = {
+    onMouseDown: this.onMouseDown,
+    onMouseUp: this.onMouseUp,
   };
 
   applyMouseActions = () => {
     if (this.props.disable) return {};
-    return {
-      onMouseDown: this.onMouseDown,
-      onMouseUp: this.onMouseUp,
-    } as const;
+    return this.handlers;
   };
 
   render() {
@@ -40,8 +43,6 @@ class Handle extends Component<HandlePropsInner> {
         data-node-id={nodeId}
         data-handle-id={handleId}
         className={getHanldeClassName(type, selected)}
-        // onMouseDown={this.onMouseDown}
-        // onMouseUp={this.onMouseUp}
         {...this.applyMouseActions()}
       ></div>
     );
