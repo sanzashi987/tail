@@ -10,6 +10,7 @@ export type EdgeBasic = {
   sourceDescriber?: DescriberType;
   target: string;
   targetNode: string;
+  targetDescriber?: DescriberType;
 };
 
 export type Edge<T extends Record<string, any> = {}> = {

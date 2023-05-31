@@ -245,6 +245,7 @@ class EdgeConnects {
       nodeId: storedNode,
       handleId: storedHandle,
       describer: storedDescriber,
+      pairedStatus,
     } = this.edgeAtomGetter(edgeInProgressAtom);
     block: {
       if (to === type && active) {
@@ -264,11 +265,11 @@ class EdgeConnects {
           if (!edgeState) break block;
           const { [type]: prevHandleId, [toNode]: prevNodeId } = edgeState.edge;
           if ((prevHandleId !== handleId || prevNodeId !== nodeId) && isNotExist) {
-            this.core.props.onEdgeUpdate?.(prevEdgeId, newPayload);
+            this.core.props.onEdgeUpdate?.(prevEdgeId, newPayload, pairedStatus);
           }
           this.parser.edgeUpdater.setState(prevEdgeId, disableEdgeReconnect);
         } else if (isNotExist) {
-          this.core.props.onEdgeCreate?.(newPayload);
+          this.core.props.onEdgeCreate?.(newPayload, pairedStatus);
         }
       }
     }

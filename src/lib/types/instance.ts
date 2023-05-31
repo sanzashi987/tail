@@ -80,13 +80,13 @@ export type HandleAttribute = {
 };
 
 export interface EdgeMutation {
-  onEdgeCreate?(edgeBasic: EdgeBasic): void;
+  onEdgeCreate?(edgeBasic: EdgeBasic, pairedStatus: EdgePairedResult | null): void;
   /**
    * trigger when rewiring an edge
    * @param id previous edge id
    * @param edgeBasic next edge instance object
    */
-  onEdgeUpdate?(id: string, edgeBasic: EdgeBasic): void;
+  onEdgeUpdate?(id: string, edgeBasic: EdgeBasic, pairedStatus: EdgePairedResult | null): void;
   /**
    * when connecting two handles, an eligible edge is ready to be created if two handles
    * are in the pair (type `source` to type `target`) before user releasing the mouse,
@@ -94,7 +94,7 @@ export interface EdgeMutation {
    * and the returned result in type of `EdgePairedResult` will be set to the `pairedStatus`
    * in the props of `EdgeInProgress` Component.
    *
-   * if the callback is not provided/ or no explicit value is returned, 
+   * if the callback is not provided/ or no explicit value is returned,
    * a default value `EdgePairedResult.allow` wil be applied
    * @param sourceHandle
    * @param targetHandle
