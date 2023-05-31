@@ -1,7 +1,7 @@
 # tail-js
 A React &amp; Atom-based, data driven flow chart editor
 
-# start the dev-server
+## start the dev-server
 clone the repo and cd to the project's root
 ```shell
 npm run start
