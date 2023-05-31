@@ -1,30 +1,24 @@
-import React, { ComponentType, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import type {
   EdgeUpdater,
   ItemSelector,
   NodeUpdater,
 } from '@lib/components/ItemParser/itemUpdater';
-import {
-  Node,
-  NodeAtomState,
-  NodeMouseInterface,
-  NodeTemplatesType,
-  TemplatePickerType,
-} from './nodes';
+import type { Node, NodeAtomState, NodeMouseInterface, NodeRendererProps } from './nodes';
 import type {
   Edge,
-  EdgeBasicProps,
   EdgeTree,
   EdgeAtomState,
   EdgeBasic,
   EdgeMouseInterface,
   MarkerDefsProps,
-  EdgeTemplatesType,
   MarkerTemplatesType,
+  EdgePairedResult,
+  EdgeRendererProps,
 } from './edges';
 import type { ViewerInterface, SelectModeType } from './viewer';
-import type { HandleElement, HandleType } from './handles';
-import { coordinates } from './dragger';
+import type { DescriberType, HandleElement, HandleType } from './handles';
+import type { coordinates } from './dragger';
 
 export type CoreMethods = {
   switchMode(m: SelectModeType): void;
@@ -36,11 +30,11 @@ export type CoreMethods = {
 };
 
 export type TailCoreOptionalProps = {
-  nodeTemplates?: NodeTemplatesType;
-  edgeTemplates?: EdgeTemplatesType;
+  nodeTemplates?: NodeRendererProps['templates'];
+  edgeTemplates?: EdgeRendererProps['templates'];
   markerTemplates?: MarkerTemplatesType;
-  nodeTemplatePicker?: TemplatePickerType;
-  connectingEdge?: ComponentType<EdgeBasicProps>;
+  nodeTemplatePicker?: NodeRendererProps['templatePicker'];
+  connectingEdge?: NonNullable<EdgeRendererProps['connectingEdge']>;
   quickNodeUpdate?: boolean;
   lazyRenderNodes?: boolean;
   // onDelete?(nodes: string[], edges: string[]): void; //come with id array
@@ -71,9 +65,41 @@ export interface NodeMutation {
   onNodeUpdate?(id: Node[]): void;
 }
 
+// type HandlePayload<T extends 'source' | 'target'> = {
+//   [F in NonNullable<
+//     {
+//       [Key in keyof EdgeBasic]: Key extends `${T}${infer X}` ? Key : never;
+//     }[keyof EdgeBasic]
+//   >]: EdgeBasic[F];
+// };
+
+export type HandleAttribute = {
+  handleId: string;
+  nodeId: string;
+  describer?: DescriberType;
+};
+
 export interface EdgeMutation {
   onEdgeCreate?(edgeBasic: EdgeBasic): void;
+  /**
+   * trigger when rewiring an edge
+   * @param id previous edge id
+   * @param edgeBasic next edge instance object
+   */
   onEdgeUpdate?(id: string, edgeBasic: EdgeBasic): void;
+  /**
+   * when connecting two handles, an eligible edge is ready to be created if two handles
+   * are in the pair (type `source` to type `target`) before user releasing the mouse,
+   * the connecting edge under such condition will call the `onEdgePaired` callback,
+   * and the returned result in type of `EdgePairedResult` will be set to the `pairedStatus`
+   * in the props of `EdgeInProgress` Component.
+   *
+   * if the callback is not provided/ or no explicit value is returned, 
+   * a default value `EdgePairedResult.allow` wil be applied
+   * @param sourceHandle
+   * @param targetHandle
+   */
+  onEdgePaired?(sourceHandle: HandleAttribute, targetHandle: HandleAttribute): EdgePairedResult;
 }
 
 export type HandleMap = {
@@ -103,6 +129,8 @@ export interface InterfaceValue extends GeneralMethods {
 export interface HandleInterface {
   onMouseDown: ConnectMethodType;
   onMouseUp: ConnectMethodType;
+  onMouseEnter: ConnectMethodType;
+  onMouseLeave: ConnectMethodType;
 }
 
 export type UpdaterType<T> = T | ((currVal: T) => T);

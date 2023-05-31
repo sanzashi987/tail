@@ -1,15 +1,32 @@
 import { CoordinateCalc } from '@lib/components/Dragger';
-import type {
+import {
   EdgeAtomState,
   EdgeInProgressAtomState,
   EdgeTree,
   EdgeBasic,
   EdgeInProgressAtomUpdater,
+  EdgePairedResult,
 } from '@lib/types/edges';
-import { HandleType, ConnectMethodType, DraggerData, coordinates } from '@lib/types';
+import {
+  HandleType,
+  ConnectMethodType,
+  DraggerData,
+  coordinates,
+  HandleAttribute,
+} from '@lib/types';
 import { AtomGetter, AtomSetter } from '@lib/types/jotai';
 import { edgeInProgressAtom, edgeInProgressAtomDefault } from '@lib/atoms/edges';
 import type TailCore from '..';
+
+function allowEdgeInProgressStatus(prev: EdgeInProgressAtomState) {
+  prev.pairedStatus = EdgePairedResult.allow;
+}
+function forbidEdgeInProgressStatus(prev: EdgeInProgressAtomState) {
+  prev.pairedStatus = EdgePairedResult.notAllow;
+}
+function resetEdgeInProgressStatus(prev: EdgeInProgressAtomState) {
+  prev.pairedStatus = null;
+}
 
 function enableEdgeReconnect(prev: EdgeAtomState): EdgeAtomState {
   return {
@@ -41,10 +58,16 @@ const flipHandle = {
   source: 'target',
   target: 'source',
 } as const;
-const flipHandleNode = {
-  source: 'targetNode',
-  target: 'sourceNode',
+// const flipHandleNode = {
+//   source: 'targetNode',
+//   target: 'sourceNode',
+// } as const;
+
+const addHandleDescriber = {
+  source: 'sourceDescriber',
+  target: 'targetDescriber',
 } as const;
+
 const addHandleNode = {
   source: 'sourceNode',
   target: 'targetNode',
@@ -59,17 +82,27 @@ function createEdgePayload(
   to: HandleType,
   nodeId: string,
   handleId: string,
+  describer: Record<string, any> | undefined,
   nodeIdStored: string,
   handleIdStored: string,
+  describerStored: Record<string, any> | undefined,
 ) {
   const storedHandle = flipHandle[to];
-  const storedNode = flipHandleNode[to];
+  // const storedNode = flipHandleNode[to];
+  const storedNode = addHandleNode[storedHandle];
   const toNode = addHandleNode[to];
+
+  const describers = {
+    [addHandleDescriber[to]]: describer,
+    [addHandleDescriber[storedHandle]]: describerStored,
+  };
+
   return {
     [storedNode]: nodeIdStored,
     [storedHandle]: handleIdStored,
     [to]: handleId,
     [toNode]: nodeId,
+    ...Object.fromEntries(Object.entries(describers).filter(([k, v]) => !!v)),
   } as unknown as EdgeBasic;
 }
 
@@ -95,6 +128,7 @@ function createBasicConnect(
   y: number,
   nodeId: string,
   handleId: string,
+  describer?: Record<string, any>,
 ): EdgeInProgressAtomState {
   return {
     active: true,
@@ -106,6 +140,8 @@ function createBasicConnect(
     sourceY: y,
     targetX: x,
     targetY: y,
+    describer,
+    pairedStatus: null,
   };
 }
 
@@ -180,7 +216,7 @@ class EdgeConnects {
     const handleAbs = this.getHandleAbsCoordinate(nodeId, newType, handleId);
     if (!handleAbs) return;
     const { x, y } = handleAbs;
-    let basicState = createBasicConnect(newType, x, y, nodeId, handleId);
+    let basicState = createBasicConnect(newType, x, y, nodeId, handleId, describer);
     if (possibleEdge !== false) {
       // reconnect
       const res = addReconnectToState.call(this, basicState, newType, possibleEdge);
@@ -208,11 +244,19 @@ class EdgeConnects {
       to,
       nodeId: storedNode,
       handleId: storedHandle,
-      
+      describer: storedDescriber,
     } = this.edgeAtomGetter(edgeInProgressAtom);
     block: {
       if (to === type && active) {
-        const newPayload = createEdgePayload(to, nodeId, handleId, storedNode, storedHandle);
+        const newPayload = createEdgePayload(
+          to,
+          nodeId,
+          handleId,
+          describer,
+          storedNode,
+          storedHandle,
+          storedDescriber,
+        );
         const isNotExist = !validateExistEdge(newPayload, this.parser.edgeUpdater.edgeTree);
         if (reconnect && prevEdgeId) {
           const toNode = addHandleNode[type];
@@ -229,6 +273,48 @@ class EdgeConnects {
       }
     }
     this.connectReset();
+  };
+
+  onHandleMouseEnter: ConnectMethodType = (e, type, nodeId, handleId, describer) => {
+    const {
+      active,
+      to,
+      nodeId: storedNode,
+      handleId: storedHandle,
+      describer: storedDescriber,
+    } = this.edgeAtomGetter(edgeInProgressAtom);
+    if (to !== type || !active) return;
+    const args: [HandleAttribute, HandleAttribute] = [
+      {
+        handleId: storedHandle,
+        nodeId: storedNode,
+        describer: storedDescriber,
+      },
+      { handleId, nodeId, describer },
+    ];
+
+    const res = this.core.props.onEdgePaired?.apply(
+      this.core,
+      to === 'target' ? args : (args.reverse() as [HandleAttribute, HandleAttribute]),
+    );
+
+    switch (res) {
+      case EdgePairedResult.allow:
+        this.edgeInProgressUpdater(allowEdgeInProgressStatus);
+        break;
+      case EdgePairedResult.notAllow:
+        this.edgeInProgressUpdater(forbidEdgeInProgressStatus);
+        break;
+      default:
+        this.edgeInProgressUpdater(allowEdgeInProgressStatus);
+        break;
+    }
+  };
+
+  onHandleMouseLeave: ConnectMethodType = () => {
+    const { active, pairedStatus: status } = this.edgeAtomGetter(edgeInProgressAtom);
+    if (!active || status === null) return;
+    this.edgeInProgressUpdater(resetEdgeInProgressStatus);
   };
 
   private rollback = () => {

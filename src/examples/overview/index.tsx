@@ -112,6 +112,9 @@ function Overview() {
         onNodeContextMenu={noop}
         onEdgeCreate={onEdgeCreate}
         onEdgeUpdate={noop}
+        onEdgePaired={(a, b) => {
+          console.log('paired!', a, b);
+        }}
         onEdgeContextMenu={noop}
         // onDelete={noop}
         nodeTemplates={{}}

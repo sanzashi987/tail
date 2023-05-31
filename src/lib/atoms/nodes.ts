@@ -21,7 +21,7 @@ const createDefaultNodeDescriber = () => ({
   forceRender: 0,
 });
 
-export function createNodeAtom<T>(node: Node<T>) {
+export function createNodeAtom<T extends Record<string, any>>(node: Node<T>) {
   return atomWithImmer<NodeAtomState<T>>({
     node,
     ...createDefaultNodeDescriber(),

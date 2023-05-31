@@ -23,7 +23,7 @@ export type TemplateNodeClass = Record<string, NodeCom<any>>;
 export type TemplatePickerType = (node: Node<any>) => [string, string];
 
 export type NodeRendererProps = {
-  templates: Record<string, TemplateNodeClass>;
+  templates: NodeTemplatesType;
   templatePicker: TemplatePickerType;
 };
 
@@ -34,7 +34,7 @@ export type NodeAtomsType = Record<string, NodeAtom>;
 
 export type NodeWrapperProps<T extends Record<string, any> = {}> = {
   atom: NodeAtom<T>;
-  templates: Record<string, TemplateNodeClass>;
+  templates: NodeTemplatesType;
   templatePicker: TemplatePickerType;
 };
 

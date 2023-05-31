@@ -24,6 +24,7 @@ export const edgeInProgressAtomDefault = {
   to: 'target',
   nodeId: '',
   handleId: '',
+  pairedStatus: null,
   ...emptySourceTarget,
 } as const;
 

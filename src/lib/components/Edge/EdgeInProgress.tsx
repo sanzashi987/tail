@@ -8,10 +8,18 @@ const EdgeInProgress: FC<EdgeInProgressProps> = ({
   template: EdgeComponent = BasicEdge as any,
 }) => {
   const state = useAtomValue(edgeInProgressAtom);
-  const { active, sourceX, sourceY, targetX, targetY } = state;
+  const { active, sourceX, sourceY, targetX, targetY, pairedStatus } = state;
   // console.log(state);
   if (!active) return null;
-  return <EdgeComponent sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY={targetY} />;
+  return (
+    <EdgeComponent
+      sourceX={sourceX}
+      sourceY={sourceY}
+      targetX={targetX}
+      targetY={targetY}
+      pairedStatus={pairedStatus}
+    />
+  );
 };
 
 export default EdgeInProgress;

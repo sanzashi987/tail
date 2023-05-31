@@ -10,7 +10,6 @@ export type EdgeBasic = {
   sourceDescriber?: DescriberType;
   target: string;
   targetNode: string;
-  targetDescriber?: DescriberType;
 };
 
 export type Edge<T extends Record<string, any> = {}> = {
@@ -29,6 +28,8 @@ export type EdgeBasicProps = {
   targetY: number;
 };
 
+export type ConnectingEdgeProps = EdgeBasicProps & Pick<EdgeInProgressAtomState, 'pairedStatus'>;
+
 export type EdgeAtomStateRaw<T extends Record<string, any> = {}> = {
   edge: Edge<T>;
   selected: boolean;
@@ -42,9 +43,11 @@ export type EdgePropsFromWrapper = {
   setContainerStyle(css: UpdaterType<CSSProperties>): void;
 };
 
+export type TailEdgeCallback = (e: React.MouseEvent, edge: EdgeAtomState) => void;
+
 export interface EdgeMouseInterface {
-  onEdgeClick?: (e: React.MouseEvent, edge: EdgeAtomState) => void;
-  onEdgeContextMenu?: (e: React.MouseEvent, edge: EdgeAtomState) => void;
+  onEdgeClick?: TailEdgeCallback;
+  onEdgeContextMenu?: TailEdgeCallback;
 }
 
 export type EdgeAtomState<T extends Record<string, any> = {}> = EdgeAtomStateRaw<T> &
@@ -66,7 +69,7 @@ export type EdgeComponentPackType = {
 
 export type EdgeRendererProps = {
   templates: EdgeTemplatesType;
-  connectingEdge?: ComponentType<EdgeBasicProps>;
+  connectingEdge?: ComponentType<ConnectingEdgeProps>;
 };
 
 type NodeId = string;
@@ -83,12 +86,19 @@ export type EdgeInProgressAtomState = {
   reconnect: boolean;
   prevEdgeId?: string;
   describer?: DescriberType;
+  /**
+   * `null` indicates the edge in not under the paired status
+   *
+   * developers can use this field to apply responsive styles on their customized `EdgeInProgress`
+   * component to provide information to their users such as the connection of edge is legal or not
+   */
+  pairedStatus: EdgePairedResult | null;
 } & EdgeBasicProps;
 
 export type EdgeInProgressAtomUpdater = (updater: ImmerUpdater<EdgeInProgressAtomState>) => void;
 
 export type EdgeInProgressProps = {
-  template?: ComponentType<EdgeBasicProps>;
+  template?: EdgeRendererProps['connectingEdge'];
 };
 
 // markers
@@ -120,7 +130,7 @@ export type MarkerDefsProps = {
   markerTemplates?: MarkerTemplatesType;
 };
 
-export enum EdgeConnectResult {
+export enum EdgePairedResult {
   allow = 'allow',
   notAllow = 'notAllow',
 }

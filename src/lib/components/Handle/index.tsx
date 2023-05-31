@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import type { HandleProps, InterfaceValue } from '@lib/types';
+import { InstanceInterface } from '@lib/contexts/instance';
 import styles from './index.module.scss';
-import { InstanceInterface } from '../../contexts/instance';
 
 type HandlePropsInner = HandleProps;
 
@@ -12,23 +12,19 @@ function getHanldeClassName(type: string, selected: boolean) {
 }
 class Handle extends Component<HandlePropsInner> {
   static contextType = InstanceInterface;
-  declare context: InterfaceValue;
+  context!: InterfaceValue;
 
-  onMouseDown = (e: React.MouseEvent) => {
+  createContextHandler = (name: keyof InterfaceValue['handle']) => (e: React.MouseEvent) => {
     e.stopPropagation();
     const { type, handleId, nodeId, describer } = this.props;
-    this.context.handle.onMouseDown(e, type, nodeId, handleId, describer);
-  };
-
-  onMouseUp = (e: React.MouseEvent) => {
-    const { type, handleId, nodeId, describer } = this.props;
-    e.stopPropagation();
-    this.context.handle.onMouseUp(e, type, nodeId, handleId, describer);
+    this.context.handle[name](e, type, nodeId, handleId, describer);
   };
 
   handlers = {
-    onMouseDown: this.onMouseDown,
-    onMouseUp: this.onMouseUp,
+    onMouseDown: this.createContextHandler('onMouseDown'),
+    onMouseUp: this.createContextHandler('onMouseUp'),
+    onMouseEnter: this.createContextHandler('onMouseEnter'),
+    onMouseLeave: this.createContextHandler('onMouseLeave'),
   };
 
   applyMouseActions = () => {

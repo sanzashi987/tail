@@ -35,7 +35,8 @@ class TailCore extends Component<TailCoreProps> {
     super(props);
     const { onEdgeClick, onNodeClick, onEdgeContextMenu, onNodeContextMenu } = props;
     const { batchNodeDragStart, batchNodeDrag, batchNodeDragEnd } = new NodeMoves(this);
-    const { onHandleMouseUp, onHandleMouseDown } = new EdgeConnects(this);
+    const { onHandleMouseUp, onHandleMouseDown, onHandleMouseEnter, onHandleMouseLeave } =
+      new EdgeConnects(this);
 
     // context methods are not responsive
     this.Interface = {
@@ -50,6 +51,8 @@ class TailCore extends Component<TailCoreProps> {
       handle: {
         onMouseDown: onHandleMouseDown,
         onMouseUp: onHandleMouseUp,
+        onMouseEnter: onHandleMouseEnter,
+        onMouseLeave: onHandleMouseLeave,
       },
       getScale: this.getScale,
     };
