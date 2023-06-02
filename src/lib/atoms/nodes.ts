@@ -21,10 +21,14 @@ const createDefaultNodeDescriber = () => ({
   forceRender: 0,
 });
 
-export function createNodeAtom<T extends Record<string, any>>(node: Node<T>) {
+export function createNodeAtom<T extends Record<string, any>>(
+  node: Node<T>,
+  describerOverride: Partial<ReturnType<typeof createDefaultNodeDescriber>> = {},
+) {
   return atomWithImmer<NodeAtomState<T>>({
     node,
     ...createDefaultNodeDescriber(),
+    ...describerOverride,
   });
 }
 

@@ -44,7 +44,7 @@ function templatePicker(node: Node) {
 function Overview() {
   const [nodeState, setNodeState] = useState(nodes);
   const [edgeState, setEdgeState] = useState(edges);
-  const [activeNodes, setActiveNodes] = useState<string[]>([]);
+  const [activeNodes, setActiveNodes] = useState<string[]>(['id233']);
   const [activeEdges, setActiveEdges] = useState<string[]>([]);
   const onDrag = useCallback((e: any, n: Node, c: DraggerData) => {
     const { id } = n;

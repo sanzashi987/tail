@@ -1,3 +1,4 @@
+import type React from 'react';
 import type { NodeAtomState, Node, Edge, EdgeAtomState, EdgeTree } from '@lib/types';
 import type {
   AtomGetter,
@@ -9,15 +10,7 @@ import type {
 import { createNodeAtom } from '@lib/atoms/nodes';
 import { createEdgeAtom } from '@lib/atoms/edges';
 import EventEmitter from 'eventemitter3';
-import {
-  deleteItem,
-  mountItem,
-  registerChild,
-  removeChild,
-  updateItem,
-  selectItem,
-  unselectItem,
-} from './helpers';
+import { registerChild, removeChild, selectItem, unselectItem } from './helpers';
 
 export abstract class ItemUpdater<
   PropsState extends { id: string },
@@ -25,27 +18,28 @@ export abstract class ItemUpdater<
 > extends EventEmitter {
   protected atoms: Record<string, JotaiImmerAtom<AtomState>> = {};
   protected currentItems: Record<string, PropsState> = {};
-  constructor(public getter: AtomGetter<AtomState>, public setter: AtomSetter<AtomState>) {
+  constructor(
+    public getter: AtomGetter<AtomState>,
+    public setter: AtomSetter<AtomState>,
+    public activeSet: React.MutableRefObject<Set<string>>,
+  ) {
     super();
-    const { on: _on } = EventEmitter.prototype;
-    this.on = function (eventName: string | symbol, listener: (...args: any[]) => void) {
-      if (eventName === 'mount') {
-        const { currentItems: lastItems, atoms: itemAtoms } = this;
-        Object.entries(itemAtoms).forEach(([id, atom]) => {
-          Promise.resolve().then(() => {
-            listener(lastItems[id], atom);
-          });
-          // requestIdleCallback();
-        });
-      } else if (eventName === 'rerender') {
+  }
+
+  on<T extends string | symbol>(event: T, fn: (...args: any[]) => void, context?: any): this {
+    if (event === 'mount') {
+      const { currentItems: lastItems, atoms: itemAtoms } = this;
+      Object.entries(itemAtoms).forEach(([id, atom]) => {
         Promise.resolve().then(() => {
-          listener();
+          fn(lastItems[id], atom);
         });
-        // requestIdleCallback();
-      }
-      _on.call(this, eventName, listener);
-      return this;
-    };
+      });
+    } else if (event === 'rerender') {
+      Promise.resolve().then(() => {
+        fn();
+      });
+    }
+    return super.on.call(this, event, fn, context);
   }
 
   diff(next: Record<string, PropsState>) {
@@ -81,15 +75,20 @@ export abstract class ItemUpdater<
   }
 
   protected deleteItem(item: PropsState) {
-    deleteItem.call(this as any, item);
+    this.emit('delete', item);
+    delete this.atoms[item.id];
   }
 
   protected mountItem(item: PropsState) {
-    mountItem.call(this as any, item);
+    const atom = this.createAtom(item);
+    this.atoms[item.id] = atom;
+    this.emit('mount', item, atom);
   }
 
   protected updateItem(lastItem: PropsState, nextItem: PropsState) {
-    updateItem.call(this as any, lastItem, nextItem);
+    const updater = this.createAtomUpdater(nextItem);
+    this.setter(this.atoms[nextItem.id], updater);
+    this.emit('update');
   }
 
   getState = (id: string): AtomState | null => {
@@ -108,13 +107,17 @@ export abstract class ItemUpdater<
     return this.atoms;
   }
 
+  isActive(id: string) {
+    return { selected: this.activeSet.current.has(id) };
+  }
+
   abstract createAtom(item: PropsState): JotaiImmerAtom<AtomState>;
   abstract createAtomUpdater(item: PropsState): ImmerUpdater<AtomState>;
 }
 
 export class NodeUpdater extends ItemUpdater<Node, NodeAtomState> {
   createAtom(item: Node) {
-    return createNodeAtom(item);
+    return createNodeAtom(item, this.isActive(item.id));
   }
   createAtomUpdater(item: Node) {
     return (prev: NodeAtomState): NodeAtomState => ({ ...prev, node: item });
@@ -125,24 +128,24 @@ export class EdgeUpdater extends ItemUpdater<Edge, EdgeAtomState> {
   edgeTree: EdgeTree = new Map();
 
   createAtom(item: Edge) {
-    return createEdgeAtom(item);
+    return createEdgeAtom(item, this.isActive(item.id));
   }
   createAtomUpdater(item: Edge) {
     return (prev: EdgeAtomState): EdgeAtomState => ({ ...prev, edge: item });
   }
 
   protected deleteItem(item: Edge) {
-    deleteItem.call(this as any, item);
+    super.deleteItem(item);
     removeChild(this.edgeTree, item);
   }
   protected mountItem(item: Edge) {
-    mountItem.call(this as any, item);
+    super.mountItem(item);
     registerChild(this.edgeTree, item);
   }
   protected updateItem(lastItem: Edge, nextItem: Edge) {
     removeChild(this.edgeTree, lastItem);
     registerChild(this.edgeTree, nextItem);
-    updateItem.call(this as any, lastItem, nextItem);
+    super.updateItem(lastItem, nextItem);
   }
 }
 
