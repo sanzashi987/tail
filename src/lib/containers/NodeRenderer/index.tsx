@@ -12,6 +12,12 @@ class NodeRenderer extends BasicRenderer<NodeRendererProps> {
     this.context.nodeUpdater.on('rerender', this.updateMemoVNodes);
   }
 
+  componentWillUnmount(): void {
+    this.context.nodeUpdater.off('mount', this.mountNode);
+    this.context.nodeUpdater.off('delete', this.unmountNode);
+    this.context.nodeUpdater.off('rerender', this.updateMemoVNodes);
+  }
+
   mountNode = (node: Node, atom: NodeAtom) => {
     const { id } = node;
     const { templatePicker, templates } = this.props;

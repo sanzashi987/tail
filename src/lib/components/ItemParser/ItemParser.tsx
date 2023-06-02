@@ -4,41 +4,39 @@ import type { ItemParserProps } from '@lib/types';
 import { useAtomGetter, useAtomSetter } from '@lib/hooks/jotai';
 import { EdgeUpdater, ItemSelector, NodeUpdater } from './itemUpdater';
 
+const defaultSet = new Set<string>();
+
 const ItemParser: FC<ItemParserProps> = ({ nodes, edges, activeEdges, activeNodes, children }) => {
   const atomSetter = useAtomSetter();
   const atomGetter = useAtomGetter();
-  const differ = useRef({
-    nodeUpdater: new NodeUpdater(atomGetter, atomSetter),
-    edgeUpdater: new EdgeUpdater(atomGetter, atomSetter),
-  });
 
-  const actives = useRef({
-    nodeSelector: new ItemSelector(differ.current.nodeUpdater.setState),
-    edgeSelector: new ItemSelector(differ.current.edgeUpdater.setState),
-  });
+  const activeNodesSet = useRef<Set<string>>(defaultSet);
+  const activeEdgesSet = useRef<Set<string>>(defaultSet);
+
+  const parserContext = useMemo(() => {
+    const nodeUpdater = new NodeUpdater(atomGetter, atomSetter, activeNodesSet);
+    const edgeUpdater = new EdgeUpdater(atomGetter, atomSetter, activeEdgesSet);
+    const nodeSelector = new ItemSelector(nodeUpdater.setState);
+    const edgeSelector = new ItemSelector(edgeUpdater.setState);
+    return { nodeUpdater, edgeUpdater, nodeSelector, edgeSelector };
+  }, []);
 
   useEffect(() => {
-    differ.current.nodeUpdater.diff(nodes);
-  }, [nodes]);
-  useEffect(() => {
-    differ.current.edgeUpdater.diff(edges);
-  }, [edges]);
-  useEffect(() => {
-    actives.current.nodeSelector.diff(activeNodes!);
+    activeNodesSet.current = new Set(activeNodes!);
+    parserContext.nodeSelector.diff(activeNodes!);
   }, [activeNodes]);
   useEffect(() => {
-    actives.current.edgeSelector.diff(activeEdges!);
+    activeEdgesSet.current = new Set(activeEdges!);
+    parserContext.edgeSelector.diff(activeEdges!);
   }, [activeEdges]);
+  useEffect(() => {
+    parserContext.nodeUpdater.diff(nodes);
+  }, [nodes]);
+  useEffect(() => {
+    parserContext.edgeUpdater.diff(edges);
+  }, [edges]);
 
-  const ctx = useMemo(
-    () => ({
-      ...differ.current,
-      ...actives.current,
-    }),
-    [],
-  );
-
-  return <ParserProvider value={ctx}>{children}</ParserProvider>;
+  return <ParserProvider value={parserContext}>{children}</ParserProvider>;
 };
 
 ItemParser.defaultProps = {
