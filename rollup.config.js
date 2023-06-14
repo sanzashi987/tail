@@ -8,6 +8,7 @@ import typescript from 'rollup-plugin-typescript2';
 import { DEFAULT_EXTENSIONS as DEFAULT_BABEL_EXTENSIONS } from '@babel/core';
 import { visualizer } from 'rollup-plugin-visualizer';
 import alias from '@rollup/plugin-alias';
+import { terser } from 'rollup-plugin-terser';
 // import builtins from 'rollup-plugin-node-builtins';
 // import * as path from 'path';
 import pkg from './package.json';
@@ -43,6 +44,7 @@ export const baseConfig = ({ outputDir = 'dist/esm', injectCSS = true } = {}) =>
   },
 
   plugins: [
+    terser(),
     replace({
       __ENV__: JSON.stringify(processEnv),
       __TAIL_VERSION__: JSON.stringify(pkg.version),
