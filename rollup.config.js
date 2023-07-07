@@ -39,7 +39,9 @@ export const baseConfig = ({ outputDir = 'dist/esm', injectCSS = true } = {}) =>
   output: {
     dir: outputDir,
     // file: path.resolve(__dirname, outputDir, 'index.js'),
-    format: 'esm',
+    // name: 'tail',
+    // format: 'umd',
+    format: 'esm'
     // sourcemap: true,
   },
 

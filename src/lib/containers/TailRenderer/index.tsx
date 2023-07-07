@@ -27,7 +27,7 @@ class TailCore extends Component<TailCoreProps> {
   };
   static contextType = ParserContext;
 
-  context!: ItemParserInterface;
+  declare context: ItemParserInterface;
   viewer = createRef<InfiniteViewer>();
   Interface: InterfaceValue;
 
