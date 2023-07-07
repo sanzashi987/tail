@@ -23,7 +23,7 @@ import { CoordinateCalc } from '../Dragger';
 const { 'minimap-wrapper': c } = styles;
 class MapContainer extends Component<MapContainerProps, MapContainerState> {
   static contextType = ViewerContext;
-  context!: ViewerContextType;
+  declare context: ViewerContextType;
   state = { lockBoundary: false };
 
   dragger = new CoordinateCalc();
@@ -50,9 +50,12 @@ class MapContainer extends Component<MapContainerProps, MapContainerState> {
             x2: sortedX[sortedX.length - 1],
             y2: sortedY[sortedY.length - 1],
           });
-    const { x: boundaryX, y: boundaryY, width: boundaryWidth, height: boundaryHeight } = toRect(
-      boundaryBox,
-    );
+    const {
+      x: boundaryX,
+      y: boundaryY,
+      width: boundaryWidth,
+      height: boundaryHeight,
+    } = toRect(boundaryBox);
     const maxRatio = Math.max(boundaryWidth / width!, boundaryHeight / height!);
     const [vw, vh] = [width! * maxRatio, height! * maxRatio];
     const left = boundaryX - (vw - boundaryWidth) / 2;

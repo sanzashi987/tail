@@ -12,7 +12,7 @@ function getHanldeClassName(type: string, selected: boolean) {
 }
 class Handle extends Component<HandlePropsInner> {
   static contextType = InstanceInterface;
-  context!: InterfaceValue;
+  declare context: InterfaceValue;
 
   createContextHandler = (name: keyof InterfaceValue['handle']) => (e: React.MouseEvent) => {
     e.stopPropagation();
