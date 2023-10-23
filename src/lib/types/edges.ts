@@ -76,7 +76,8 @@ export type EdgeRendererProps = {
 type NodeId = string;
 type HandleId = string;
 type EdgeId = string;
-export type EdgeTree = Map<NodeId, Map<HandleId, Map<EdgeId, EdgeId>>>;
+export type HandleTree = Map<HandleId, Map<EdgeId, Edge>>;
+export type EdgeTree = Map<NodeId, HandleTree>;
 
 // edge in progress
 export type EdgeInProgressAtomState = {

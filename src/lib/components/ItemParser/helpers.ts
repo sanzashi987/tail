@@ -1,4 +1,4 @@
-import type { Edge, EdgeTree } from '@lib/types';
+import type { Edge, EdgeTree, HandleTree } from '@lib/types';
 import type { Draft } from 'immer';
 
 export function removeChild(edgeTree: EdgeTree, edge: Edge) {
@@ -7,22 +7,28 @@ export function removeChild(edgeTree: EdgeTree, edge: Edge) {
   edgeTree.get(targetNode)?.get(target)?.delete(id);
 }
 
-function ensureParent(tree: Map<string, any>, parentId: string) {
+function ensureParent<T extends Map<string, any>>(tree: T, parentId: string) {
   if (tree.get(parentId) === undefined) {
     tree.set(parentId, new Map());
   }
   return tree.get(parentId)!;
 }
 
-function setChild(edgeTree: EdgeTree, nodeId: string, handleId: string, edgeId: string) {
-  const nodeMap = ensureParent(edgeTree, nodeId);
-  ensureParent(nodeMap, handleId).set(edgeId, edgeId);
+function setChild(
+  edgeTree: EdgeTree,
+  nodeId: string,
+  handleId: string,
+  edgeId: string,
+  edge: Edge,
+) {
+  const nodeMap = ensureParent<EdgeTree>(edgeTree, nodeId);
+  ensureParent<HandleTree>(nodeMap, handleId).set(edgeId, edge);
 }
 
 export function registerChild(edgeTree: EdgeTree, edge: Edge) {
   const { source, sourceNode, target, targetNode, id } = edge;
-  setChild(edgeTree, sourceNode, source, id);
-  setChild(edgeTree, targetNode, target, id);
+  setChild(edgeTree, sourceNode, source, id, edge);
+  setChild(edgeTree, targetNode, target, id, edge);
 }
 
 export function selectItem(draft: Draft<any>) {

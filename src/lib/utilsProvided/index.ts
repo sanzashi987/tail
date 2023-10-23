@@ -13,7 +13,7 @@ export const getConnectedEdgeByNode = (nodeId: string, edgeTree: EdgeTree) => {
   if (!handles) return [];
 
   const res = [...handles].reduce<string[]>((last, handle) => {
-    return last.concat([...handle.values()]);
+    return last.concat([...handle.values()].map((e) => e.id));
   }, []);
   return res;
 };

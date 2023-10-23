@@ -1,4 +1,4 @@
-import type { coordinates, Node, NodeAtomState } from '..';
+import type { coordinates, EdgeTree, Node, NodeAtom, NodeAtomState } from '..';
 
 type Options = {
   brushSize: number;
@@ -34,8 +34,10 @@ const step = (
       if (cb(node, i / iterNum)) {
         changed = true;
       }
-      newCenter.x += node.left;
-      newCenter.y += node.top;
+      const { x, y } = getGlobalLocation(node);
+
+      newCenter.x += x;
+      newCenter.y += y;
       nodeCount += 1;
     }
 
@@ -54,10 +56,34 @@ const step = (
   }
 };
 
+const getGlobalLocation = (node: Node) => {
+  return { x: node.left, y: node.top };
+};
+
 const arrangeRelax = (
   node: Node,
+  nodeAtom: NodeAtomState,
+  edgeTree: EdgeTree,
   influence: number,
   relaxPower: number,
   distance: number,
   clampedPull: boolean,
-) => {};
+) => {
+  const globalLoc = getGlobalLocation(node);
+
+  let offset = { x: 0, y: 0 };
+
+  let tarY = 0,
+    tarXIn = clampedPull ? globalLoc.x : 0,
+    linkCnt = 0,
+    hasInput = false;
+
+  for (const handle in nodeAtom.handles.target) {
+    const edges  = [...edgeTree.get(node.id)!.get(handle)!.keys()]
+
+    for (const upstreamNode of ) { 
+
+    }
+
+  }
+};
