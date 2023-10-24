@@ -1,4 +1,4 @@
-import type { coordinates, EdgeTree, Node, NodeAtom, NodeAtomState } from '..';
+import type { coordinates, EdgeTree, JotaiImmerAtom, Node, NodeAtom, NodeAtomState } from '..';
 
 type Options = {
   brushSize: number;
@@ -61,29 +61,74 @@ const getGlobalLocation = (node: Node) => {
 };
 
 const arrangeRelax = (
-  node: Node,
-  nodeAtom: NodeAtomState,
+  nodeId: string,
+  nodes: Record<string, Node>,
+  nodeGetter: (atom: JotaiImmerAtom<NodeAtomState>) => NodeAtomState,
+  nodeAtoms: Record<string, JotaiImmerAtom<NodeAtomState>>,
   edgeTree: EdgeTree,
   influence: number,
   relaxPower: number,
   distance: number,
   clampedPull: boolean,
 ) => {
-  const globalLoc = getGlobalLocation(node);
+  const currentNode = nodes[nodeId];
+  const currentNodeAtom = nodeGetter(nodeAtoms[nodeId]);
+  const currentNodeCoor = getGlobalLocation(currentNode);
+  const currentNodeRect = currentNodeAtom.rect;
 
-  let offset = { x: 0, y: 0 };
+  const offset = { x: 0, y: 0 };
 
   let tarY = 0,
-    tarXIn = clampedPull ? globalLoc.x : 0,
+    tarXIn = clampedPull ? currentNodeCoor.x : 0,
     linkCnt = 0,
     hasInput = false;
 
-  for (const handle in nodeAtom.handles.target) {
-    const edges  = [...edgeTree.get(node.id)!.get(handle)!.keys()]
+  for (const handle in currentNodeAtom.handles.target) {
+    const edges = [...edgeTree.get(nodeId)!.get(handle)!.values()];
 
-    for (const upstreamNode of ) { 
+    for (const edge of edges) {
+      const upstreamNodeAtom = nodeGetter(nodeAtoms[edge.sourceNode]);
+      const upsteamNodeCoor = getGlobalLocation(upstreamNodeAtom.node);
+      const upsteamNodeRect = { ...upstreamNodeAtom.rect };
+      const x = upsteamNodeCoor.x + upsteamNodeRect.width + distance;
 
+      if (clampedPull) {
+        tarXIn = hasInput ? Math.max(tarXIn, x) : x;
+      } else {
+        tarXIn += x;
+      }
+      hasInput = true;
+      tarY +=
+        upsteamNodeCoor.y +
+        socket_pos(socket, node.inputs, currentNodeRect.height) -
+        socket_pos(link.from_socket, other.outputs, upsteamNodeRect.height);
+      linkCnt++;
     }
+  }
 
+  let tarXOut = clampedPull ? currentNodeCoor.x : 0,
+    hasOutput = false;
+
+  for (const handle in currentNodeAtom.handles.source) {
+    const edges = [...edgeTree.get(nodeId)!.get(handle)!.values()];
+
+    for (const edge of edges) {
+      const downstreamNodeAtom = nodeGetter(nodeAtoms[edge.targetNode]);
+      const downstreamNodeCoor = getGlobalLocation(downstreamNodeAtom.node);
+      const downstreamNodeRect = { ...downstreamNodeAtom.rect };
+      const x = downstreamNodeCoor.x - currentNodeRect.width - distance;
+
+      if (clampedPull) {
+        tarXIn = hasOutput ? Math.min(tarXOut, x) : x;
+      } else {
+        tarXIn += x;
+      }
+      hasOutput = true;
+      tarY +=
+        downstreamNodeCoor.y +
+        socket_pos(socket, node.inputs, currentNodeRect.y) -
+        socket_pos(link.from_socket, other.outputs, downstreamNodeRect.height);
+      linkCnt++;
+    }
   }
 };
