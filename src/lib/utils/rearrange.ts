@@ -60,34 +60,54 @@ const getGlobalLocation = (node: Node) => {
   return { x: node.left, y: node.top };
 };
 
+const socketPosition = (
+  node: string,
+  tree: EdgeTree,
+  handle: string,
+  handles: string[],
+  size: number,
+) => {
+  const nodeHandles = tree.get(node)!;
+  const handleConnected = handles.filter((e) => !!nodeHandles.get(e));
+
+  //possible issue here, the object key array is not ordered
+  for (let i = 0; i < handleConnected.length; i++) {
+    if (handle === handleConnected[i]) {
+      return (i / handleConnected.length) * size;
+    }
+  }
+
+  return size / 2;
+};
+
 const arrangeRelax = (
   nodeId: string,
-  nodes: Record<string, Node>,
-  nodeGetter: (atom: JotaiImmerAtom<NodeAtomState>) => NodeAtomState,
-  nodeAtoms: Record<string, JotaiImmerAtom<NodeAtomState>>,
+  nodeAtomStates: Record<string, NodeAtomState>,
   edgeTree: EdgeTree,
   influence: number,
   relaxPower: number,
   distance: number,
   clampedPull: boolean,
 ) => {
-  const currentNode = nodes[nodeId];
-  const currentNodeAtom = nodeGetter(nodeAtoms[nodeId]);
+  const currentNodeAtom = nodeAtomStates[nodeId];
+  const currentNode = currentNodeAtom.node;
   const currentNodeCoor = getGlobalLocation(currentNode);
   const currentNodeRect = currentNodeAtom.rect;
 
-  const offset = { x: 0, y: 0 };
+  const offset: coordinates = { x: 0, y: 0 };
 
   let tarY = 0,
     tarXIn = clampedPull ? currentNodeCoor.x : 0,
     linkCnt = 0,
     hasInput = false;
 
-  for (const handle in currentNodeAtom.handles.target) {
+  const inputs = currentNodeAtom.handles.target;
+
+  for (const handle in inputs) {
     const edges = [...edgeTree.get(nodeId)!.get(handle)!.values()];
 
     for (const edge of edges) {
-      const upstreamNodeAtom = nodeGetter(nodeAtoms[edge.sourceNode]);
+      const upstreamNodeAtom = nodeAtomStates[edge.sourceNode];
       const upsteamNodeCoor = getGlobalLocation(upstreamNodeAtom.node);
       const upsteamNodeRect = { ...upstreamNodeAtom.rect };
       const x = upsteamNodeCoor.x + upsteamNodeRect.width + distance;
@@ -100,20 +120,20 @@ const arrangeRelax = (
       hasInput = true;
       tarY +=
         upsteamNodeCoor.y +
-        socket_pos(socket, node.inputs, currentNodeRect.height) -
-        socket_pos(link.from_socket, other.outputs, upsteamNodeRect.height);
+        socketPosition(handle, inputs, currentNodeRect.height) -
+        socketPosition(link.from_socket, other.outputs, upsteamNodeRect.height);
       linkCnt++;
     }
   }
 
-  let tarXOut = clampedPull ? currentNodeCoor.x : 0,
-    hasOutput = false;
+  const tarXOut = clampedPull ? currentNodeCoor.x : 0;
+  let hasOutput = false;
 
   for (const handle in currentNodeAtom.handles.source) {
     const edges = [...edgeTree.get(nodeId)!.get(handle)!.values()];
 
     for (const edge of edges) {
-      const downstreamNodeAtom = nodeGetter(nodeAtoms[edge.targetNode]);
+      const downstreamNodeAtom = nodeAtomStates[edge.targetNode];
       const downstreamNodeCoor = getGlobalLocation(downstreamNodeAtom.node);
       const downstreamNodeRect = { ...downstreamNodeAtom.rect };
       const x = downstreamNodeCoor.x - currentNodeRect.width - distance;
@@ -126,9 +146,36 @@ const arrangeRelax = (
       hasOutput = true;
       tarY +=
         downstreamNodeCoor.y +
-        socket_pos(socket, node.inputs, currentNodeRect.y) -
-        socket_pos(link.from_socket, other.outputs, downstreamNodeRect.height);
+        socketPosition(socket, node.inputs, currentNodeRect.y) -
+        socketPosition(link.from_socket, other.outputs, downstreamNodeRect.height);
       linkCnt++;
     }
   }
+
+  if (linkCnt > 0) {
+    let tarX;
+    if (clampedPull) {
+      tarX = tarXIn * Number(hasInput) + tarXOut * Number(hasOutput);
+      tarX /= Number(hasInput) + Number(hasOutput);
+    } else {
+      tarX = (tarXIn + tarXOut) / linkCnt;
+    }
+    tarY /= linkCnt;
+    offset.x += (tarX - currentNodeCoor.x) * relaxPower;
+    offset.y += (tarY - currentNodeCoor.y) * relaxPower;
+
+    if (Math.abs(offset.x) > 1 || Math.abs(offset.y) > 1) {
+      applyMovement(nodeId, nodeAtomStates, {
+        x: offset.x * influence,
+        y: offset.y * influence,
+      });
+      return true;
+    } else return false;
+  }
 };
+
+const applyMovement = (
+  nodeId: string,
+  nodeAtomStates: Record<string, NodeAtomState>,
+  offset: coordinates,
+) => {};
