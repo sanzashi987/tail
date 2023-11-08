@@ -1,4 +1,12 @@
-import type { coordinates, EdgeTree, JotaiImmerAtom, Node, NodeAtom, NodeAtomState } from '..';
+import type {
+  coordinates,
+  EdgeTree,
+  JotaiImmerAtom,
+  Node,
+  NodeAtom,
+  NodeAtomState,
+  Rect,
+} from '..';
 
 type Options = {
   brushSize: number;
@@ -275,6 +283,98 @@ const calcNode = (
     applyMovement(nodeId, nodeAtomStates, {
       x: offset.x * influence,
       y: offset.y * influence,
+    });
+    return true;
+  } else {
+    return false;
+  }
+};
+
+const collide = (
+  coor0: coordinates,
+  coor1: coordinates,
+  rect0: Rect,
+  rect1: Rect,
+  offset: coordinates,
+  power: number,
+  dist: coordinates,
+  onlyY = false,
+) => {
+  const pos0 = {
+    x: coor0.x + rect0.width / 2,
+    y: coor0.y + rect0.height / 2,
+  };
+  const pos1 = {
+    x: coor1.x + rect0.width / 2,
+    y: coor1.y + rect0.height / 2,
+  };
+
+  pos0.y -= rect0.height;
+  pos1.y -= rect1.height;
+
+  const size = {
+    width: (rect0.width + rect1.width) / 2 + dist.x,
+    height: (rect0.height + rect1.height) / 2 + dist.y,
+  };
+
+  const delta = {
+    x: pos0.x - pos1.x,
+    y: pos0.y - pos1.y,
+  };
+
+  const inters = {
+    x: size.width - Math.abs(delta.x),
+    y: size.height - Math.abs(delta.y),
+  };
+
+  if (inters.x > 0 && inters.y > 0) {
+    if (inters.y < inters.x || onlyY) {
+      if (delta.y > 0) {
+        inters.y *= -1;
+      }
+      offset.y += (inters.y / 2) * power;
+    } else {
+      if (delta.x > 0) {
+        inters.x *= -1;
+      }
+      offset.x += (inters.x / 2) * power;
+    }
+  }
+};
+
+const calcCollisionY = (
+  nodeId: string,
+  nodeAtomStates: Record<string, NodeAtomState>,
+  collidePower: number,
+  collideDist: coordinates,
+) => {
+  const nodeAtomState = nodeAtomStates[nodeId];
+  const coor = getGlobalLocation(nodeAtomState.node);
+  const rect = nodeAtomState.rect;
+
+  const offset = { x: 0, y: 0 };
+
+  for (const id in nodeAtomStates) {
+    if (id === nodeId) {
+      continue;
+    }
+    const otherNode = nodeAtomStates[id];
+    collide(
+      coor,
+      getGlobalLocation(otherNode.node),
+      rect,
+      otherNode.rect,
+      offset,
+      1,
+      collideDist,
+      true,
+    );
+  }
+
+  if (Math.abs(offset.y) > MOVE_UNIT) {
+    applyMovement(nodeId, nodeAtomStates, {
+      x: offset.x * collidePower,
+      y: offset.y * collidePower,
     });
     return true;
   } else {
