@@ -1,4 +1,5 @@
 import React, { Component, createRef, forwardRef, useImperativeHandle, useRef } from 'react';
+import { Provider } from 'jotai';
 import type {
   InterfaceValue,
   TailCoreProps,
@@ -9,6 +10,7 @@ import type {
   SelectCallback,
 } from '@lib/types';
 import { ParserContext, InterfaceProvider } from '@lib/contexts';
+import { tailStore } from '@lib/store';
 import { NodeMoves, EdgeConnects } from './callbackFactory';
 import { getInsideIds } from './helpers';
 import ItemParser from '../../components/ItemParser';
@@ -141,11 +143,13 @@ const Tail = forwardRef<CoreMethods, TailProps>(
       [],
     );
     return (
-      <ItemParser nodes={nodes} edges={edges} activeNodes={activeNodes} activeEdges={activeEdges}>
-        <TailCore ref={coreRef} {...otherprops}>
-          {children}
-        </TailCore>
-      </ItemParser>
+      <Provider store={tailStore}>
+        <ItemParser nodes={nodes} edges={edges} activeNodes={activeNodes} activeEdges={activeEdges}>
+          <TailCore ref={coreRef} {...otherprops}>
+            {children}
+          </TailCore>
+        </ItemParser>
+      </Provider>
     );
   },
 );
