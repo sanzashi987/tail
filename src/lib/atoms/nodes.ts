@@ -1,5 +1,5 @@
 import { JotaiImmerAtom } from '@lib/types/jotai';
-import { atomWithImmer } from 'jotai/immer';
+import { atomWithImmer } from 'jotai-immer';
 import type { Node, NodeAtomState } from '@lib/types';
 
 export const defaultRect = {

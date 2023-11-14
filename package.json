@@ -107,7 +107,8 @@
   "dependencies": {
     "eventemitter3": "4.0.7",
     "immer": "9.0.14",
-    "jotai": "1.7.0",
+    "jotai": "^2.5.1",
+    "jotai-immer": "^0.2.0",
     "lodash.debounce": "4.0.8"
   },
   "peerDependencies": {

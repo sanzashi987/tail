@@ -1,5 +1,5 @@
 import { Edge, EdgeAtomState, EdgeInProgressAtomState } from '@lib/types';
-import { atomWithImmer } from 'jotai/immer';
+import { atomWithImmer } from 'jotai-immer';
 
 export function createEdgeAtom(
   edge: Edge,
