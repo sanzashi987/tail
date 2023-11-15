@@ -139,6 +139,12 @@ const Tail = forwardRef<CoreMethods, TailProps>(
         getEdgeTree: () => coreRef.current?.context.edgeUpdater.edgeTree ?? new Map(),
         moveViewCenter: (x, y) => coreRef.current?.viewer.current?.moveCamera(x, y),
         getOffSet: () => coreRef.current?.getOffset() ?? TailCore.offsetFallback,
+        getSnapshot: () =>
+          coreRef.current?.context.getSnapshot() ?? {
+            edgeTree: new Map(),
+            nodeAtomStates: {},
+            edgeAtomStates: {},
+          },
       }),
       [],
     );

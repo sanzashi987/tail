@@ -2,20 +2,41 @@ import React, { FC, useEffect, useMemo, useRef } from 'react';
 import { ParserProvider } from '@lib/contexts/parser';
 import type { ItemParserProps } from '@lib/types';
 import { atomGetter, atomSetter } from '@lib/store';
+// import { useAtomGetter, useAtomSetter } from '@lib/hooks/jotai';
 import { EdgeUpdater, ItemSelector, NodeUpdater } from './itemUpdater';
 
 const defaultSet = new Set<string>();
 
 const ItemParser: FC<ItemParserProps> = ({ nodes, edges, activeEdges, activeNodes, children }) => {
-  const activeNodesSet = useRef<Set<string>>(defaultSet);
-  const activeEdgesSet = useRef<Set<string>>(defaultSet);
+  // const atomGetter = useAtomGetter();
+  // const atomSetter = useAtomSetter();
+
+  const activeNodesSet = useRef(defaultSet);
+  const activeEdgesSet = useRef(defaultSet);
 
   const parserContext = useMemo(() => {
     const nodeUpdater = new NodeUpdater(atomGetter, atomSetter, activeNodesSet);
     const edgeUpdater = new EdgeUpdater(atomGetter, atomSetter, activeEdgesSet);
     const nodeSelector = new ItemSelector(nodeUpdater.setState);
     const edgeSelector = new ItemSelector(edgeUpdater.setState);
-    return { nodeUpdater, edgeUpdater, nodeSelector, edgeSelector };
+
+    const getSnapshot = () => {
+      const nodeAtoms = nodeUpdater.getAtoms();
+      const edgeAtoms = edgeUpdater.getAtoms();
+      const edgeTree = edgeUpdater.edgeTree;
+
+      return {
+        edgeTree,
+        nodeAtomStates: Object.fromEntries(
+          Object.entries(nodeAtoms).map(([k, v]) => [k, atomGetter(v)]),
+        ),
+        edgeAtomStates: Object.fromEntries(
+          Object.entries(edgeAtoms).map(([k, v]) => [k, atomGetter(v)]),
+        ),
+      };
+    };
+
+    return { nodeUpdater, edgeUpdater, nodeSelector, edgeSelector, getSnapshot };
   }, []);
 
   useEffect(() => {

@@ -27,6 +27,7 @@ export type CoreMethods = {
   getEdgeTree(): EdgeTree;
   moveViewCenter(x: number, y: number): void;
   getOffSet(): coordinates;
+  getSnapshot: ItemParserInterface['getSnapshot'];
 };
 
 export type TailCoreOptionalProps = {
@@ -140,4 +141,9 @@ export type ItemParserInterface = {
   edgeUpdater: EdgeUpdater;
   nodeSelector: ItemSelector<NodeAtomState>;
   edgeSelector: ItemSelector<EdgeAtomState>;
+  getSnapshot: () => {
+    edgeTree: EdgeTree;
+    nodeAtomStates: Record<string, NodeAtomState>;
+    edgeAtomStates: Record<string, EdgeAtomState>;
+  };
 };
