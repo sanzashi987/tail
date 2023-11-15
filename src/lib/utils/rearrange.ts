@@ -1,12 +1,4 @@
-import type {
-  coordinates,
-  EdgeTree,
-  JotaiImmerAtom,
-  Node,
-  NodeAtom,
-  NodeAtomState,
-  Rect,
-} from '..';
+import type { coordinates, EdgeTree, HandleMap, Node, NodeAtomState, Rect } from '..';
 
 type Options = {
   brushSize: number;
@@ -70,9 +62,17 @@ const getGlobalLocation = (node: Node) => {
   return { x: node.left, y: node.top };
 };
 
+const orderedHandleKeys = (handleMap: HandleMap) => {
+  return Object.entries(handleMap)
+    .sort((a, b) => {
+      return a[1].y - b[1].y;
+    })
+    .map((e) => e[0]);
+};
+
 const socketPosition = (
-  node: string,
   tree: EdgeTree,
+  node: string,
   handle: string,
   handles: string[],
   size: number,
@@ -80,7 +80,6 @@ const socketPosition = (
   const nodeHandles = tree.get(node)!;
   const handleConnected = handles.filter((e) => !!nodeHandles.get(e));
 
-  //possible issue here, the object key array is not ordered
   for (let i = 0; i < handleConnected.length; i++) {
     if (handle === handleConnected[i]) {
       return (i / handleConnected.length) * size;
@@ -129,8 +128,20 @@ const arrangeRelax = (
       hasInput = true;
       tarY +=
         upsteamNodeCoor.y +
-        socketPosition(handle, inputs, nodeRect.height) -
-        socketPosition(link.from_socket, other.outputs, upsteamNodeRect.height);
+        socketPosition(
+          edgeTree,
+          nodeState.node.id,
+          handle,
+          orderedHandleKeys(inputs),
+          nodeRect.height,
+        ) -
+        socketPosition(
+          edgeTree,
+          upstreamNode.node.id,
+          edge.source,
+          orderedHandleKeys(upstreamNode.handles.source),
+          upsteamNodeRect.height,
+        );
       linkCnt++;
     }
   }
@@ -138,7 +149,9 @@ const arrangeRelax = (
   const tarXOut = clampedPull ? nodeCoor.x : 0;
   let hasOutput = false;
 
-  for (const handle in nodeState.handles.source) {
+  const outputs = nodeState.handles.source;
+
+  for (const handle in outputs) {
     const edges = [...edgeTree.get(nodeId)!.get(handle)!.values()];
 
     for (const edge of edges) {
@@ -155,8 +168,20 @@ const arrangeRelax = (
       hasOutput = true;
       tarY +=
         downstreamNodeCoor.y +
-        socketPosition(socket, node.inputs, nodeRect.y) -
-        socketPosition(link.from_socket, other.outputs, downstreamNodeRect.height);
+        socketPosition(
+          edgeTree,
+          nodeState.node.id,
+          handle,
+          orderedHandleKeys(outputs),
+          nodeRect.y,
+        ) -
+        socketPosition(
+          edgeTree,
+          downstreamNode.node.id,
+          edge.target,
+          orderedHandleKeys(downstreamNode.handles.target),
+          downstreamNodeRect.height,
+        );
       linkCnt++;
     }
   }
@@ -183,11 +208,33 @@ const arrangeRelax = (
   }
 };
 
+const shallowCopyAndApplyDelta = <T extends Rect>(rect: T, delta: coordinates) => {
+  const next = { ...rect };
+  next.x += delta.x;
+  next.y += delta.y;
+  return next;
+};
+
 const applyMovement = (
   nodeId: string,
   nodeAtomStates: Record<string, NodeAtomState>,
-  offset: coordinates,
-) => {};
+  delta: coordinates,
+) => {
+  const nodeState = nodeAtomStates[nodeId];
+  nodeState.rect = shallowCopyAndApplyDelta(nodeState.rect, delta);
+  nodeState.node.left += delta.x;
+  nodeState.node.top += delta.y;
+
+  for (const type in nodeState.handles) {
+    const typeKey = type as keyof NodeAtomState['handles'];
+    for (const handleKey in nodeState.handles[typeKey]) {
+      nodeState.handles[typeKey][handleKey] = shallowCopyAndApplyDelta(
+        nodeState.handles[typeKey][handleKey],
+        delta,
+      );
+    }
+  }
+};
 
 const calcNode = (
   edgeTree: EdgeTree,
