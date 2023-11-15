@@ -1,15 +1,12 @@
 import React, { FC, useEffect, useMemo, useRef } from 'react';
 import { ParserProvider } from '@lib/contexts/parser';
 import type { ItemParserProps } from '@lib/types';
-import { useAtomGetter, useAtomSetter } from '@lib/hooks/jotai';
+import { atomGetter, atomSetter } from '@lib/store';
 import { EdgeUpdater, ItemSelector, NodeUpdater } from './itemUpdater';
 
 const defaultSet = new Set<string>();
 
 const ItemParser: FC<ItemParserProps> = ({ nodes, edges, activeEdges, activeNodes, children }) => {
-  const atomSetter = useAtomSetter();
-  const atomGetter = useAtomGetter();
-
   const activeNodesSet = useRef<Set<string>>(defaultSet);
   const activeEdgesSet = useRef<Set<string>>(defaultSet);
 
