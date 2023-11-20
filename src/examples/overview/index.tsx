@@ -111,7 +111,13 @@ function Overview() {
         onNodeUpdate={noop}
         onNodeContextMenu={noop}
         onEdgeCreate={onEdgeCreate}
-        onEdgeUpdate={noop}
+        onEdgeUpdate={(id, next) => {
+          setEdgeState((last) => {
+            const next = { ...last };
+            delete next[id];
+          });
+          onEdgeCreate(next);
+        }}
         onEdgePaired={(a, b) => {
           console.log('paired!', a, b);
         }}
