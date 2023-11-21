@@ -35,13 +35,15 @@ const step = (
   for (let i = 0; i < iterNum; i++) {
     const newCenter = { x: 0, y: 0 };
     let [nodeCount, changed] = [0, false];
-    for (const node of nodes) {
+    for (const nodeId in nodes) {
+      const node = nodes[nodeId];
+
       // if (false) continue; potential bailout
-      if (opt.onlySelected && !selected[node.id]) continue;
-      if (cb(node, i / iterNum)) {
+      if (opt.onlySelected && !node.selected) continue;
+      if (cb(node.node, i / iterNum)) {
         changed = true;
       }
-      const { x, y } = getGlobalLocation(node);
+      const { x, y } = getGlobalLocation(node.node);
 
       newCenter.x += x;
       newCenter.y += y;
@@ -55,9 +57,8 @@ const step = (
       newCenter.x /= nodeCount;
       newCenter.y /= nodeCount;
       const slide = { x: center.x - newCenter.x, y: center.y - newCenter.y };
-      for (const node of nodes) {
-        node.left += slide.x;
-        node.top += slide.y;
+      for (const nodeId in nodes) {
+        applyMovement(nodeId, nodes, slide);
       }
     }
   }
@@ -445,8 +446,23 @@ const defaultOption: Options = {
 };
 
 const startRearrange = (nodes: NodesAtomState, opt: Partial<Options> = {}) => {
+  if (Object.keys(nodes).length === 0) return;
   const fullOpt = { ...defaultOption, ...opt };
   const rootCenter = { x: 0, y: 0 };
 
-  step(1, fullOpt.iterates_1, nodes);
+  let nodeCount = 0;
+  if (!fullOpt.onlySelected) {
+    for (const nodeId in nodes) {
+      const node = getGlobalLocation(nodes[nodeId].node);
+      rootCenter.x += node.x;
+      rootCenter.y += node.y;
+      nodeCount++;
+    }
+    rootCenter.x /= nodeCount;
+    rootCenter.y /= nodeCount;
+  }
+
+  step(1, fullOpt.iterates_1, nodes, rootCenter, (node, e) => {
+    arrangeRelax();
+  });
 };
