@@ -136,6 +136,8 @@ export interface HandleInterface {
 
 export type UpdaterType<T> = T | ((currVal: T) => T);
 
+export type NodesAtomState = Record<string, NodeAtomState>;
+
 export type ItemParserInterface = {
   nodeUpdater: NodeUpdater;
   edgeUpdater: EdgeUpdater;
@@ -143,7 +145,7 @@ export type ItemParserInterface = {
   edgeSelector: ItemSelector<EdgeAtomState>;
   getSnapshot: () => {
     edgeTree: EdgeTree;
-    nodeAtomStates: Record<string, NodeAtomState>;
-    edgeAtomStates: Record<string, EdgeAtomState>;
+    nodesAtomState: NodesAtomState;
+    edgesAtomState: Record<string, EdgeAtomState>;
   };
 };

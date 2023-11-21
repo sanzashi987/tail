@@ -1,4 +1,12 @@
-import type { coordinates, EdgeTree, HandleMap, Node, NodeAtomState, Rect } from '..';
+import type {
+  coordinates,
+  EdgeTree,
+  HandleMap,
+  Node,
+  NodeAtomState,
+  NodesAtomState,
+  Rect,
+} from '..';
 
 type Options = {
   brushSize: number;
@@ -8,12 +16,10 @@ type Options = {
   collisionPower: number;
   adpativeIter: boolean;
   onlySelected: boolean;
-  iterates: {
-    1: number;
-    2: number;
-    3: number;
-    4: number;
-  };
+  iterates_1: number;
+  iterates_2: number;
+  iterates_3: number;
+  iterates_4: number;
 };
 
 const MOVE_UNIT = 1;
@@ -21,8 +27,7 @@ const MOVE_UNIT = 1;
 const step = (
   stepNumber: number,
   iterNum: number,
-  nodes: Node[],
-  selected: Record<string, boolean>,
+  nodes: NodesAtomState,
   opt: Options,
   center: coordinates,
   cb: (node: Node, t: number) => boolean,
@@ -91,14 +96,14 @@ const socketPosition = (
 
 const arrangeRelax = (
   nodeId: string,
-  nodeAtomStates: Record<string, NodeAtomState>,
+  nodesAtomState: NodesAtomState,
   edgeTree: EdgeTree,
   influence: number,
   relaxPower: number,
   distance: number,
   clampedPull: boolean,
 ) => {
-  const nodeState = nodeAtomStates[nodeId];
+  const nodeState = nodesAtomState[nodeId];
   const nodeCoor = getGlobalLocation(nodeState.node);
   const nodeRect = nodeState.rect;
 
@@ -115,7 +120,7 @@ const arrangeRelax = (
     const edges = [...edgeTree.get(nodeId)!.get(handle)!.values()];
 
     for (const edge of edges) {
-      const upstreamNode = nodeAtomStates[edge.sourceNode];
+      const upstreamNode = nodesAtomState[edge.sourceNode];
       const upsteamNodeCoor = getGlobalLocation(upstreamNode.node);
       const upsteamNodeRect = { ...upstreamNode.rect };
       const x = upsteamNodeCoor.x + upsteamNodeRect.width + distance;
@@ -155,7 +160,7 @@ const arrangeRelax = (
     const edges = [...edgeTree.get(nodeId)!.get(handle)!.values()];
 
     for (const edge of edges) {
-      const downstreamNode = nodeAtomStates[edge.targetNode];
+      const downstreamNode = nodesAtomState[edge.targetNode];
       const downstreamNodeCoor = getGlobalLocation(downstreamNode.node);
       const downstreamNodeRect = { ...downstreamNode.rect };
       const x = downstreamNodeCoor.x - nodeRect.width - distance;
@@ -199,7 +204,7 @@ const arrangeRelax = (
     offset.y += (tarY - nodeCoor.y) * relaxPower;
 
     if (Math.abs(offset.x) > MOVE_UNIT || Math.abs(offset.y) > MOVE_UNIT) {
-      applyMovement(nodeId, nodeAtomStates, {
+      applyMovement(nodeId, nodesAtomState, {
         x: offset.x * influence,
         y: offset.y * influence,
       });
@@ -215,12 +220,8 @@ const shallowCopyAndApplyDelta = <T extends Rect>(rect: T, delta: coordinates) =
   return next;
 };
 
-const applyMovement = (
-  nodeId: string,
-  nodeAtomStates: Record<string, NodeAtomState>,
-  delta: coordinates,
-) => {
-  const nodeState = nodeAtomStates[nodeId];
+const applyMovement = (nodeId: string, nodesAtomState: NodesAtomState, delta: coordinates) => {
+  const nodeState = nodesAtomState[nodeId];
   nodeState.rect = shallowCopyAndApplyDelta(nodeState.rect, delta);
   nodeState.node.left += delta.x;
   nodeState.node.top += delta.y;
@@ -239,7 +240,7 @@ const applyMovement = (
 const calcNode = (
   edgeTree: EdgeTree,
   nodeId: string,
-  nodeAtomStates: Record<string, NodeAtomState>,
+  nodesAtomState: NodesAtomState,
   influence: number,
   slideVector: coordinates,
   relaxPower: number,
@@ -247,7 +248,7 @@ const calcNode = (
   collideDist: coordinates,
   pullNonSiblings: boolean,
 ) => {
-  const nodeState = nodeAtomStates[nodeId];
+  const nodeState = nodesAtomState[nodeId];
   if (nodeState.node.type === '') {
     return false;
   }
@@ -266,7 +267,7 @@ const calcNode = (
     for (const handle in inputs) {
       const edges = [...edgeTree.get(nodeId)!.get(handle)!.values()];
       for (const edge of edges) {
-        const upstreamNodeAtom = nodeAtomStates[edge.targetNode];
+        const upstreamNodeAtom = nodesAtomState[edge.targetNode];
 
         // parent
         // if (!pullNonSiblings && nodeState.parent !== upstreamNodeAtom.parent) {
@@ -291,7 +292,7 @@ const calcNode = (
     for (const handle in outputs) {
       const edges = [...edgeTree.get(nodeId)!.get(handle)!.values()];
       for (const edge of edges) {
-        const downstreamNode = nodeAtomStates[edge.targetNode];
+        const downstreamNode = nodesAtomState[edge.targetNode];
         // if (!pullNonSiblings && nodeState.parent !== downstreamNodeAtom.parent) {
         //   continue;
         // }
@@ -319,15 +320,15 @@ const calcNode = (
   }
 
   if (collidePower > 0) {
-    for (const node in nodeAtomStates) {
+    for (const node in nodesAtomState) {
       if (node === nodeId) continue;
-      const nodeState = nodeAtomStates[node];
+      const nodeState = nodesAtomState[node];
       // if (nodeState.node.type === '') continue;
     }
   }
 
   if (Math.abs(offset.x) > MOVE_UNIT || Math.abs(offset.y) > MOVE_UNIT) {
-    applyMovement(nodeId, nodeAtomStates, {
+    applyMovement(nodeId, nodesAtomState, {
       x: offset.x * influence,
       y: offset.y * influence,
     });
@@ -391,21 +392,21 @@ const collide = (
 
 const calcCollisionY = (
   nodeId: string,
-  nodeAtomStates: Record<string, NodeAtomState>,
+  nodesAtomState: NodesAtomState,
   collidePower: number,
   collideDist: coordinates,
 ) => {
-  const nodeAtomState = nodeAtomStates[nodeId];
+  const nodeAtomState = nodesAtomState[nodeId];
   const coor = getGlobalLocation(nodeAtomState.node);
   const rect = nodeAtomState.rect;
 
   const offset = { x: 0, y: 0 };
 
-  for (const id in nodeAtomStates) {
+  for (const id in nodesAtomState) {
     if (id === nodeId) {
       continue;
     }
-    const otherNode = nodeAtomStates[id];
+    const otherNode = nodesAtomState[id];
     collide(
       coor,
       getGlobalLocation(otherNode.node),
@@ -419,7 +420,7 @@ const calcCollisionY = (
   }
 
   if (Math.abs(offset.y) > MOVE_UNIT) {
-    applyMovement(nodeId, nodeAtomStates, {
+    applyMovement(nodeId, nodesAtomState, {
       x: offset.x * collidePower,
       y: offset.y * collidePower,
     });
@@ -427,4 +428,25 @@ const calcCollisionY = (
   } else {
     return false;
   }
+};
+
+const defaultOption: Options = {
+  brushSize: 150,
+  distance: 80,
+  relaxPower: 0.1,
+  slidePower: 0.6,
+  collisionPower: 0.9,
+  adpativeIter: true,
+  onlySelected: false,
+  iterates_1: 200,
+  iterates_2: 200,
+  iterates_3: 200,
+  iterates_4: 200,
+};
+
+const startRearrange = (nodes: NodesAtomState, opt: Partial<Options> = {}) => {
+  const fullOpt = { ...defaultOption, ...opt };
+  const rootCenter = { x: 0, y: 0 };
+
+  step(1, fullOpt.iterates_1, nodes);
 };

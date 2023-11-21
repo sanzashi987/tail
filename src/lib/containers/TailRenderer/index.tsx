@@ -142,8 +142,8 @@ const Tail = forwardRef<CoreMethods, TailProps>(
         getSnapshot: () =>
           coreRef.current?.context.getSnapshot() ?? {
             edgeTree: new Map(),
-            nodeAtomStates: {},
-            edgeAtomStates: {},
+            nodesAtomState: {},
+            edgesAtomState: {},
           },
       }),
       [],
