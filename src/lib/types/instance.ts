@@ -27,7 +27,7 @@ export type CoreMethods = {
   getEdgeTree(): EdgeTree;
   moveViewCenter(x: number, y: number): void;
   getOffSet(): coordinates;
-  getSnapshot: ItemParserInterface['getSnapshot'];
+  rearrageNodes(): Record<string, Node>;
 };
 
 export type TailCoreOptionalProps = {

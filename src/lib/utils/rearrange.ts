@@ -30,7 +30,7 @@ const step = (
   nodes: NodesAtomState,
   opt: Options,
   center: coordinates,
-  cb: (node: Node, t: number) => boolean,
+  cb: (nodeId: string, t: number) => boolean,
 ) => {
   for (let i = 0; i < iterNum; i++) {
     const newCenter = { x: 0, y: 0 };
@@ -40,7 +40,7 @@ const step = (
 
       // if (false) continue; potential bailout
       if (opt.onlySelected && !node.selected) continue;
-      if (cb(node.node, i / iterNum)) {
+      if (cb(nodeId, i / iterNum)) {
         changed = true;
       }
       const { x, y } = getGlobalLocation(node.node);
@@ -203,14 +203,16 @@ const arrangeRelax = (
     tarY /= linkCnt;
     offset.x += (tarX - nodeCoor.x) * relaxPower;
     offset.y += (tarY - nodeCoor.y) * relaxPower;
+  }
 
-    if (Math.abs(offset.x) > MOVE_UNIT || Math.abs(offset.y) > MOVE_UNIT) {
-      applyMovement(nodeId, nodesAtomState, {
-        x: offset.x * influence,
-        y: offset.y * influence,
-      });
-      return true;
-    } else return false;
+  if (Math.abs(offset.x) > MOVE_UNIT || Math.abs(offset.y) > MOVE_UNIT) {
+    applyMovement(nodeId, nodesAtomState, {
+      x: offset.x * influence,
+      y: offset.y * influence,
+    });
+    return true;
+  } else {
+    return false;
   }
 };
 
@@ -239,9 +241,9 @@ const applyMovement = (nodeId: string, nodesAtomState: NodesAtomState, delta: co
 };
 
 const calcNode = (
-  edgeTree: EdgeTree,
   nodeId: string,
   nodesAtomState: NodesAtomState,
+  edgeTree: EdgeTree,
   influence: number,
   slideVector: coordinates,
   relaxPower: number,
@@ -325,6 +327,15 @@ const calcNode = (
       if (node === nodeId) continue;
       const nodeState = nodesAtomState[node];
       // if (nodeState.node.type === '') continue;
+      collide(
+        nodeCoor,
+        getGlobalLocation(nodeState.node),
+        nodeRect,
+        nodeState.rect,
+        offset,
+        collidePower,
+        collideDist,
+      );
     }
   }
 
@@ -445,7 +456,11 @@ const defaultOption: Options = {
   iterates_4: 200,
 };
 
-const startRearrange = (nodes: NodesAtomState, opt: Partial<Options> = {}) => {
+export const startRearrange = (
+  nodes: NodesAtomState,
+  edgeTree: EdgeTree,
+  opt: Partial<Options> = {},
+) => {
   if (Object.keys(nodes).length === 0) return;
   const fullOpt = { ...defaultOption, ...opt };
   const rootCenter = { x: 0, y: 0 };
@@ -462,7 +477,22 @@ const startRearrange = (nodes: NodesAtomState, opt: Partial<Options> = {}) => {
     rootCenter.y /= nodeCount;
   }
 
-  step(1, fullOpt.iterates_1, nodes, rootCenter, (node, e) => {
-    arrangeRelax();
+  step(1, fullOpt.iterates_1, nodes, fullOpt, rootCenter, (nodeId, e) => {
+    return arrangeRelax(nodeId, nodes, edgeTree, 1, 1, fullOpt.distance, false);
   });
+  step(1, fullOpt.iterates_2, nodes, fullOpt, rootCenter, (nodeId, e) => {
+    return arrangeRelax(nodeId, nodes, edgeTree, 1, 1, fullOpt.distance, true);
+  });
+
+  const dist = { x: 0, y: fullOpt.distance };
+
+  step(3, fullOpt.iterates_3, nodes, fullOpt, rootCenter, (curr_node, e) =>
+    calcCollisionY(curr_node, nodes, e, dist),
+  );
+
+  const _dist = { x: fullOpt.distance, y: fullOpt.distance };
+  const zero = { x: 0, y: 0 };
+  step(4, fullOpt.iterates_4, nodes, fullOpt, rootCenter, (curr_node, e) =>
+    calcNode(curr_node, nodes, edgeTree, Math.min(1, e * 2), zero, 0.2, 1, _dist, true),
+  );
 };

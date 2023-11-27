@@ -27,10 +27,10 @@ const ItemParser: FC<ItemParserProps> = ({ nodes, edges, activeEdges, activeNode
 
       return {
         edgeTree,
-        nodeAtomStates: Object.fromEntries(
+        nodesAtomState: Object.fromEntries(
           Object.entries(nodeAtoms).map(([k, v]) => [k, atomGetter(v)]),
         ),
-        edgeAtomStates: Object.fromEntries(
+        edgesAtomState: Object.fromEntries(
           Object.entries(edgeAtoms).map(([k, v]) => [k, atomGetter(v)]),
         ),
       };

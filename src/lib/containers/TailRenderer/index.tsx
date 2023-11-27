@@ -11,6 +11,8 @@ import type {
 } from '@lib/types';
 import { ParserContext, InterfaceProvider } from '@lib/contexts';
 import { tailStore } from '@lib/store';
+import produce from 'immer';
+import { startRearrange } from '@lib/utils/rearrange';
 import { NodeMoves, EdgeConnects } from './callbackFactory';
 import { getInsideIds } from './helpers';
 import ItemParser from '../../components/ItemParser';
@@ -139,12 +141,18 @@ const Tail = forwardRef<CoreMethods, TailProps>(
         getEdgeTree: () => coreRef.current?.context.edgeUpdater.edgeTree ?? new Map(),
         moveViewCenter: (x, y) => coreRef.current?.viewer.current?.moveCamera(x, y),
         getOffSet: () => coreRef.current?.getOffset() ?? TailCore.offsetFallback,
-        getSnapshot: () =>
-          coreRef.current?.context.getSnapshot() ?? {
-            edgeTree: new Map(),
-            nodesAtomState: {},
-            edgesAtomState: {},
-          },
+        rearrageNodes: () => {
+          const {
+            edgeTree = new Map(),
+            // edgesAtomState = {},
+            nodesAtomState = {},
+          } = coreRef.current?.context.getSnapshot() ?? {};
+
+          const next = produce(nodesAtomState, (draft) => {
+            startRearrange(draft, edgeTree);
+          });
+          return Object.fromEntries(Object.entries(next).map(([k, v]) => [k, v.node]));
+        },
       }),
       [],
     );
