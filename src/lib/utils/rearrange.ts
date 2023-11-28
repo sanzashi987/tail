@@ -28,26 +28,24 @@ const getGlobalLocation = (node: Node) => {
   return { x: node.left, y: node.top };
 };
 
-const shallowCopyAndApplyDelta = <T extends Rect>(rect: T, delta: coordinates) => {
-  const next = { ...rect };
-  next.x += delta.x;
-  next.y += delta.y;
-  return next;
+const applyRectDelta = <T extends Rect>(rect: T, delta: coordinates) => {
+  rect.x += delta.x;
+  rect.y += delta.y;
 };
 
 const applyMovement = (nodeId: string, nodesAtomState: NodesAtomState, delta: coordinates) => {
   const nodeState = nodesAtomState[nodeId];
-  nodeState.rect = shallowCopyAndApplyDelta(nodeState.rect, delta);
+  if (isNaN(delta.x) || isNaN(delta.y)) {
+    debugger; //eslint-disable-line
+  }
+  applyRectDelta(nodeState.rect, delta);
   nodeState.node.left += delta.x;
   nodeState.node.top += delta.y;
 
   for (const type in nodeState.handles) {
     const typeKey = type as keyof NodeAtomState['handles'];
     for (const handleKey in nodeState.handles[typeKey]) {
-      nodeState.handles[typeKey][handleKey] = shallowCopyAndApplyDelta(
-        nodeState.handles[typeKey][handleKey],
-        delta,
-      );
+      applyRectDelta(nodeState.handles[typeKey][handleKey], delta);
     }
   }
 };
@@ -142,12 +140,11 @@ const arrangeRelax = (
   const inputs = nodeState.handles.target;
 
   for (const handle in inputs) {
-    const edges = [...edgeTree.get(nodeId)!.get(handle)!.values()];
-
+    const edges = Array.from(edgeTree.get(nodeId)?.get(handle)?.values() ?? []);
     for (const edge of edges) {
       const upstreamNode = nodesAtomState[edge.sourceNode];
       const upsteamNodeCoor = getGlobalLocation(upstreamNode.node);
-      const upsteamNodeRect = { ...upstreamNode.rect };
+      const upsteamNodeRect = upstreamNode.rect;
       const x = upsteamNodeCoor.x + upsteamNodeRect.width + distance;
 
       if (clampedPull) {
@@ -182,12 +179,12 @@ const arrangeRelax = (
   const outputs = nodeState.handles.source;
 
   for (const handle in outputs) {
-    const edges = [...edgeTree.get(nodeId)!.get(handle)!.values()];
+    const edges = Array.from(edgeTree.get(nodeId)?.get(handle)?.values() ?? []);
 
     for (const edge of edges) {
       const downstreamNode = nodesAtomState[edge.targetNode];
       const downstreamNodeCoor = getGlobalLocation(downstreamNode.node);
-      const downstreamNodeRect = { ...downstreamNode.rect };
+      const downstreamNodeRect = downstreamNode.rect;
       const x = downstreamNodeCoor.x - nodeRect.width - distance;
 
       if (clampedPull) {
@@ -241,17 +238,28 @@ const arrangeRelax = (
   }
 };
 
-const calcNode = (
-  nodeId: string,
-  nodesAtomState: NodesAtomState,
-  edgeTree: EdgeTree,
-  influence: number,
-  slideVector: coordinates,
-  relaxPower: number,
-  collidePower: number,
-  collideDist: coordinates,
-  pullNonSiblings: boolean,
-) => {
+const calcNode = (props: {
+  nodeId: string;
+  nodesAtomState: NodesAtomState;
+  edgeTree: EdgeTree;
+  influence: number;
+  slideVector: coordinates;
+  relaxPower: number;
+  collidePower: number;
+  collideDist: coordinates;
+  pullNonSiblings: boolean;
+}) => {
+  const {
+    nodeId,
+    nodesAtomState,
+    edgeTree,
+    influence,
+    slideVector,
+    relaxPower,
+    collidePower,
+    collideDist,
+    pullNonSiblings,
+  } = props;
   const nodeState = nodesAtomState[nodeId];
   if (nodeState.node.type === '') {
     return false;
@@ -269,7 +277,7 @@ const calcNode = (
 
     const inputs = nodeState.handles.target;
     for (const handle in inputs) {
-      const edges = [...edgeTree.get(nodeId)!.get(handle)!.values()];
+      const edges = Array.from(edgeTree.get(nodeId)?.get(handle)?.values() ?? []);
       for (const edge of edges) {
         const upstreamNodeAtom = nodesAtomState[edge.targetNode];
 
@@ -279,7 +287,7 @@ const calcNode = (
         // }
 
         const upstreamNodeCoor = getGlobalLocation(upstreamNodeAtom.node);
-        const upstreamNodeRect = { ...upstreamNodeAtom.rect };
+        const upstreamNodeRect = upstreamNodeAtom.rect;
         const x = upstreamNodeCoor.x + upstreamNodeRect.width + collideDist.x;
 
         tarXIn = Number(hasInput) > 0 ? Math.max(tarXIn, x) : x;
@@ -294,14 +302,14 @@ const calcNode = (
 
     const outputs = nodeState.handles.source;
     for (const handle in outputs) {
-      const edges = [...edgeTree.get(nodeId)!.get(handle)!.values()];
+      const edges = Array.from(edgeTree.get(nodeId)?.get(handle)?.values() ?? []);
       for (const edge of edges) {
         const downstreamNode = nodesAtomState[edge.targetNode];
         // if (!pullNonSiblings && nodeState.parent !== downstreamNodeAtom.parent) {
         //   continue;
         // }
         const downstreamNodeCoor = getGlobalLocation(downstreamNode.node);
-        const downstreamNodeRect = { ...downstreamNode.rect };
+        const downstreamNodeRect = downstreamNode.rect;
 
         const x = downstreamNodeCoor.x - nodeRect.width - collideDist.x;
 
@@ -480,10 +488,10 @@ export const startRearrange = (
   }
 
   step(1, fullOpt.iterates_1, nodes, fullOpt, rootCenter, (nodeId, e) => {
-    return arrangeRelax(nodeId, nodes, edgeTree, 1, 1, fullOpt.distance, false);
+    return arrangeRelax(nodeId, nodes, edgeTree, 0.8, 0.5, fullOpt.distance, false);
   });
-  step(1, fullOpt.iterates_2, nodes, fullOpt, rootCenter, (nodeId, e) => {
-    return arrangeRelax(nodeId, nodes, edgeTree, 1, 1, fullOpt.distance, true);
+  step(2, fullOpt.iterates_2, nodes, fullOpt, rootCenter, (nodeId, e) => {
+    return arrangeRelax(nodeId, nodes, edgeTree, 0.8, 0.5, fullOpt.distance, true);
   });
 
   const dist = { x: 0, y: fullOpt.distance };
@@ -495,6 +503,16 @@ export const startRearrange = (
   const _dist = { x: fullOpt.distance, y: fullOpt.distance };
   const zero = { x: 0, y: 0 };
   step(4, fullOpt.iterates_4, nodes, fullOpt, rootCenter, (curr_node, e) =>
-    calcNode(curr_node, nodes, edgeTree, Math.min(1, e * 2), zero, 0.2, 1, _dist, true),
+    calcNode({
+      nodeId: curr_node,
+      nodesAtomState: nodes,
+      edgeTree: edgeTree,
+      influence: Math.min(1, e * 2),
+      slideVector: zero,
+      relaxPower: 0.2,
+      collidePower: 10,
+      collideDist: _dist,
+      pullNonSiblings: true,
+    }),
   );
 };

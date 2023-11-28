@@ -33,6 +33,20 @@ const edges: Record<string, Edge> = {
     target: 'input',
     targetNode: 'id2',
   },
+  id2: {
+    id: 'id2',
+    source: 'output',
+    sourceNode: 'id2',
+    target: 'input',
+    targetNode: 'id3',
+  },
+  33: {
+    id: '33',
+    source: 'output',
+    sourceNode: 'id3',
+    target: 'input',
+    targetNode: 'id1',
+  },
 };
 function noop() {
   return;
@@ -66,21 +80,21 @@ function Overview() {
     }));
   }, []);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setNodeState((prev) => {
-        return {
-          ...prev,
-          ['id233']: {
-            id: 'id233',
-            left: 510,
-            top: 250,
-            type: 'logical',
-          },
-        };
-      });
-    }, 5000);
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setNodeState((prev) => {
+  //       return {
+  //         ...prev,
+  //         ['id233']: {
+  //           id: 'id233',
+  //           left: 510,
+  //           top: 250,
+  //           type: 'logical',
+  //         },
+  //       };
+  //     });
+  //   }, 5000);
+  // }, []);
   const ref = useRef<any>();
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
@@ -91,6 +105,15 @@ function Overview() {
         }}
       >
         focus
+      </button>
+      <button
+        onClick={() => {
+          const nextNodes = ref.current?.rearrangeNodes();
+          console.log(nextNodes);
+          nextNodes && setNodeState(nextNodes);
+        }}
+      >
+        rearrange
       </button>
       <Tail
         ref={ref}
