@@ -4,6 +4,7 @@ import type {
   ItemSelector,
   NodeUpdater,
 } from '@lib/components/ItemParser/itemUpdater';
+import type { NodeArrangeOptions } from '@lib/utils/rearrange';
 import type { Node, NodeAtomState, NodeMouseInterface, NodeRendererProps } from './nodes';
 import type {
   Edge,
@@ -27,7 +28,7 @@ export type CoreMethods = {
   getEdgeTree(): EdgeTree;
   moveViewCenter(x: number, y: number): void;
   getOffSet(): coordinates;
-  rearrageNodes(): Record<string, Node>;
+  rearrangeNodes(opts?: Partial<NodeArrangeOptions>): Record<string, Node>;
 };
 
 export type TailCoreOptionalProps = {

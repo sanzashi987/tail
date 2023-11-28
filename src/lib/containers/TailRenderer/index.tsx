@@ -141,7 +141,7 @@ const Tail = forwardRef<CoreMethods, TailProps>(
         getEdgeTree: () => coreRef.current?.context.edgeUpdater.edgeTree ?? new Map(),
         moveViewCenter: (x, y) => coreRef.current?.viewer.current?.moveCamera(x, y),
         getOffSet: () => coreRef.current?.getOffset() ?? TailCore.offsetFallback,
-        rearrageNodes: () => {
+        rearrangeNodes: (opt) => {
           const {
             edgeTree = new Map(),
             // edgesAtomState = {},
@@ -149,7 +149,7 @@ const Tail = forwardRef<CoreMethods, TailProps>(
           } = coreRef.current?.context.getSnapshot() ?? {};
 
           const next = produce(nodesAtomState, (draft) => {
-            startRearrange(draft, edgeTree);
+            startRearrange(draft, edgeTree, opt);
           });
           return Object.fromEntries(Object.entries(next).map(([k, v]) => [k, v.node]));
         },

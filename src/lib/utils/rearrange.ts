@@ -8,7 +8,7 @@ import type {
   Rect,
 } from '..';
 
-type Options = {
+export type NodeArrangeOptions = {
   brushSize: number;
   distance: number;
   relaxPower: number;
@@ -24,11 +24,39 @@ type Options = {
 
 const MOVE_UNIT = 1;
 
+const getGlobalLocation = (node: Node) => {
+  return { x: node.left, y: node.top };
+};
+
+const shallowCopyAndApplyDelta = <T extends Rect>(rect: T, delta: coordinates) => {
+  const next = { ...rect };
+  next.x += delta.x;
+  next.y += delta.y;
+  return next;
+};
+
+const applyMovement = (nodeId: string, nodesAtomState: NodesAtomState, delta: coordinates) => {
+  const nodeState = nodesAtomState[nodeId];
+  nodeState.rect = shallowCopyAndApplyDelta(nodeState.rect, delta);
+  nodeState.node.left += delta.x;
+  nodeState.node.top += delta.y;
+
+  for (const type in nodeState.handles) {
+    const typeKey = type as keyof NodeAtomState['handles'];
+    for (const handleKey in nodeState.handles[typeKey]) {
+      nodeState.handles[typeKey][handleKey] = shallowCopyAndApplyDelta(
+        nodeState.handles[typeKey][handleKey],
+        delta,
+      );
+    }
+  }
+};
+
 const step = (
   stepNumber: number,
   iterNum: number,
   nodes: NodesAtomState,
-  opt: Options,
+  opt: NodeArrangeOptions,
   center: coordinates,
   cb: (nodeId: string, t: number) => boolean,
 ) => {
@@ -62,10 +90,6 @@ const step = (
       }
     }
   }
-};
-
-const getGlobalLocation = (node: Node) => {
-  return { x: node.left, y: node.top };
 };
 
 const orderedHandleKeys = (handleMap: HandleMap) => {
@@ -179,7 +203,7 @@ const arrangeRelax = (
           nodeState.node.id,
           handle,
           orderedHandleKeys(outputs),
-          nodeRect.y,
+          nodeRect.height,
         ) -
         socketPosition(
           edgeTree,
@@ -200,6 +224,7 @@ const arrangeRelax = (
     } else {
       tarX = (tarXIn + tarXOut) / linkCnt;
     }
+    tarX = isNaN(tarX) ? 0 : tarX;
     tarY /= linkCnt;
     offset.x += (tarX - nodeCoor.x) * relaxPower;
     offset.y += (tarY - nodeCoor.y) * relaxPower;
@@ -213,30 +238,6 @@ const arrangeRelax = (
     return true;
   } else {
     return false;
-  }
-};
-
-const shallowCopyAndApplyDelta = <T extends Rect>(rect: T, delta: coordinates) => {
-  const next = { ...rect };
-  next.x += delta.x;
-  next.y += delta.y;
-  return next;
-};
-
-const applyMovement = (nodeId: string, nodesAtomState: NodesAtomState, delta: coordinates) => {
-  const nodeState = nodesAtomState[nodeId];
-  nodeState.rect = shallowCopyAndApplyDelta(nodeState.rect, delta);
-  nodeState.node.left += delta.x;
-  nodeState.node.top += delta.y;
-
-  for (const type in nodeState.handles) {
-    const typeKey = type as keyof NodeAtomState['handles'];
-    for (const handleKey in nodeState.handles[typeKey]) {
-      nodeState.handles[typeKey][handleKey] = shallowCopyAndApplyDelta(
-        nodeState.handles[typeKey][handleKey],
-        delta,
-      );
-    }
   }
 };
 
@@ -315,6 +316,7 @@ const calcNode = (
     if (linkCnt > 0) {
       let tarX = tarXIn * Number(hasInput) + tarXOut * Number(hasOutput);
       tarX /= Number(hasInput) + Number(hasOutput);
+      tarX = isNaN(tarX) ? 0 : tarX;
       tarY /= linkCnt;
       tarY += nodeRect.height / 2;
       offset.x += (tarX - nodeCoor.x) * relaxPower;
@@ -442,7 +444,7 @@ const calcCollisionY = (
   }
 };
 
-const defaultOption: Options = {
+const defaultOption: NodeArrangeOptions = {
   brushSize: 150,
   distance: 80,
   relaxPower: 0.1,
@@ -459,7 +461,7 @@ const defaultOption: Options = {
 export const startRearrange = (
   nodes: NodesAtomState,
   edgeTree: EdgeTree,
-  opt: Partial<Options> = {},
+  opt: Partial<NodeArrangeOptions> = {},
 ) => {
   if (Object.keys(nodes).length === 0) return;
   const fullOpt = { ...defaultOption, ...opt };
