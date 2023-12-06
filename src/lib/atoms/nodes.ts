@@ -35,8 +35,10 @@ export function createNodeAtom<T extends Record<string, any>>(
 export const DummyNodeAtom: JotaiImmerAtom<NodeAtomState> = atomWithImmer({
   node: {
     id: 'dummy',
-    left: NaN,
-    top: NaN,
+    // left: NaN,
+    left: 0,
+    // top: NaN,
+    top: 0,
     type: '',
   },
   ...createDefaultNodeDescriber(),

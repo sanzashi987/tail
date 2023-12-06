@@ -36,7 +36,7 @@ function calcSourceTargetPoint(
 const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
   const rootInterface = useContext(InstanceInterface)!;
   const { nodeUpdater } = useContext(ParserContext)!;
-  const [edgeState, setEdge] = useAtom(atom);
+  const [edgeState, setEdgeInternal] = useAtom(atom);
   const { edge, selected, reconnect, hovered } = edgeState;
   const { markerEnd, markerStart, source, sourceNode, target, targetNode, type = '' } = edge;
   const { [sourceNode]: sourceAtom, [targetNode]: targetAtom } = nodeUpdater.getAtoms();
@@ -52,10 +52,10 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
     rootInterface.edge.onEdgeClick?.(e, edgeState);
   };
   const onHoverIn = () => {
-    !hovered && setEdge(setHovered);
+    !hovered && setEdgeInternal(setHovered);
   };
   const onHoverOut = () => {
-    hovered && setEdge(setNotHovered);
+    hovered && setEdgeInternal(setNotHovered);
   };
 
   const onContextMenu = (e: React.MouseEvent) => {
