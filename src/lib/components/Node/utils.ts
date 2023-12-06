@@ -38,6 +38,8 @@ export const getHandleBoundsByHandleType = (
     //   y: (bounds.top - parentBounds.top) / k,
     //   ...dimensions,
     // };
+
+    /**Local coordinate, won't change unless the handle layout is updated */
     lastRes[handleId!] = {
       id: handleId!,
       // position: handlePosition,

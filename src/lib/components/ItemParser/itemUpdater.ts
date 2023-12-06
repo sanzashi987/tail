@@ -1,5 +1,5 @@
 import type React from 'react';
-import type { NodeAtomState, Node, Edge, EdgeAtomState, EdgeTree } from '@lib/types';
+import type { NodeAtomState, Node, Edge, EdgeAtomState, EdgeTree, NodeTree } from '@lib/types';
 import type {
   AtomGetter,
   AtomSetter,
@@ -10,7 +10,15 @@ import type {
 import { createNodeAtom } from '@lib/atoms/nodes';
 import { createEdgeAtom } from '@lib/atoms/edges';
 import EventEmitter from 'eventemitter3';
-import { registerChild, removeChild, selectItem, unselectItem } from './helpers';
+import {
+  registerChild,
+  registerNodeChild,
+  removeChild,
+  removeNodeChild,
+  selectItem,
+  unselectItem,
+  updateNodeChild,
+} from './helpers';
 
 export abstract class ItemUpdater<
   PropsState extends { id: string },
@@ -116,11 +124,26 @@ export abstract class ItemUpdater<
 }
 
 export class NodeUpdater extends ItemUpdater<Node, NodeAtomState> {
+  nodeTree: NodeTree = new Map();
+
   createAtom(item: Node) {
     return createNodeAtom(item, this.isActive(item.id));
   }
   createAtomUpdater(item: Node) {
     return (prev: NodeAtomState): NodeAtomState => ({ ...prev, node: item });
+  }
+
+  protected deleteItem(item: Node): void {
+    super.deleteItem(item);
+    removeNodeChild(this.nodeTree, item);
+  }
+  protected mountItem(item: Node): void {
+    super.mountItem(item);
+    registerNodeChild(this.nodeTree, item);
+  }
+  protected updateItem(lastItem: Node, nextItem: Node): void {
+    updateNodeChild(this.nodeTree, lastItem, nextItem);
+    super.updateItem(lastItem, nextItem);
   }
 }
 

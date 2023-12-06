@@ -10,6 +10,7 @@ export type Node<T extends Record<string, any> = {}> = {
   top: number;
   fold?: boolean;
   disable?: boolean;
+  parent?: string;
   type: string;
 } & T;
 export type Nodes = Record<string, Node>;
@@ -58,10 +59,14 @@ export type DraggerCallbacksType = {
   onDragEnd?: (e: MouseEvent, n: Node, c: DraggerData) => boolean | void;
 };
 
-export type NodeAtomRaw<T extends Record<string, any> = {}> = Omit<
+export type NodeAtomRaw<T extends Record<string, any> = {}> = Pick<
   NodeProps<T>,
-  'updateNodeHandles' | 'setContainerStyle'
+  'node' | 'selected' | 'hovered'
 > & {
   handles: HandlesInfo;
   rect: Rect;
+  render?: boolean;
 };
+
+type NodeId = string;
+export type NodeTree = Map<NodeId, Set<NodeId>>;

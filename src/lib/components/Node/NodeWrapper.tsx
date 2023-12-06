@@ -25,7 +25,7 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   const rootInterface = useContext(InstanceInterface)!;
   const [styled, setStyle] = useState<CSSProperties>({});
 
-  const { node, selected, /* selectedHandles, */ hovered } = nodeState;
+  const { node, selected, /* selectedHandles, */ hovered, render = true } = nodeState;
   const { left: x, top: y } = node;
 
   const style = useMemo(() => {
@@ -86,8 +86,10 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
 
   // built-in life cycle
   useEffect(() => {
-    updateNodeHandles();
-  }, []);
+    if (render) {
+      updateNodeHandles();
+    }
+  }, [render]);
 
   const NodeComponent: NodeCom = useMemo(() => {
     return templatePicker(node).reduce<any>((last, val) => {

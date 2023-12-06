@@ -1,4 +1,4 @@
-import type { Edge, EdgeTree, HandleTree } from '@lib/types';
+import type { Edge, EdgeTree, HandleTree, NodeTree, Node } from '@lib/types';
 import type { Draft } from 'immer';
 
 export function removeChild(edgeTree: EdgeTree, edge: Edge) {
@@ -36,6 +36,31 @@ export function selectItem(draft: Draft<any>) {
 }
 export function unselectItem(draft: Draft<any>) {
   draft.selected = false;
+}
+
+function ensureParentSet(tree: NodeTree, parentId: string) {
+  if (tree.get(parentId) === undefined) {
+    tree.set(parentId, new Set());
+  }
+  return tree.get(parentId)!;
+}
+
+export function removeNodeChild(nodeTree: NodeTree, { parent, id }: Node) {
+  if (parent) {
+    nodeTree.get(parent)?.delete(id);
+  }
+}
+
+export function registerNodeChild(nodeTree: NodeTree, { parent, id }: Node) {
+  if (parent) {
+    const node = ensureParentSet(nodeTree, parent);
+    node.add(id);
+  }
+}
+
+export function updateNodeChild(nodeTree: NodeTree, lastNode: Node, nextNode: Node) {
+  removeNodeChild(nodeTree, lastNode);
+  registerNodeChild(nodeTree, nextNode);
 }
 
 // function immutableSelectedHandles(prev: NodeAtomState) {
