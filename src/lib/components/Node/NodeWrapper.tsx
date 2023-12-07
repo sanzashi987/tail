@@ -13,9 +13,9 @@ import { InstanceInterface } from '@lib/contexts/instance';
 import { setHovered, setNotHovered } from '@lib/atoms/reducers';
 import { useAtom } from 'jotai';
 import Dragger from './Dragger';
-import { getNodeInfo } from './utils';
+import { getNodeInfo, useNodePosition } from './utils';
 import styles from './Wrapper.module.scss';
-import { BasicNode } from '.';
+import BasicNode from './BasicNode';
 
 const wrapperClassname = `tail-node__wrapper ${styles.wrapper}`;
 
@@ -25,15 +25,16 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   const rootInterface = useContext(InstanceInterface)!;
   const [styled, setStyle] = useState<CSSProperties>({});
 
-  const { node, selected, /* selectedHandles, */ hovered, render = true } = nodeState;
-  const { left: x, top: y } = node;
+  const { node, selected, /* selectedHandles, */ hovered, hide = true } = nodeState;
+  // const { left: x, top: y } = node;
+  const { x, y, absX, absY } = useNodePosition(nodeState, setNodeInternal);
 
   const style = useMemo(() => {
     return {
       ...styled,
-      transform: `translate(${x}px,${y}px)`,
+      transform: `translate(${absX}px,${absY}px)`,
     } as CSSProperties;
-  }, [x, y, styled]);
+  }, [absX, absY, styled]);
 
   //built-in event callbacks
   const dragStart = useCallback(
@@ -86,10 +87,8 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
 
   // built-in life cycle
   useEffect(() => {
-    if (render) {
-      updateNodeHandles();
-    }
-  }, [render]);
+    if (!hide) updateNodeHandles();
+  }, [hide]);
 
   const NodeComponent: NodeCom = useMemo(() => {
     return templatePicker(node).reduce<any>((last, val) => {
@@ -97,6 +96,8 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
       return BasicNode;
     }, templates);
   }, [templatePicker, node]);
+
+  if (hide) return null;
 
   return (
     <Dragger
@@ -117,14 +118,18 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
         onMouseLeave={onHoverOut}
         onContextMenu={onContextMenu}
       >
-        <NodeComponent
-          node={node}
-          hovered={hovered}
-          selected={selected}
-          // selectedHandles={selectedHandles}
-          updateNodeHandles={updateNodeHandles}
-          setContainerStyle={setStyle}
-        />
+        {useMemo(() => {
+          return (
+            <NodeComponent
+              node={node}
+              hovered={hovered}
+              selected={selected}
+              // selectedHandles={selectedHandles}
+              updateNodeHandles={updateNodeHandles}
+              setContainerStyle={setStyle}
+            />
+          );
+        }, [node, hovered, selected])}
       </div>
     </Dragger>
   );

@@ -44,7 +44,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
   const targetNodeState = useAtomValue(targetAtom ?? DummyNodeAtom);
   const [style, setStyle] = useState<CSSProperties>({});
 
-  const { sourceX, sourceY, targetX, targetY } = useMemo(() => {
+  const sourceTarget = useMemo(() => {
     return calcSourceTargetPoint(sourceNodeState, targetNodeState, source, target);
   }, [sourceNodeState, targetNodeState, source, target]);
 
@@ -63,8 +63,8 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
   };
 
   const notValidEdge = useMemo(() => {
-    return [sourceX, sourceY, targetX, targetY].some(isNotNum);
-  }, [sourceX, sourceY, targetX, targetY]);
+    return Object.values(sourceTarget).some(isNotNum);
+  }, [sourceTarget]);
 
   const [EdgeComponent, ShadowComponent] = useMemo(() => {
     const { default: d, shadow } = templates[type] ?? defaultEdgePair;
@@ -79,10 +79,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
           edge={edge}
           hovered={hovered}
           selected={selected}
-          sourceX={sourceX}
-          sourceY={sourceY}
-          targetX={targetX}
-          targetY={targetY}
+          {...sourceTarget}
           markerEnd={markerEnd}
           markerStart={markerStart}
           setContainerStyle={setStyle}
@@ -95,7 +92,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
         onMouseLeave={onHoverOut}
         onContextMenu={onContextMenu}
       >
-        <ShadowComponent sourceX={sourceX} sourceY={sourceY} targetX={targetX} targetY={targetY} />
+        <ShadowComponent {...sourceTarget} />
       </g>
     </g>
   );

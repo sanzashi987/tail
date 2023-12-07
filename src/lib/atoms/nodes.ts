@@ -9,7 +9,9 @@ export const defaultRect = {
   height: NaN,
 };
 
-const createDefaultNodeDescriber = () => ({
+const createDefaultNodeDescriber = (
+  overrides: Partial<Omit<NodeAtomState, 'node'>> = {},
+): Omit<NodeAtomState, 'node'> => ({
   hovered: false,
   selected: false,
   // selectedHandles: {},
@@ -19,6 +21,8 @@ const createDefaultNodeDescriber = () => ({
   },
   rect: defaultRect,
   forceRender: 0,
+  runtimePosition: { x: NaN, y: NaN },
+  ...overrides,
 });
 
 export function createNodeAtom<T extends Record<string, any>>(
@@ -27,7 +31,7 @@ export function createNodeAtom<T extends Record<string, any>>(
 ) {
   return atomWithImmer<NodeAtomState<T>>({
     node,
-    ...createDefaultNodeDescriber(),
+    ...createDefaultNodeDescriber({ runtimePosition: { x: node.left, y: node.top } }),
     ...describerOverride,
   });
 }
@@ -35,11 +39,19 @@ export function createNodeAtom<T extends Record<string, any>>(
 export const DummyNodeAtom: JotaiImmerAtom<NodeAtomState> = atomWithImmer({
   node: {
     id: 'dummy',
-    // left: NaN,
-    left: 0,
-    // top: NaN,
-    top: 0,
+    left: NaN,
+    top: NaN,
     type: '',
   },
   ...createDefaultNodeDescriber(),
+});
+
+export const ZeroPositionNodeAtom: JotaiImmerAtom<NodeAtomState> = atomWithImmer({
+  node: {
+    id: 'zero-offset',
+    left: NaN,
+    top: NaN,
+    type: '',
+  },
+  ...createDefaultNodeDescriber({ runtimePosition: { x: 0, y: 0 } }),
 });

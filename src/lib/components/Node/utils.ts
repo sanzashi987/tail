@@ -1,6 +1,15 @@
-import React from 'react';
-import type { Node, HandleMap, HandlesInfo, Rect } from '@lib/types';
-import { defaultRect } from '@lib/atoms/nodes';
+import React, { useContext, useEffect } from 'react';
+import type {
+  Node,
+  HandleMap,
+  HandlesInfo,
+  Rect,
+  JotaiSetStateAction,
+  NodeAtomState,
+} from '@lib/types';
+import { defaultRect, ZeroPositionNodeAtom } from '@lib/atoms/nodes';
+import { ParserContext } from '@lib/contexts';
+import { useAtomValue } from 'jotai';
 
 export const getHandleBounds = (nodeElement: HTMLDivElement, scale: number) => {
   const bounds = nodeElement.getBoundingClientRect();
@@ -65,4 +74,34 @@ export const getNodeInfo = (
   const rect = ref.current.getBoundingClientRect();
   [rect.height, rect.width] = [Math.round(rect.height / scale), Math.round(rect.width / scale)];
   return [rect, getHandleBounds(ref.current, scale)];
+};
+
+export const useNodePosition = (
+  nodeState: NodeAtomState,
+  setNodeInternal: JotaiSetStateAction<NodeAtomState>,
+) => {
+  const { node, runtimePosition } = nodeState;
+  const { nodeUpdater } = useContext(ParserContext)!;
+  const { runtimePosition: parentPosition } = useAtomValue(
+    nodeUpdater.getAtoms()[node.parent ?? ''] ?? ZeroPositionNodeAtom,
+  );
+
+  const { left, top } = node;
+
+  useEffect(() => {
+    const runtimeX = left + parentPosition.x;
+    const runtimeY = top + parentPosition.y;
+    if (runtimeX !== runtimePosition.x || runtimeY !== runtimePosition.y) {
+      setNodeInternal((last) => {
+        last.runtimePosition = { x: runtimeX, y: runtimeY };
+      });
+    }
+  }, [left, top, runtimePosition, parentPosition]);
+
+  return {
+    x: left,
+    y: top,
+    absX: runtimePosition.x,
+    absY: runtimePosition.y,
+  };
 };

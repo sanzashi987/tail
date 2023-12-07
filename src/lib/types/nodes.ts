@@ -2,7 +2,7 @@
 import type { ComponentType, CSSProperties } from 'react';
 import type { JotaiImmerAtom, AtomForceRender } from './jotai';
 import type { UpdaterType, HandlesInfo } from './instance';
-import type { DraggerData, Rect } from './dragger';
+import type { coordinates, DraggerData, Rect } from './dragger';
 
 export type Node<T extends Record<string, any> = {}> = {
   id: string;
@@ -65,7 +65,8 @@ export type NodeAtomRaw<T extends Record<string, any> = {}> = Pick<
 > & {
   handles: HandlesInfo;
   rect: Rect;
-  render?: boolean;
+  hide?: boolean;
+  runtimePosition: coordinates;
 };
 
 type NodeId = string;
