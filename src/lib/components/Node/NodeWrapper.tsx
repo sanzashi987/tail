@@ -12,8 +12,9 @@ import type { NodeWrapperProps, NodeCom, DraggerData } from '@lib/types';
 import { InstanceInterface } from '@lib/contexts/instance';
 import { setHovered, setNotHovered } from '@lib/atoms/reducers';
 import { useAtom } from 'jotai';
+import useNodePosition from '@lib/hooks/useNodePosition';
 import Dragger from './Dragger';
-import { getNodeInfo, useNodePosition } from './utils';
+import { getNodeInfo } from './utils';
 import styles from './Wrapper.module.scss';
 import BasicNode from './BasicNode';
 
