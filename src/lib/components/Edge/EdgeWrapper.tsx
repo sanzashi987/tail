@@ -16,11 +16,13 @@ function calcSourceTargetPoint(
 ) {
   const {
     handles: { source: sourceHandles },
-    node: { left: sourceLeft, top: sourceTop },
+    // node: { left: sourceLeft, top: sourceTop },
+    runtimePosition: { x: sourceLeft, y: sourceTop },
   } = sourceNodeState;
   const {
     handles: { target: targetHandles },
-    node: { left: targetLeft, top: targetTop },
+    // node: { left: targetLeft, top: targetTop },
+    runtimePosition: { x: targetLeft, y: targetTop },
   } = targetNodeState;
   const { x: sourceX, y: sourceY } = sourceHandles[source] ?? emptyHandle;
   const { x: targetX, y: targetY } = targetHandles[target] ?? emptyHandle;
