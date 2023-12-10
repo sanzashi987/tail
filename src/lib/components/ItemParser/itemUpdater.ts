@@ -145,6 +145,10 @@ export class NodeUpdater extends ItemUpdater<Node, NodeAtomState> {
     updateNodeChild(this.nodeTree, lastItem, nextItem);
     super.updateItem(lastItem, nextItem);
   }
+
+  getNodeTree = () => {
+    return this.nodeTree;
+  };
 }
 
 export class EdgeUpdater extends ItemUpdater<Edge, EdgeAtomState> {

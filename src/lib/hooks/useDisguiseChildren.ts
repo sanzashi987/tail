@@ -14,7 +14,7 @@ const useDisguiseChildren = (nodeState: NodeAtomState) => {
     const handleMap = { source: {}, target: {} };
     children?.forEach((nodeId) => {
       edgeTree.get(nodeId)?.forEach((handleId, key, map) => {
-        handleId.
+        handleId;
       });
     });
   }, []);

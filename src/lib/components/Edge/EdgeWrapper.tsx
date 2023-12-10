@@ -50,6 +50,7 @@ const EdgeWrapper: FC<EdgeWrapperProps> = ({ atom, templates }) => {
     return calcSourceTargetPoint(sourceNodeState, targetNodeState, source, target);
   }, [sourceNodeState, targetNodeState, source, target]);
 
+  // console.log(sourceTarget);
   const onClick = (e: React.MouseEvent) => {
     rootInterface.edge.onEdgeClick?.(e, edgeState);
   };

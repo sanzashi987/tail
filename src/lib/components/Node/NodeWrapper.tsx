@@ -26,9 +26,10 @@ const NodeWrapper: FC<NodeWrapperProps> = ({ atom, templatePicker, templates }) 
   const rootInterface = useContext(InstanceInterface)!;
   const [styled, setStyle] = useState<CSSProperties>({});
 
-  const { node, selected, /* selectedHandles, */ hovered, hide = true } = nodeState;
+  const { node, selected, /* selectedHandles, */ hovered, hide = false } = nodeState;
   // const { left: x, top: y } = node;
   const { x, y, absX, absY } = useNodePosition(nodeState, setNodeInternal);
+  // console.log(x, y, absX, absY);
 
   const style = useMemo(() => {
     return {
