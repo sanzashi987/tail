@@ -20,7 +20,7 @@ import NodeRenderer from '../NodeRenderer';
 import EdgeRenderer from '../EdgeRenderer';
 import InfiniteViewer from '../InfiniteViewer';
 import MarkerDefs from '../MarkerDefs';
-import '@lib/styles/index.scss';
+import '../../styles/index.scss';
 
 class TailCore extends Component<TailCoreProps> {
   static offsetFallback = { x: 0, y: 0 };
