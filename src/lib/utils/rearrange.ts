@@ -452,7 +452,16 @@ const calcCollisionY = (
   }
 };
 
-const defaultOption: NodeArrangeOptions = {
+type AffiliateOptions = {
+  influence_1: number;
+  relaxPower_1: number;
+  influence_2: number;
+  relaxPower_2: number;
+  influence_3: number;
+  relaxPower_3: number;
+};
+
+const defaultOption: NodeArrangeOptions & AffiliateOptions = {
   brushSize: 150,
   distance: 80,
   relaxPower: 0.1,
@@ -464,12 +473,18 @@ const defaultOption: NodeArrangeOptions = {
   iterates_2: 200,
   iterates_3: 200,
   iterates_4: 200,
+  influence_1: 0.8,
+  relaxPower_1: 0.5,
+  influence_2: 0.8,
+  relaxPower_2: 0.5,
+  influence_3: 0.8,
+  relaxPower_3: 0.5,
 };
 
 export const startRearrange = (
   nodes: NodesAtomState,
   edgeTree: EdgeTree,
-  opt: Partial<NodeArrangeOptions> = {},
+  opt: Partial<NodeArrangeOptions & AffiliateOptions> = {},
 ) => {
   if (Object.keys(nodes).length === 0) return;
   const fullOpt = { ...defaultOption, ...opt };
@@ -488,10 +503,26 @@ export const startRearrange = (
   }
 
   step(1, fullOpt.iterates_1, nodes, fullOpt, rootCenter, (nodeId, e) => {
-    return arrangeRelax(nodeId, nodes, edgeTree, 0.8, 0.5, fullOpt.distance, false);
+    return arrangeRelax(
+      nodeId,
+      nodes,
+      edgeTree,
+      fullOpt.influence_1,
+      fullOpt.relaxPower_1,
+      fullOpt.distance,
+      false,
+    );
   });
   step(2, fullOpt.iterates_2, nodes, fullOpt, rootCenter, (nodeId, e) => {
-    return arrangeRelax(nodeId, nodes, edgeTree, 0.8, 0.5, fullOpt.distance, true);
+    return arrangeRelax(
+      nodeId,
+      nodes,
+      edgeTree,
+      fullOpt.influence_2,
+      fullOpt.relaxPower_2,
+      fullOpt.distance,
+      true,
+    );
   });
 
   const dist = { x: 0, y: fullOpt.distance };
@@ -509,8 +540,8 @@ export const startRearrange = (
       edgeTree: edgeTree,
       influence: Math.min(1, e * 2),
       slideVector: zero,
-      relaxPower: 0.2,
-      collidePower: 10,
+      relaxPower: fullOpt.influence_3,
+      collidePower: fullOpt.relaxPower_3,
       collideDist: _dist,
       pullNonSiblings: true,
     }),
