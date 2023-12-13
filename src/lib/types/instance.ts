@@ -4,7 +4,6 @@ import type {
   ItemSelector,
   NodeUpdater,
 } from '@lib/components/ItemParser/itemUpdater';
-import type { NodeArrangeOptions } from '@lib/utils/rearrange';
 import type { Node, NodeAtomState, NodeMouseInterface, NodeRendererProps } from './nodes';
 import type {
   Edge,
@@ -20,6 +19,7 @@ import type {
 import type { ViewerInterface, SelectModeType } from './viewer';
 import type { DescriberType, HandleElement, HandleType } from './handles';
 import type { coordinates } from './dragger';
+import { NodeArrangeOptions } from './rearrange';
 
 export type CoreMethods = {
   switchMode(m: SelectModeType): void;

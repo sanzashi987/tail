@@ -6,3 +6,4 @@ export * from './instance';
 export * from './viewer';
 export * from './minimap';
 export * from './jotai';
+export * from './rearrange';

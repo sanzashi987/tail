@@ -3,24 +3,12 @@ import type {
   EdgeTree,
   HandleMap,
   Node,
+  NodeArrangeOptions,
   NodeAtomState,
   NodesAtomState,
   Rect,
-} from '..';
-
-export type NodeArrangeOptions = {
-  brushSize: number;
-  distance: number;
-  relaxPower: number;
-  slidePower: number;
-  collisionPower: number;
-  adpativeIter: boolean;
-  onlySelected: boolean;
-  iterates_1: number;
-  iterates_2: number;
-  iterates_3: number;
-  iterates_4: number;
-};
+  TailArrangeOptions,
+} from '../types';
 
 const MOVE_UNIT = 1;
 
@@ -452,16 +440,7 @@ const calcCollisionY = (
   }
 };
 
-type AffiliateOptions = {
-  influence_1: number;
-  relaxPower_1: number;
-  influence_2: number;
-  relaxPower_2: number;
-  influence_3: number;
-  relaxPower_3: number;
-};
-
-const defaultOption: NodeArrangeOptions & AffiliateOptions = {
+const defaultOption: TailArrangeOptions = {
   brushSize: 150,
   distance: 80,
   relaxPower: 0.1,
@@ -484,7 +463,7 @@ const defaultOption: NodeArrangeOptions & AffiliateOptions = {
 export const startRearrange = (
   nodes: NodesAtomState,
   edgeTree: EdgeTree,
-  opt: Partial<NodeArrangeOptions & AffiliateOptions> = {},
+  opt: Partial<TailArrangeOptions> = {},
 ) => {
   if (Object.keys(nodes).length === 0) return;
   const fullOpt = { ...defaultOption, ...opt };
