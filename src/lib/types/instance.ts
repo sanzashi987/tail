@@ -19,7 +19,7 @@ import type {
 import type { ViewerInterface, SelectModeType } from './viewer';
 import type { DescriberType, HandleElement, HandleType } from './handles';
 import type { coordinates } from './dragger';
-import { NodeArrangeOptions } from './rearrange';
+import type { NodeArrangeOptions } from './rearrange';
 
 export type CoreMethods = {
   switchMode(m: SelectModeType): void;
