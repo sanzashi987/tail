@@ -1,3 +1,4 @@
+import produce from 'immer';
 import type {
   coordinates,
   EdgeTree,
@@ -456,73 +457,82 @@ const defaultOption: TailArrangeOptions = {
   relaxPower_1: 1,
   influence_2: 1,
   relaxPower_2: 1,
-  influence_4: 0.2,
-  relaxPower_4: 1,
+  influence_4: 1,
+  relaxPower_4: 12,
 };
 
 export const startRearrange = (
-  nodes: NodesAtomState,
+  rawNodes: NodesAtomState,
   edgeTree: EdgeTree,
   opt: Partial<TailArrangeOptions> = {},
 ) => {
-  if (Object.keys(nodes).length === 0) return;
+  if (Object.keys(rawNodes).length === 0) return {};
   const fullOpt = { ...defaultOption, ...opt };
   const rootCenter = { x: 0, y: 0 };
 
-  let nodeCount = 0;
-  if (!fullOpt.onlySelected) {
-    for (const nodeId in nodes) {
-      const node = getGlobalLocation(nodes[nodeId].node);
-      rootCenter.x += node.x;
-      rootCenter.y += node.y;
-      nodeCount++;
-    }
-    rootCenter.x /= nodeCount;
-    rootCenter.y /= nodeCount;
+  let cb = (e: [string, NodeAtomState<any>]) => edgeTree.has(e[0]);
+  if (fullOpt.onlySelected) {
+    cb = (e: [string, NodeAtomState<any>]) => edgeTree.has(e[0]) && e[1].selected;
   }
 
-  step(1, fullOpt.iterates_1, nodes, fullOpt, rootCenter, (nodeId, e) => {
-    return arrangeRelax(
-      nodeId,
-      nodes,
-      edgeTree,
-      fullOpt.influence_1,
-      fullOpt.relaxPower_1,
-      fullOpt.distance,
-      false,
+  const nodesFiltered: NodesAtomState = Object.fromEntries(Object.entries(rawNodes).filter(cb));
+  fullOpt.onlySelected = false;
+  return produce(nodesFiltered, (nodes) => {
+    let nodeCount = 0;
+    if (!fullOpt.onlySelected) {
+      for (const nodeId in nodes) {
+        const node = getGlobalLocation(nodes[nodeId].node);
+        rootCenter.x += node.x;
+        rootCenter.y += node.y;
+        nodeCount++;
+      }
+      rootCenter.x /= nodeCount;
+      rootCenter.y /= nodeCount;
+    }
+
+    step(1, fullOpt.iterates_1, nodes, fullOpt, rootCenter, (nodeId, e) => {
+      return arrangeRelax(
+        nodeId,
+        nodes,
+        edgeTree,
+        fullOpt.influence_1,
+        fullOpt.relaxPower_1,
+        fullOpt.distance,
+        false,
+      );
+    });
+    step(2, fullOpt.iterates_2, nodes, fullOpt, rootCenter, (nodeId, e) => {
+      return arrangeRelax(
+        nodeId,
+        nodes,
+        edgeTree,
+        fullOpt.influence_2,
+        fullOpt.relaxPower_2,
+        fullOpt.distance,
+        true,
+      );
+    });
+
+    const dist = { x: 0, y: fullOpt.distance };
+
+    step(3, fullOpt.iterates_3, nodes, fullOpt, rootCenter, (curr_node, e) =>
+      calcCollisionY(curr_node, nodes, e, dist),
+    );
+
+    const _dist = { x: fullOpt.distance, y: fullOpt.distance };
+    const zero = { x: 0, y: 0 };
+    step(4, fullOpt.iterates_4, nodes, fullOpt, rootCenter, (curr_node, e) =>
+      calcNode({
+        nodeId: curr_node,
+        nodesAtomState: nodes,
+        edgeTree: edgeTree,
+        influence: Math.min(1, e * 2),
+        slideVector: zero,
+        relaxPower: fullOpt.influence_4,
+        collidePower: fullOpt.relaxPower_4,
+        collideDist: _dist,
+        pullNonSiblings: true,
+      }),
     );
   });
-  step(2, fullOpt.iterates_2, nodes, fullOpt, rootCenter, (nodeId, e) => {
-    return arrangeRelax(
-      nodeId,
-      nodes,
-      edgeTree,
-      fullOpt.influence_2,
-      fullOpt.relaxPower_2,
-      fullOpt.distance,
-      true,
-    );
-  });
-
-  const dist = { x: 0, y: fullOpt.distance };
-
-  step(3, fullOpt.iterates_3, nodes, fullOpt, rootCenter, (curr_node, e) =>
-    calcCollisionY(curr_node, nodes, e, dist),
-  );
-
-  const _dist = { x: fullOpt.distance, y: fullOpt.distance };
-  const zero = { x: 0, y: 0 };
-  step(4, fullOpt.iterates_4, nodes, fullOpt, rootCenter, (curr_node, e) =>
-    calcNode({
-      nodeId: curr_node,
-      nodesAtomState: nodes,
-      edgeTree: edgeTree,
-      influence: Math.min(1, e * 2),
-      slideVector: zero,
-      relaxPower: fullOpt.influence_4,
-      collidePower: fullOpt.relaxPower_4,
-      collideDist: _dist,
-      pullNonSiblings: true,
-    }),
-  );
 };
