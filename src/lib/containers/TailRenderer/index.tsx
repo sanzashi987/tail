@@ -148,10 +148,10 @@ const Tail = forwardRef<CoreMethods, TailProps>(
             nodesAtomState = {},
           } = coreRef.current?.context.getSnapshot() ?? {};
 
-          console.log(nodesAtomState);
-          const next = produce(nodesAtomState, (draft) => {
-            startRearrange(draft, edgeTree, opt);
-          });
+          // console.log(nodesAtomState);
+          // const next = produce(nodesAtomState, (draft) => {
+          const next = startRearrange(nodesAtomState, edgeTree, opt);
+
           return Object.fromEntries(Object.entries(next).map(([k, v]) => [k, v.node]));
         },
       }),
