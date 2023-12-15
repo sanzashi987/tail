@@ -466,7 +466,6 @@ export const startRearrange = (
   edgeTree: EdgeTree,
   opt: Partial<TailArrangeOptions> = {},
 ) => {
-  if (Object.keys(rawNodes).length === 0) return {};
   const fullOpt = { ...defaultOption, ...opt };
   const rootCenter = { x: 0, y: 0 };
 
@@ -476,6 +475,8 @@ export const startRearrange = (
   }
 
   const nodesFiltered: NodesAtomState = Object.fromEntries(Object.entries(rawNodes).filter(cb));
+  if (Object.keys(nodesFiltered).length === 0) return {};
+
   fullOpt.onlySelected = false;
   return produce(nodesFiltered, (nodes) => {
     let nodeCount = 0;
